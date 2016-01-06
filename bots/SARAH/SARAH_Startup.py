@@ -9,9 +9,9 @@ from java.lang import String
 # SARAH is an AIML based MRL powered implementation 
 ######################################################################
  
-aimlDir = "XXXXXXXXXXXXX"
+aimlDir = "/home/Desktop/MRL/github/AIML/bots"
 userName = "Nolan"
-botName = "SARAH"
+botName = "sarah"
  
 
 ######################################################################
@@ -24,7 +24,7 @@ def heard(data):
 ######################################################################
 # Create ProgramAB chat bot
 ######################################################################
-SARAH = Runtime.createAndStart("SARAH", "ProgramAB")
+sarah = Runtime.createAndStart("sarah", "ProgramAB")
 # start the session for the chat bot
 SARAH.startSession(aimlDir, userName, botName)
 
@@ -54,7 +54,7 @@ mouth = Runtime.createAndStart("mouth", "MarySpeech")
 # MRL Routing   webgui (speech recognition) -> program ab -> htmlfilter -> inmoov
 ######################################################################
 # Add route from Program AB to html filter
-SARAH.addTextListener(htmlfilter)
+sarah.addTextListener(htmlfilter)
 # Add route from html filter to mouth
 htmlfilter.addTextListener(mouth)
  
