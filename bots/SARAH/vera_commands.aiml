@@ -1,6 +1,6 @@
-#http://myipaddress:49451/data_request?id=lu_action&output_format=xml&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&action=RunScene&SceneNum=11
-#
-# example of sending an HTTP command to VERA LITE iniated by AIML
+<!-- http://myipaddress:49451/data_request?id=lu_action&output_format=xml&serviceId=urn:micasaverde-com:serviceId:HomeAutomationGateway1&action=RunScene&SceneNum=11 -->
+<!-- additional command syntax found at wiki http://wiki.micasaverde.com/index.php/Luup_Requests#action -->
+<!-- example of sending an HTTP command to VERA LITE iniated by AIML -->
 
   <category>
     <pattern>LIGHTS ON</pattern>
