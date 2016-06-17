@@ -24,7 +24,7 @@ on peut lui répondre soit :
 <pattern>BONJOUR #</pattern>
 <template> 
 <condition name="name"> 
-<li value="default">Bonjour, je souhaiterais faire connaissance, puis-je avoir ton prénom ?</li>
+<li value="default">Salut ! je souhaiterais faire connaissance, puis-je avoir ton prénom ?</li>
 <li> Bonjour <get name="name" /></li> 
 </condition> 
 </template> 
