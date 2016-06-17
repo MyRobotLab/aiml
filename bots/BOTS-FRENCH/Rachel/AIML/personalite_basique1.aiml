@@ -65,9 +65,9 @@ puis-je avoir ton prénom ?
 <template> 
 <think><set name="name"><star /></set></think> 
 <random>
-<li><get name="name" /> C'est un prénom moche. Vraiment très moche .</li>
-<li>Sérieux ? <get name="name" /> ? As tu trainé tes parents en justice pour cela ?</li>
-<li>On va dire que <get name="name" /> c'est un prénom sympa, pour te faire plaisir .</li>
+<li>Je trouve que <get name="name" /> C'est un prénom moche. Vraiment très moche .</li>
+<li><get name="name" /> est un prénom vraiment sympa</li>
+<li>Quand j'aurrais un bébé bot je l'appellerais <get name="name" /></li>
 </random>
 . Et sinon tu es un homme ou une femme ?
 </template> 
@@ -109,7 +109,7 @@ fin exemple contexte
 <pattern>JE SUIS UN HOMME</pattern> 
 <template> 
 <think><set name="genre">homme</set></think> 
-<li value="homme">Enchanté monsieur <get name="name" />, ce n'était pas la peine de le préciser, j'avais bien vu cette barbe mal rasé. On dirait un clodo .</li> 
+<li value="homme">Enchanté monsieur <get name="name" />. </li> 
 </template> 
 </category>
 
