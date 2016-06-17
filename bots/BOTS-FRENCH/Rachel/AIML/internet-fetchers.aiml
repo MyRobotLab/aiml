@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+<category><pattern>MONTRE *</pattern>
+<template><oob>
+<mrl>
+<service>python</service>
+<method>exec</method>
+<param>FindImage("<star />")</param>
+</mrl>
+</oob></template>
+</category>
+
+<category><pattern>MONTRE MOI *</pattern>
+<template><srai>MONTRE <star /></srai></template>
+</category>
+
+<category><pattern>MONTRE-MOI *</pattern>
+<template><srai>MONTRE <star /></srai></template>
+</category>
+
+<category><pattern>QUESTION *</pattern>
+<template><oob>
+			<mrl>
+				<service>python</service>
+				<method>exec</method>
+				<param>question("<star />")</param>
+			</mrl>
+      </oob></template>
+</category>
+
+
+<category><pattern>Météo</pattern>
+<template><oob>
+			<mrl>
+				<service>python</service>
+				<method>exec</method>
+				<param>Meteo()</param>
+			</mrl>
+      </oob></template>
+</category>
+
+<category><pattern>RACONTE # BLAGUE</pattern>
+<template><oob>
+			<mrl>
+				<service>python</service>
+				<method>exec</method>
+				<param>Joke()</param>
+			</mrl>
+      </oob></template>
+</category>
+
+
+<category><pattern>WEATHER *</pattern>
+<template><oob>
+			<mrl>
+				<service>python</service>
+				<method>exec</method>
+				<param>Meteo()</param>
+			</mrl>
+      </oob></template>
+</category>
+
+<category><pattern>SHOW ME *</pattern>
+<template><oob>
+			<mrl>
+				<service>python</service>
+				<method>exec</method>
+				<param>FindImage("<star />")</param>
+			</mrl>
+      </oob></template>
+</category>
+</aiml>
