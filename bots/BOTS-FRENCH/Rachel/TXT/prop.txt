@@ -1146,7 +1146,7 @@ domaine:P1568
 ensemble d'arrivée:P1571
 exemplaire de:P1574
 style de vie:P1576
-produit par le taxon:P1582
+l'arbre qui produit:P1582
 point le plus bas:P1589
 défendeur:P1591
 procureur:P1592
@@ -1173,7 +1173,7 @@ configuration d'aile:P1654
 dévoilé par:P1656
 mpaa film rating:P1657
 has index case:P1660
-ce taxon produit:P1672
+fruit:P1672
 index case of:P1677
 has vertex figure:P1678
 récompense pour:P1686
