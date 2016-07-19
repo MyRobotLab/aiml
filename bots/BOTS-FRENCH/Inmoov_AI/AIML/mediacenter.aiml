@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+
+<category><pattern>lis-moi *</pattern>
+<template><think>
+            <set name="PlayUtub"><star/></set>
+         </think>
+	<oob>
+					<mrl>
+				   <service>python</service>
+				   <method>exec</method>
+				   <param>PlayUtub("<star/>",0)</param>
+				 </mrl>
+			</oob>
+</template>
+</category> 
+
+  
+<category><pattern>Numéro *</pattern>
+<template>
+	<oob>
+					<mrl>
+				   <service>python</service>
+				   <method>exec</method>
+				   <param>PlayUtub("<get name="PlayUtub"/>",<star/>)</param>
+				 </mrl>
+			</oob>
+</template>
+</category>   
+
+</aiml>
+
