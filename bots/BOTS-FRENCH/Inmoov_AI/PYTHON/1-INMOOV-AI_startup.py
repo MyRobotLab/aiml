@@ -55,6 +55,9 @@ import socket
 import os
 import shutil
 import hashlib
+import subprocess
+
+from subprocess import Popen, PIPE
 
 global Ispeak
 Ispeak=1
@@ -694,8 +697,13 @@ def PhotoProcess(messagePhoto):
 	
 
 def PlayUtub(q,num):
-	webgui.startBrowser("http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8'))
-	print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
+	if q=="stop" and num==0:
+		subprocess.Popen("taskkill /F /T /PID %i"%proc1.pid , shell=True)
+		sleep(2)
+		webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
+	else:
+		webgui.startBrowser("http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8'))
+		print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
 	
 # ##########################################################	
 # program start :
@@ -719,6 +727,7 @@ sleep(5)
 
 i01.startEar()
 ear = i01.ear
+proc1 = subprocess.Popen("%userprofile%\AppData\Local\Chromium\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
 Light(1,1,1)
 if lang=="FR":
@@ -737,4 +746,5 @@ sleep(0.5)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
 Light(1,1,1)
 NeoPixelF(1)
+
 
