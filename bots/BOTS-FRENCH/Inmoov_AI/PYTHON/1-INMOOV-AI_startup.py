@@ -61,6 +61,8 @@ from subprocess import Popen, PIPE
 
 global Ispeak
 Ispeak=1
+global MoveHeadRandom
+MoveHeadRandom=1
 
 
 oridir=os.getcwd().replace("\\", "/")
@@ -143,12 +145,14 @@ if IsInmoovLeft==1:
 	left.connect(leftPort)
 	sleep(1)
 	i01.startLeftHand(leftPort,"")
-	i01.startHead(leftPort,BoardType)
+	head = Runtime.create("i01.head","InMoovHead")
 	if MRLmouthControl==1:
+		head.jaw.setMinMax(JawMIN,JawMAX)
+		head.jaw.map(0,180,JawMIN,JawMAX)
+		head.jaw.setRest(JawMIN)
 		i01.startMouthControl(leftPort)
-		i01.head.jaw.setMinMax(JawMIN,JawMAX)
 		i01.mouthControl.setmouth(JawMIN,JawMAX)
-		i01.head.jaw.setRest(JawMIN)
+	i01.startHead(leftPort,BoardType)
 	i01.startLeftArm(leftPort)
 	torso = i01.startTorso(leftPort)
 	i01.setHeadSpeed(0.5, 0.5)
@@ -242,9 +246,11 @@ def NeoPixelF(valNeo):
 NeoPixelF(3)
 
 def No(data):
+	global MoveHeadRandom
+	MoveHeadRandom=0
 	if IsInmoovLeft==1:
 		#i01.attach()
-		i01.setHeadSpeed(1, 1)
+		i01.setHeadSpeed(0.5, 0.5)
 		i01.moveHead(80,90,0,80,40)
 		sleep(2)
 		i01.moveHead(80,90,180,80,40)
@@ -267,6 +273,7 @@ def No(data):
 		i01.moveHead(80,90,90,78,40)
 	if IsInmoovLeft==1:
 		i01.head.jaw.rest()
+	MoveHeadRandom=1
 		#i01.detach()
 		
 def talk(data):
