@@ -274,6 +274,7 @@ def No(data):
 	if IsInmoovLeft==1:
 		i01.head.jaw.rest()
 	MoveHeadRandom=1
+	sleep(1)
 		#i01.detach()
 		
 def talk(data):
@@ -323,7 +324,8 @@ def onEndSpeaking(text):
 			pass
 
 def onStartSpeaking(text):
-	MoveHeadTimer.startClock()
+	if MoveHeadRandom==1:
+		MoveHeadTimer.startClock()
 	global Ispeak
 	Ispeak=1
 	try:
