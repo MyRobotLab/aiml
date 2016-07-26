@@ -273,8 +273,8 @@ def No(data):
 		i01.moveHead(80,90,90,78,40)
 	if IsInmoovLeft==1:
 		i01.head.jaw.rest()
-	MoveHeadRandom=1
 	sleep(1)
+	MoveHeadRandom=1
 		#i01.detach()
 		
 def talk(data):
