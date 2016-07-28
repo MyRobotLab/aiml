@@ -152,16 +152,15 @@ if IsInmoovLeft==1:
 		head.jaw.setRest(JawMIN)
 		i01.startMouthControl(leftPort)
 		i01.mouthControl.setmouth(JawMIN,JawMAX)
+	i01.setHeadSpeed(0.5, 0.5)
 	i01.startHead(leftPort,BoardType)
 	i01.startLeftArm(leftPort)
 	torso = i01.startTorso(leftPort)
-	i01.setHeadSpeed(0.5, 0.5)
 	i01.head.neck.setMinMax(0,180)
 	i01.head.neck.map(0,180,MinNeck,MaxNeck)
 	i01.head.rothead.setMinMax(0,180)
 	i01.head.rothead.map(0,180,MinRotHead,MaxRotHead)
 	i01.moveHead(80,86,40,78,76)
-	i01.setHeadSpeed(1, 1)
 	i01.head.eyeX.setMinMax(0,180)
 	i01.head.eyeY.setMinMax(0,180)
 	i01.head.eyeX.setRest(90)
@@ -246,37 +245,8 @@ def NeoPixelF(valNeo):
 NeoPixelF(3)
 
 def No(data):
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	if IsInmoovLeft==1:
-		#i01.attach()
-		i01.setHeadSpeed(0.5, 0.5)
-		i01.moveHead(80,90,0,80,40)
-		sleep(2)
-		i01.moveHead(80,90,180,80,40)
-		sleep(1)
-		i01.moveHead(80,90,90,80,40)
-		sleep(0.5)
-	#Light(0,1,1)
-	if IsInmoovLeft==1:
-		i01.moveHead(81,50,90,78,40)
-		sleep(0.5)
-		i01.moveHead(79,120,90,78,40)
 	chatBot.getResponse("IDONTUNDERSTAND")
-	if IsInmoovLeft==1:
-		i01.moveHead(80,50,90,78,40)
-		sleep(0.5)
-		i01.moveHead(83,120,90,78,40)
-	sleep(0.5)
-	#Light(1,1,1)
-	if IsInmoovLeft==1:
-		i01.moveHead(80,90,90,78,40)
-	if IsInmoovLeft==1:
-		i01.head.jaw.rest()
-	sleep(1)
-	MoveHeadRandom=1
-		#i01.detach()
-		
+			
 def talk(data):
 	sleep(0.1)
 	#VieAleatoire.stopClock()
@@ -322,6 +292,8 @@ def onEndSpeaking(text):
 			ear.startListening()
 		except: 
 			pass
+	if IsInmoovLeft==1:
+		i01.moveHead(90,90,90,90,90)
 
 def onStartSpeaking(text):
 	if MoveHeadRandom==1:
@@ -466,19 +438,12 @@ def FindImage(image):
 	print BotURL+"&type=pic&pic="+urllib2.quote(image).replace(" ", "%20")
 	#Light(1,1,1)
 			
-def Joke():
-	MoveHead()
-	a = Parse(BotURL+"&type=joke&genre="+JokeType).replace(" : ", random.choice(troat))
-	mouth.speakBlocking(a+' '+random.choice(laugh))
-	
-
 	
 def Yes(data):
 	i01.attach()
 	i01.moveHead(80,90,90,180,40)
 	sleep(1)
 	#Light(1,0,1)
-	i01.setHeadSpeed(1, 1)
 	i01.moveHead(120,88,90,78,40)
 	sleep(0.4)
 	i01.moveHead(40,92,90,78,40)
@@ -569,7 +534,7 @@ def Meteo(data):
 	a = Parse(BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20"))
 	print BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20")
 	mouth.speakBlocking(a)
-	MoveHead()
+	
 
 def question(data):
 	chatBot.getResponse("FINDTHEWEB")
@@ -618,7 +583,7 @@ def rest():
 	if IsInmoovLeft==1:
 		i01.setHandSpeed("left", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 		i01.setArmSpeed("left", 1.0, 1.0, 1.0, 1.0)
-		i01.setHeadSpeed(1.0, 1.0)
+		i01.setHeadSpeed(0.8, 0.8)
 		i01.setTorsoSpeed(1.0, 1.0, 1.0)
 		i01.moveHead(80,86,82,78,76)
 		i01.moveArm("left",5,90,0,10)
