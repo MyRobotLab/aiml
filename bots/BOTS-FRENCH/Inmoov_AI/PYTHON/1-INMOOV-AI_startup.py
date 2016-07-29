@@ -149,9 +149,9 @@ if IsInmoovLeft==1:
 	if MRLmouthControl==1:
 		head.jaw.setMinMax(JawMIN,JawMAX)
 		head.jaw.map(0,180,JawMIN,JawMAX)
-		head.jaw.setRest(JawMIN)
+		head.jaw.setRest(0)
 		i01.startMouthControl(leftPort)
-		i01.mouthControl.setmouth(JawMIN,JawMAX)
+		i01.mouthControl.setmouth(0,180)
 	i01.setHeadSpeed(0.5, 0.5)
 	i01.startHead(leftPort,BoardType)
 	i01.startLeftArm(leftPort)
@@ -354,6 +354,14 @@ def onEndSpeaking(text):
 
 def onStartSpeaking(text):
 	global MoveHeadRandom
+	if 'non' in text or 'no' in text:
+		No('no')
+		MoveHeadRandom=0
+		print("no detected")
+	if 'oui' in text or 'yes' in text:
+		Yes('yes')
+		print("yes detected")
+		MoveHeadRandom=0
 	if MoveHeadRandom==1:
 		MoveHeadTimer.startClock()
 	global Ispeak
@@ -373,13 +381,6 @@ def onText(text):
 	ear.stopListening()	
 	print text.replace("'", " ")
 	chatBot.getResponse(text.replace("'", " "))
-	if 'non' in text or 'no' in text:
-		No('no')
-	if 'oui' in text or 'yes' in text:
-		Yes('yes')
-	
-
-
 	
 
 	
