@@ -189,6 +189,11 @@
 	</random></template>
 </category>
 
+<category><pattern># tu aime #</pattern>
+<template><srai># tu aimes #</srai></template>
+</category>
+
+
 <category><pattern># aimes-tu #</pattern>
 <template><srai># tu aimes #</srai></template>
 </category>

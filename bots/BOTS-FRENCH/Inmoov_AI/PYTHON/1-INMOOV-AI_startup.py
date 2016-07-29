@@ -245,7 +245,61 @@ def NeoPixelF(valNeo):
 NeoPixelF(3)
 
 def No(data):
-	chatBot.getResponse("IDONTUNDERSTAND")
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	if IsInmoovLeft==1:
+		#i01.attach()
+		i01.setHeadSpeed(0.9, 0.9)
+		i01.moveHead(80,130)
+		sleep(0.5)
+		i01.moveHead(80,90)
+		sleep(0.5)
+		i01.moveHead(80,50)
+		sleep(0.5)
+	#Light(0,1,1)
+	if IsInmoovLeft==1:
+		i01.moveHead(81,90)
+		sleep(0.5)
+		i01.moveHead(79,130)
+	if IsInmoovLeft==1:
+		i01.moveHead(80,90)
+		sleep(0.5)
+		i01.moveHead(83,50)
+	sleep(0.5)
+	#Light(1,1,1)
+	if IsInmoovLeft==1:
+		i01.moveHead(80,90)
+	if IsInmoovLeft==1:
+		i01.head.jaw.rest()
+
+def Yes(data):
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	if IsInmoovLeft==1:
+		#i01.attach()
+		i01.setHeadSpeed(0.9, 0.9)
+		i01.moveHead(130,90)
+		sleep(0.5)
+		i01.moveHead(50,93)
+		sleep(0.5)
+		i01.moveHead(130,90)
+		sleep(0.5)
+	#Light(0,1,1)
+	if IsInmoovLeft==1:
+		i01.moveHead(60,91)
+		sleep(0.5)
+		i01.moveHead(120,88)
+	if IsInmoovLeft==1:
+		i01.moveHead(70,90)
+		sleep(0.5)
+		i01.moveHead(95,90)
+	sleep(0.5)
+	#Light(1,1,1)
+	if IsInmoovLeft==1:
+		i01.moveHead(90,90)
+	if IsInmoovLeft==1:
+		i01.head.jaw.rest()
+	
 			
 def talk(data):
 	sleep(0.1)
@@ -280,6 +334,7 @@ execfile('../INMOOV-AI_move_head_random.py')
 #on bloque le micro quand le robot parle
 
 def onEndSpeaking(text):
+	global MoveHeadRandom
 	MoveHeadTimer.stopClock()
 	global Ispeak
 	Ispeak=0
@@ -287,6 +342,7 @@ def onEndSpeaking(text):
 	VieAleatoire.startClock()
 	TimeNoSpeak="OFF"
 	#Light(0,0,0)
+	sleep(0.5)
 	if IcanStartToEar==1:
 		try:
 			ear.startListening()
@@ -294,8 +350,10 @@ def onEndSpeaking(text):
 			pass
 	if IsInmoovLeft==1:
 		i01.moveHead(90,90,90,90,90)
+	MoveHeadRandom=1
 
 def onStartSpeaking(text):
+	global MoveHeadRandom
 	if MoveHeadRandom==1:
 		MoveHeadTimer.startClock()
 	global Ispeak
@@ -315,6 +373,10 @@ def onText(text):
 	ear.stopListening()	
 	print text.replace("'", " ")
 	chatBot.getResponse(text.replace("'", " "))
+	if 'non' in text or 'no' in text:
+		No('no')
+	if 'oui' in text or 'yes' in text:
+		Yes('yes')
 	
 
 
@@ -439,29 +501,7 @@ def FindImage(image):
 	#Light(1,1,1)
 			
 	
-def Yes(data):
-	i01.attach()
-	i01.moveHead(80,90,90,180,40)
-	sleep(1)
-	#Light(1,0,1)
-	i01.moveHead(120,88,90,78,40)
-	sleep(0.4)
-	i01.moveHead(40,92,90,78,40)
-	sleep(0.4)
-	mouth.speakBlocking(data.decode( "utf8" ))
-	sleep(0.4)
-	i01.moveHead(120,87,90,78,40)
-	sleep(0.4)
-	i01.moveHead(40,91,90,78,40)
-	sleep(0.4)
-	i01.moveHead(120,87,90,78,40)
-	sleep(0.3)
-	#Light(1,1,1)
-	i01.moveHead(80,90,90,78,40)
-	mouth.speakBlocking(random.choice(troat))
-	i01.head.jaw.rest()
-	i01.detach()
-	
+
 
 	
 def ClearMemory():
@@ -720,5 +760,5 @@ sleep(0.5)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
 Light(1,1,1)
 NeoPixelF(1)
-
+Yes(1)
 
