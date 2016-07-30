@@ -156,12 +156,16 @@ if IsInmoovLeft==1:
 	i01.startHead(leftPort,BoardType)
 	i01.startLeftArm(leftPort)
 	torso = i01.startTorso(leftPort)
-	i01.head.neck.setMinMax(0,180)
+	i01.head.neck.setMinMax(MinNeck,MaxNeck)
 	i01.head.neck.map(0,180,MinNeck,MaxNeck)
 	i01.head.rothead.setMinMax(0,180)
 	i01.head.rothead.map(0,180,MinRotHead,MaxRotHead)
 	i01.moveHead(80,86,40,78,76)
+	i01.head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
+	i01.head.eyeX.map(0,180,EyeXMIN,EyeXMAX)
 	i01.head.eyeX.setMinMax(0,180)
+	i01.head.eyeY.setMinMax(EyeYMIN,EyeYMAX)
+	i01.head.eyeY.map(0,180,EyeYMIN,EyeYMAX)
 	i01.head.eyeY.setMinMax(0,180)
 	i01.head.eyeX.setRest(90)
 	i01.head.eyeY.setRest(90)
@@ -641,9 +645,9 @@ def rest():
 		i01.detach()
   
 def trackHumans():
-	i01.headTracking.findFace()
+	#i01.headTracking.findFace()
 	#i01.opencv.SetDisplayFilter
-	#i01.headTracking.faceDetect()
+	i01.headTracking.faceDetect()
 	i01.eyesTracking.faceDetect()
 	print "test"
 
