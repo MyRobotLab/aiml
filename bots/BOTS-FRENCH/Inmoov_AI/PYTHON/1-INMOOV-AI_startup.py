@@ -156,10 +156,21 @@ if IsInmoovLeft==1:
 	i01.startHead(leftPort,BoardType)
 	i01.startLeftArm(leftPort)
 	torso = i01.startTorso(leftPort)
+	
 	i01.head.neck.setMinMax(MinNeck,MaxNeck)
-	i01.head.neck.map(0,180,MinNeck,MaxNeck)
+	if param1==1: #param1 = inversion du servo du cou
+		i01.head.neck.map(0,180,MaxNeck,MinNeck)
+	else:
+		i01.head.neck.map(0,180,MinNeck,MaxNeck)
+	i01.head.neck.setMinMax(0,180)
+	
+	i01.head.rothead.setMinMax(MinRotHead,MinRotHead)
+	if param2==1: #param2 = inversion du servo du cou
+		i01.head.rothead.map(0,180,MaxRotHead,MinRotHead)
+	else:
+		i01.head.rothead.map(0,180,MinRotHead,MaxRotHead)
+		
 	i01.head.rothead.setMinMax(0,180)
-	i01.head.rothead.map(0,180,MinRotHead,MaxRotHead)
 	i01.moveHead(80,86,40,78,76)
 	i01.head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
 	i01.head.eyeX.map(0,180,EyeXMIN,EyeXMAX)
@@ -253,7 +264,7 @@ def No(data):
 	MoveHeadRandom=0
 	if IsInmoovLeft==1:
 		#i01.attach()
-		i01.setHeadSpeed(0.9, 0.9)
+		i01.setHeadSpeed(0.98, 0.98)
 		i01.moveHead(80,130)
 		sleep(0.5)
 		i01.moveHead(80,90)
@@ -281,7 +292,7 @@ def Yes(data):
 	MoveHeadRandom=0
 	if IsInmoovLeft==1:
 		#i01.attach()
-		i01.setHeadSpeed(0.9, 0.9)
+		i01.setHeadSpeed(0.98, 0.98)
 		i01.moveHead(130,90)
 		sleep(0.5)
 		i01.moveHead(50,93)
@@ -725,6 +736,21 @@ def PlayUtub(q,num):
 		print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
 	
 # ##########################################################	
+
+#gestures
+
+def LookAtTheSky():
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(180,90)
+	sleep(5)
+	i01.setHeadSpeed(0.92, 0.92)
+	i01.moveHead(90)
+
+# #####
+
+
 # program start :
 
 Light(1,1,0)
@@ -746,7 +772,8 @@ sleep(5)
 
 i01.startEar()
 ear = i01.ear
-proc1 = subprocess.Popen("%userprofile%\AppData\Local\Chromium\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+sleep(0.5)
 webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
 Light(1,1,1)
 if lang=="FR":
@@ -765,5 +792,3 @@ sleep(0.5)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
 Light(1,1,1)
 NeoPixelF(1)
-Yes(1)
-
