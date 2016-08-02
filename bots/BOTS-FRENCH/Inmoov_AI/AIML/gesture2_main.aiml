@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+
+<category><pattern># ouvre la main gauche #</pattern>
+<template>
+<oob>
+					<mrl>
+				   <service>python</service>
+				   <method>exec</method>
+				   <param>MoveHand("left",0,0,0,0,0)</param>
+				 </mrl>
+</oob>
+<random>
+		<li>Main ouverte</li>
+		<li>C'est fait</li>
+</random>
+</template>
+</category> 
+
+<category><pattern># ferme la main gauche #</pattern>
+<template>
+<oob>
+					<mrl>
+				   <service>python</service>
+				   <method>exec</method>
+				   <param>MoveHand("left",180,180,180,180,180)</param>
+				 </mrl>
+</oob>
+<random>
+		<li>Main fermée</li>
+		<li>C'est fait</li>
+</random>
+</template>
+</category> 
+  
+
+</aiml>
+
