@@ -339,6 +339,14 @@ def talk(data):
 		except: 
 			pass
 		mouth.speak(unicode(data,'utf-8'))
+		
+	if IsInmoovLeft==1:
+		if random.randint(1,3)==1:
+			i01.head.eyeX.moveTo(0)
+			sleep(2)
+			i01.head.eyeX.moveTo(180)
+			sleep(1)
+			i01.head.eyeX.moveTo(90)
 
 def talkBlocking(data):
 	sleep(0.1)
