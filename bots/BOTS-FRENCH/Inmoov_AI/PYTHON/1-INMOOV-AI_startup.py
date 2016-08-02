@@ -155,6 +155,19 @@ if IsInmoovLeft==1:
 	i01.setHeadSpeed(0.5, 0.5)
 	i01.startHead(leftPort,BoardType)
 	i01.startLeftArm(leftPort)
+		
+	i01.leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
+	i01.leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
+	i01.leftHand.majeure.setMinMax(majeureLeftMIN,majeureLeftMAX) 
+	i01.leftHand.ringFinger.setMinMax(ringFingerLeftMIN,ringFingerLeftMAX) 
+	i01.leftHand.pinky.setMinMax(pinkyLeftMIN,pinkyLeftMAX) 
+	i01.leftHand.thumb.map(0,180,ThumbLeftMIN,ThumbLeftMAX) 
+	i01.leftHand.index.map(0,180,IndexLeftMIN,IndexLeftMAX) 
+	i01.leftHand.majeure.map(0,180,majeureLeftMIN,majeureLeftMAX) 
+	i01.leftHand.ringFinger.map(0,180,ringFingerLeftMIN,ringFingerLeftMAX) 
+	i01.leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX) 
+
+	
 	torso = i01.startTorso(leftPort)
 	
 	i01.head.neck.setMinMax(MinNeck,MaxNeck)
@@ -738,6 +751,14 @@ def PlayUtub(q,num):
 # ##########################################################	
 
 #gestures
+
+
+def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
+	i01.leftArm.attach()
+	i01.moveHand(side,thumb,index,majeure,ringFinger,pinky)
+	i01.leftArm.detach()
+	
+	
 
 def LookAtTheSky():
 	global MoveHeadRandom
