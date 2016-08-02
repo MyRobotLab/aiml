@@ -155,19 +155,6 @@ if IsInmoovLeft==1:
 	i01.setHeadSpeed(0.5, 0.5)
 	i01.startHead(leftPort,BoardType)
 	i01.startLeftArm(leftPort)
-	
-	i01.leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
-	i01.leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
-	i01.leftHand.majeure.setMinMax(majeureLeftMIN,majeureLeftMAX) 
-	i01.leftHand.ringFinger.setMinMax(ringFingerLeftMIN,ringFingerLeftMAX) 
-	i01.leftHand.pinky.setMinMax(pinkyLeftMIN,pinkyLeftMAX) 
-	i01.leftHand.thumb.map(0,180,ThumbLeftMIN,ThumbLeftMAX) 
-	i01.leftHand.index.map(0,180,IndexLeftMIN,IndexLeftMAX) 
-	i01.leftHand.majeure.map(0,180,majeureLeftMIN,majeureLeftMAX) 
-	i01.leftHand.ringFinger.map(0,180,ringFingerLeftMIN,ringFingerLeftMAX) 
-	i01.leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX) 
-
-	
 	torso = i01.startTorso(leftPort)
 	
 	i01.head.neck.setMinMax(MinNeck,MaxNeck)
@@ -756,21 +743,63 @@ def LookAtTheSky():
 	global MoveHeadRandom
 	MoveHeadRandom=0
 	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(00,90)
+	sleep(5)
+	i01.setHeadSpeed(0.92, 0.92)
+	i01.moveHead(90)
+	
+	
+def LookAtYourFeet():
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	i01.setHeadSpeed(0.98, 0.98)
 	i01.moveHead(180,90)
 	sleep(5)
 	i01.setHeadSpeed(0.92, 0.92)
 	i01.moveHead(90)
 	
-def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
-	i01.leftArm.attach()
-	i01.moveHand(side,thumb,index,majeure,ringFinger,pinky)
-	i01.leftArm.detach()
 	
+def LookAtYourLeft():
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(120,20)
+	sleep(5)
+	i01.setHeadSpeed(0.92, 0.92)
+	i01.moveHead(90,90)
 	
+def LookAtYourRight():
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(120,160)
+	sleep(5)
+	i01.setHeadSpeed(0.92, 0.92)
+	i01.moveHead(90,90)
 
 	
-
-# #####
+	
+def LookAroundYou():
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(160,160)
+	sleep(1)
+	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(160,20)
+	sleep(1)
+	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(20,20)
+	sleep(1)
+	i01.setHeadSpeed(0.98, 0.98)
+	i01.moveHead(20,160)
+	sleep(1)
+	i01.setHeadSpeed(0.92, 0.92)
+	i01.moveHead(90,90)
+	
+	
+	
+#######
 
 
 # program start :
@@ -782,9 +811,6 @@ if myBotname!="":
 #print gesturesPath
 CheckVersion()
 chatBot.getResponse("WAKE_UP")
-
-
-
 
 
 rest()
