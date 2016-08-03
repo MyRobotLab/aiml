@@ -60,7 +60,7 @@ import subprocess
 from subprocess import Popen, PIPE
 
 global Ispeak
-Ispeak=1
+Ispeak=0
 global MoveHeadRandom
 MoveHeadRandom=1
 
@@ -332,8 +332,8 @@ def Yes(data):
 def talk(data):
 	sleep(0.1)
 	#VieAleatoire.stopClock()
-	
-	if data!="":
+	global Ispeak
+	if data!="" and Ispeak==0:
 		try:
 			ear.stopListening()
 		except: 
@@ -369,6 +369,7 @@ if IsInmoovLeft==1:
 execfile('../INMOOV-AI_move_head_random.py')
 #on bloque le micro quand le robot parle
 
+
 def onEndSpeaking(text):
 	global MoveHeadRandom
 	MoveHeadTimer.stopClock()
@@ -387,8 +388,12 @@ def onEndSpeaking(text):
 	if IsInmoovLeft==1:
 		i01.moveHead(90,90,90,90,90)
 	MoveHeadRandom=1
+	WebkitSpeachReconitionFix.startClock()
 
+	
 def onStartSpeaking(text):
+
+	WebkitSpeachReconitionFix.stopClock()
 	global MoveHeadRandom
 	if 'non' in text or 'no' in text:
 		No('no')
@@ -416,7 +421,9 @@ def onStartSpeaking(text):
 def onText(text):
 	ear.stopListening()	
 	print text.replace("'", " ")
-	chatBot.getResponse(text.replace("'", " "))
+	global Ispeak
+	if Ispeak==0:
+		chatBot.getResponse(text.replace("'", " "))
 	
 
 	
@@ -434,12 +441,13 @@ WebkitSpeachReconitionFix.setInterval(10000)
 def WebkitSpeachReconitionON(timedata):
 	global Ispeak
 	if Ispeak==0:
-		ear.startListening()
-	
+		try:
+			ear.startListening()
+		except: 
+			pass
+			
 WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")
 # start the clock
-
-
 
 
 		
