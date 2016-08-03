@@ -490,7 +490,21 @@ def askWiki(query,question,retour): # retourne la description du sujet (query)
 		talk(answer)
 	#Light(1,1,1)
 	
-
+def WikiRaw(query): # retourne la description du sujet (query)
+	#Light(1,0,0)
+	query = unicode(query,'utf-8')# on force le format de police UTF-8 pour prendre en charge les accents
+	if query[1]== "\'" : # Si le sujet contient un apostrophe , on efface tout ce qui est avant ! ( "l'été" -> "été")
+		query2 = query[2:len(query)]
+		query = query2
+	print query # petit affichage de contrôle dans la console python ..
+	word = wdf.cutStart(query) # on enlève le derminant ("le chat" -> "chat")
+	start = wdf.grabStart(query) # on garde que le déterminant ( je ne sais plus pourquoi j'ai eu besoin de ça, mais la fonction existe ...)
+	wikiAnswer = wdf.getDescription(word) # récupère la description su wikidata
+	answer = wikiAnswer
+	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimédia") : # Si le document n'ai pas trouvé , on réponds "je ne sais pas"
+		chatBot.setPredicate("default","WikiRaw","0")
+	else:
+		chatBot.setPredicate("default","WikiRaw",answer)
 
 def getProperty(query, what): # retourne la valeur contenue dans la propriété demandée (what)
 	#Light(1,0,0)
@@ -554,6 +568,7 @@ def ClearMemory():
 	chatBot.setPredicate("default","QUESTION_WhoOrWhat","")
 	chatBot.setPredicate("default","QUESTION_sujet","")
 	chatBot.setPredicate("default","QUESTION_action","")
+	chatBot.setPredicate("default","WikiRaw","0")
 	
 def UpdateBotName(botname):
 	if str(chatBot.getPredicate("default","bot_id"))=="unknown":
