@@ -785,9 +785,18 @@ def PlayUtub(q,num):
 
 
 def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
-	i01.leftArm.attach()
+	if side=="left":
+		#We turn on the servo
+		i01.leftArm.attach()
+	if side=="right":
+		i01.rightArm.attach()
 	i01.moveHand(side,thumb,index,majeure,ringFinger,pinky)
-	i01.leftArm.detach()
+		#We turn off the servo
+	if side=="left":
+		i01.leftArm.detach()
+	if side=="right":
+		i01.rightArm.detach()
+	
 	
 	
 
