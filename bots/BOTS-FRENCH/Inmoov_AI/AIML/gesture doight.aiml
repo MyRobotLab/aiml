@@ -1,33 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aiml>
 
-<category><pattern># ouvre la main droite #</pattern>
+<category><pattern># montre ton doigt #</pattern>
 <template>
 <oob>
 					<mrl>
 				   <service>python</service>
 				   <method>exec</method>
-				   <param>MoveHand("right",0,0,0,0,0)</param>
+				   <param>MoveHand("right",0)</param>
 				 </mrl>
 </oob>
 <random>
-		<li>Main ouverte</li>
+		<li>Doight ouvert</li>
 		<li>C'est fait</li>
 </random>
 </template>
 </category> 
 
-<category><pattern># ferme la main droite #</pattern>
+<category><pattern># ferme le doigt #</pattern>
 <template>
 <oob>
 					<mrl>
 				   <service>python</service>
 				   <method>exec</method>
-				   <param>MoveHand("right",180,180,180,180,180)</param>
+				   <param>MoveHand("right",180)</param>
 				 </mrl>
 </oob>
 <random>
-		<li>Main fermée</li>
+		<li>Doigt fermé</li>
 		<li>C'est fait</li>
 </random>
 </template>
