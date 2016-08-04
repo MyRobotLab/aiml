@@ -60,7 +60,7 @@ import subprocess
 from subprocess import Popen, PIPE
 
 global Ispeak
-Ispeak=0
+Ispeak=1
 global MoveHeadRandom
 MoveHeadRandom=1
 
@@ -100,7 +100,8 @@ i01.setMute(1)
 
 
 i01.startMouth()
-
+i01.startEar()
+ear = i01.ear
 mouth = i01.mouth
 
 
@@ -331,13 +332,7 @@ def Yes(data):
 			
 def talk(data):
 	
-	#VieAleatoire.stopClock()
 	if data!="":
-		try:
-			ear.stopListening()
-		except: 
-			pass
-		sleep(0.3)
 		try:
 			ear.stopListening()
 		except: 
@@ -353,15 +348,13 @@ def talk(data):
 			i01.head.eyeX.moveTo(90)
 
 def talkBlocking(data):
-	sleep(0.1)
-	#VieAleatoire.stopClock()
-	
+		
 	if data!="":
 		try:
 			ear.stopListening()
 		except: 
 			pass
-		sleep(0.1)
+		
 		mouth.speakBlocking(unicode(data,'utf-8'))
 
 
@@ -387,7 +380,7 @@ def onEndSpeaking(text):
 	if IsInmoovLeft==1:
 		i01.moveHead(90,90,90,90,90)
 	MoveHeadRandom=1
-	sleep(2)
+	sleep(1)
 	if IcanStartToEar==1:
 		try:
 			ear.startListening()
@@ -424,7 +417,8 @@ def onStartSpeaking(text):
 	
 #ear.addTextListener(chatBot)	
 def onText(text):
-	ear.stopListening()	
+	ear.stopListening()
+	talk(" ")
 	print text.replace("'", " ")
 	global Ispeak
 	if Ispeak==0:
@@ -444,7 +438,7 @@ WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
 WebkitSpeachReconitionFix.setInterval(10000)
 
 def WebkitSpeachReconitionON(timedata):
-	sleep(2)
+	
 	global Ispeak
 	if Ispeak==0:
 		try:
@@ -920,10 +914,9 @@ if IsInmoovLeft==1:
 if IsInmoovLeft==1 and tracking==1:
 	trackHumans()
 
-sleep(5)
+sleep(4)
 
-i01.startEar()
-ear = i01.ear
+
 proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 sleep(0.5)
 webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
