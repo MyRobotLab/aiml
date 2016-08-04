@@ -330,10 +330,14 @@ def Yes(data):
 	
 			
 def talk(data):
-	sleep(0.1)
+	
 	#VieAleatoire.stopClock()
-	global Ispeak
-	if data!="" and Ispeak==0:
+	if data!="":
+		try:
+			ear.stopListening()
+		except: 
+			pass
+		sleep(0.3)
 		try:
 			ear.stopListening()
 		except: 
@@ -357,6 +361,7 @@ def talkBlocking(data):
 			ear.stopListening()
 		except: 
 			pass
+		sleep(0.1)
 		mouth.speakBlocking(unicode(data,'utf-8'))
 
 
@@ -379,15 +384,15 @@ def onEndSpeaking(text):
 	VieAleatoire.startClock()
 	TimeNoSpeak="OFF"
 	#Light(0,0,0)
-	sleep(0.5)
+	if IsInmoovLeft==1:
+		i01.moveHead(90,90,90,90,90)
+	MoveHeadRandom=1
+	sleep(2)
 	if IcanStartToEar==1:
 		try:
 			ear.startListening()
 		except: 
 			pass
-	if IsInmoovLeft==1:
-		i01.moveHead(90,90,90,90,90)
-	MoveHeadRandom=1
 	WebkitSpeachReconitionFix.startClock()
 
 	
@@ -439,6 +444,7 @@ WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
 WebkitSpeachReconitionFix.setInterval(10000)
 
 def WebkitSpeachReconitionON(timedata):
+	sleep(2)
 	global Ispeak
 	if Ispeak==0:
 		try:
@@ -785,20 +791,54 @@ def PlayUtub(q,num):
 
 
 def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
+	print side
 	if side=="left":
-		#We turn on the servo
-		i01.leftArm.attach()
+		if thumb != -1:
+			i01.leftHand.thumb.attach()
+			i01.leftHand.thumb.moveTo(thumb)
+			
+		if index != -1:
+			i01.leftHand.index.attach()
+			i01.leftHand.index.moveTo(index)
+			
+		if majeure != -1:
+			i01.leftHand.majeure.attach()
+			i01.leftHand.majeure.moveTo(majeure)
+			
+		if ringFinger != -1:
+			i01.leftHand.ringFinger.attach()
+			i01.leftHand.ringFinger.moveTo(ringFinger)
+			
+		if pinky != -1:
+			i01.leftHand.pinky.attach()
+			i01.leftHand.pinky.moveTo(pinky)
+		
+		sleep(1)
+		i01.leftHand.detach()
+			
 	if side=="right":
-		i01.rightArm.attach()
-	i01.moveHand(side,thumb,index,majeure,ringFinger,pinky)
-		#We turn off the servo
-	if side=="left":
-		i01.leftArm.detach()
-	if side=="right":
-		i01.rightArm.detach()
-	
-	
-	
+		if thumb != -1:
+			i01.rightHand.thumb.attach()
+			i01.rightHand.thumb.moveTo(thumb)
+			
+		if index != -1:
+			i01.rightHand.index.attach()
+			i01.rightHand.index.moveTo(index)
+			
+		if majeure != -1:
+			i01.rightHand.majeure.attach()
+			i01.rightHand.majeure.moveTo(majeure)
+			
+		if ringFinger != -1:
+			i01.rightHand.ringFinger.attach()
+			i01.rightHand.ringFinger.moveTo(ringFinger)
+			
+		if pinky != -1:
+			i01.rightHand.pinky.attach()
+			i01.rightHand.pinky.moveTo(pinky)
+			
+		sleep(1)
+		i01.rightHand.detach()
 
 def LookAtTheSky():
 	global MoveHeadRandom

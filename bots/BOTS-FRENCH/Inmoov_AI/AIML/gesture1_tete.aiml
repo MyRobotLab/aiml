@@ -93,10 +93,7 @@
 </category> 
 
 
-<category><pattern># gauche #</pattern>
-<template><srai># regarde a gauche #</srai></template>
-</category>
-   
+
 
    
    
@@ -121,10 +118,7 @@
 </category> 
 
 
-<category><pattern># droite #</pattern>
-<template><srai># regarde a droite #</srai></template>
-</category>
-   
+
    
 
    
