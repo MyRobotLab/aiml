@@ -75,7 +75,7 @@
 				<mrl>
 				   <service>python</service>
 				   <method>exec</method>
-				   <param>MoveHand('<get name="main"/>',-1,0,-1,-1,-1)</param>
+				   <param>MoveHand('<get name="main"/>',-1,180,-1,-1,-1)</param>
 				</mrl>
 </oob>
 <random>
@@ -125,6 +125,9 @@
 <template><srai>FAIS UN DOIGT</srai></template>
 </category>
 <category><pattern>MONTRE UN DOIGT</pattern>
+<template><srai>FAIS UN DOIGT</srai></template>
+</category>
+<category><pattern>à tous mes ennemis</pattern>
 <template><srai>FAIS UN DOIGT</srai></template>
 </category>
 <category><pattern>FAIT UN DOIGT</pattern>

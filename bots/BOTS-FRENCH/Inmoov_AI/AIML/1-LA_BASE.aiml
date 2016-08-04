@@ -15,20 +15,24 @@
 <template>
 <random>
 		<li>Je ne comprend pas</li>
-		<li>tu as dis quoi ?</li>
-		<li>je ne comprends rien</li>
-		<li>je ne comprends rien a ce que tu me dis</li>
+		<li>Yu as dis quoi ?</li>
+		<li>Je ne comprends rien</li>
+		<li>Je ne comprends rien a ce que tu me dis</li>
 		<li>Peux tu reformuler la question</li>
 		<li>Peux tu répéter</li>
 		<li>Parle plus clairement</li>
 		<li>Articule je ne comprend pas</li>
 		<li>Je ne dispose pas de cette information</li>
 		<li>Je ne peux pas te répondre</li>
-		<li>comment ?</li>
-		<li>de quoi ?</li>
-		<li>mais qu'est-ce qu'il me dis</li>
+		<li>Comment ?</li>
+		<li>De quoi ?</li>
+		<li>Mais qu'est-ce qu'il me dis</li>
 		<li>je n'ai pas envie de répondre</li>
-		<li>parle avec google, moi je suis fatigué</li>
+		<li>Parle avec google, moi je suis fatigué</li>
+		<li>C'est du français ça ?</li>
+		<li>C'est pas gagné</li>
+		<li>Moi pas comprendre toi !! </li>
+		<li>tu as un grave accent !! articule</li>
 	</random>
 	<oob>
 				<mrl>
