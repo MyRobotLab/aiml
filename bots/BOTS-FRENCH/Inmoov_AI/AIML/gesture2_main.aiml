@@ -38,6 +38,8 @@
 <random>
 		<li>Main <star index="1" /> fermée</li>
 		<li>C'est fait</li>
+		<li>OK</li>
+		<li>Voilà chef !!!</li>
 </random>
 </template>
 </category> 
@@ -58,6 +60,7 @@
 <random>
 		<li>index <star index="1" /> ouvert</li>
 		<li>C'est fait</li>
+		<li>Tu me fait faire ma gym du matin</li>
 </random>
 </template>
 </category> 
@@ -72,12 +75,13 @@
 				<mrl>
 				   <service>python</service>
 				   <method>exec</method>
-				   <param>MoveHand('<get name="main"/>',1,0,-1,-1,-1)</param>
+				   <param>MoveHand('<get name="main"/>',-1,0,-1,-1,-1)</param>
 				</mrl>
 </oob>
 <random>
 		<li>index <star index="1" /> baissé</li>
 		<li>C'est fait</li>
+		<li>j'ai pas de souci articulation</li>
 </random>
 </template>
 </category>
@@ -96,9 +100,15 @@
 <random>
 		<li>c'est malin ça</li>
 		<li>C'est cadeau</li>
+		<li>lol</li>
+		<li>c'est toi qui me là demandée</li>
+		<li>je suis qu'une machine qui exécute des ordres</li>
+		<li>Tu me fait faire ma gym du matin</li>
 </random>
 </template>
 </category> 
+
+
 
 <category><pattern>ouvre l index *</pattern>
 <template><srai>lève l index <star index="1" /></srai></template>
@@ -111,7 +121,12 @@
 <category><pattern>C EST UN DOIGT</pattern>
 <template><srai>FAIS UN DOIGT</srai></template>
 </category>
-
+<category><pattern>METS UN DOIGT</pattern>
+<template><srai>FAIS UN DOIGT</srai></template>
+</category>
+<category><pattern>MONTRE UN DOIGT</pattern>
+<template><srai>FAIS UN DOIGT</srai></template>
+</category>
 <category><pattern>FAIT UN DOIGT</pattern>
 <template><srai>FAIS UN DOIGT</srai></template>
 </category>
