@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+
+<category><pattern>Traduis * en *</pattern>
+<template>
+	<oob>
+					<mrl>
+				   <service>python</service>
+				   <method>exec</method>
+				   <param>translateText("<star index="1" />","<star index="2" />")</param>
+				 </mrl>
+			</oob>
+</template>
+</category> 
+
+
+
+<category><pattern>AZURE_ERROR_1</pattern>
+<template>
+Désolé il y a un problème avec le serveur azure, réessaye et vérifie bien la clé aussi !
+</template>
+</category> 
+   
+<category><pattern>AZURE_ERROR_2 *</pattern>
+<template>
+Je ne connais pas la langue <star index="1" />, ou la syntaxe est incorecte dans le fichier azure, regarde bien !
+</template>
+</category>   
+
+<category><pattern>AZURE_ERROR_3</pattern>
+<template>
+Je n'arrive pas à me connecter au serveur.
+</template>
+</category> 
+  
+
+</aiml>
+

@@ -5,13 +5,15 @@
 # STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ RACHEL AIML + PYTHON ]
 # UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ RACHEL AIML + PYTHON ]
 # -----------------------------------
-# - Inmoov-AI Version 1.5 By Moz4r
+# - Inmoov-AI Version 1.7 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
+# - Azure translator by Papaoutai
 # - Grog / Kwatters / and All MRL team
 # - HairyGael
-# - heisenberg333 for help to construct french AIML brain
+# - Heisenberg
+# - Grattounet
 # -----------------------------------
 # !!! INSTALL : !!!
 # !!! PLEASE copy all aiml files to : develop\ProgramAB\bots\rachel\aiml !!!
@@ -56,7 +58,8 @@ import os
 import shutil
 import hashlib
 import subprocess
-
+import json
+ 
 from subprocess import Popen, PIPE
 
 global Ispeak
@@ -365,6 +368,7 @@ execfile('../INMOOV-AI_vie_aleatoire-standby_life.py')
 if IsInmoovLeft==1:
 	execfile('../INMOOV-AI_opencv.py')
 execfile('../INMOOV-AI_move_head_random.py')
+execfile('../INMOOV-AI_azure_translator.py')
 #on bloque le micro quand le robot parle
 
 
