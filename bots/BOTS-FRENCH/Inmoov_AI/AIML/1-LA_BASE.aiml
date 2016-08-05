@@ -15,7 +15,7 @@
 <template>
 <random>
 		<li>Je ne comprend pas</li>
-		<li>Yu as dis quoi ?</li>
+		<li>Tu as dis quoi ?</li>
 		<li>Je ne comprends rien</li>
 		<li>Je ne comprends rien a ce que tu me dis</li>
 		<li>Peux tu reformuler la question</li>
