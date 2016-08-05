@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aiml>
 
-<category><pattern>Traduis * en *</pattern>
+<category><pattern>Traduit * en *</pattern>
 <template>
 	<oob>
 					<mrl>
@@ -32,7 +32,10 @@ Je ne connais pas la langue <star index="1" />, ou la syntaxe est incorecte dans
 Je n'arrive pas à me connecter au serveur.
 </template>
 </category> 
-  
+ 
+<category><pattern>traduire * en *</pattern>
+<template><srai>traduit <star index="1" /> en <star index="2" /> </srai></template>
+</category>
 
 </aiml>
 
