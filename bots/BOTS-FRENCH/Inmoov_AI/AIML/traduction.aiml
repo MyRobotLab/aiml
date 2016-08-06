@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aiml>
 
-<category><pattern>Traduit * en *</pattern>
+<category><pattern>Traduis * en *</pattern>
 <template>
 	<oob>
 					<mrl>
@@ -34,7 +34,11 @@ Je n'arrive pas à me connecter au serveur.
 </category> 
  
 <category><pattern>traduire * en *</pattern>
-<template><srai>traduit <star index="1" /> en <star index="2" /> </srai></template>
+<template><srai>traduis <star index="1" /> en <star index="2" /> </srai></template>
+</category>
+
+<category><pattern>traduit * en *</pattern>
+<template><srai>traduis <star index="1" /> en <star index="2" /> </srai></template>
 </category>
 
 </aiml>
