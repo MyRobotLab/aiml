@@ -257,6 +257,18 @@ def SaveMemory(question,reponse,silent,justPredicates):
 		print "http://www.myai.cloud/shared_memory.php?action=update&question="+urllib2.quote(question)+"&reponse="+urllib2.quote(reponse.replace("'", " "))
 		if silent<>1:
 			chatBot.getResponse("SAVEMEMORY")
+			
+def SaveMemoryPersonal(question,ReturnSubject,record):
+	if str(record)=="0":
+		valueQuestion=chatBot.getPredicate("default",question).decode( "utf8" )
+		if valueQuestion=="unknown":
+			chatBot.getResponse("SaveMemoryPersonal "+ReturnSubject+" "+unicode(question,'utf-8'))
+		else:
+			chatBot.getResponse(ReturnSubject + " " + unicode(question,'utf-8') + " LECTURENOM " + " " + unicode(valueQuestion,'utf-8'))
+	else:
+		chatBot.setPredicate("default",question,record)
+		chatBot.savePredicates()
+			
 
 
 chatBot.startSession("ProgramAB", "default", "rachel")
