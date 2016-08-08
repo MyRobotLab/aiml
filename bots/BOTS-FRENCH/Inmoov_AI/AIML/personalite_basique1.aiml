@@ -2,6 +2,7 @@
 <aiml>
 <!--  -->
 <!--  -->
+<topic name="default">
 <category><pattern>BONJOUR #</pattern>
 <template><condition name="name">
             <li value="default">Salut ! je souhaiterais faire connaissance, puis-je avoir ton prénom ?</li>
@@ -248,6 +249,6 @@ J'aime beaucoup <get name="WikiRaw"/>
 <category><pattern># tu peux #</pattern>
 <template><srai># pourrais-tu #</srai></template>
 </category>
-
+</topic>
 
 </aiml>

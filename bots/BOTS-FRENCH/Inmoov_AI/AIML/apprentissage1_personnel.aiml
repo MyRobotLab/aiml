@@ -89,6 +89,7 @@ comment s'appelle <star/>
 
 <category><pattern>* LECTURENOM *</pattern>
 <template>
+<think><set name="topic">default</set></think>
 <li>
 <star/> s'appelle <star index="2"/>
 </li>

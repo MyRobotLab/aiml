@@ -580,7 +580,7 @@ def FindImage(image):
 
 	
 def ClearMemory():
-	chatBot.setPredicate("default","topic","")
+	chatBot.setPredicate("default","topic","default")
 	chatBot.setPredicate("default","QUESTION_WhoOrWhat","")
 	chatBot.setPredicate("default","QUESTION_sujet","")
 	chatBot.setPredicate("default","QUESTION_action","")

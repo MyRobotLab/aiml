@@ -71,7 +71,9 @@ male_languages = {
     'no' : 'Olav',
     'es' : 'Antonio',
     'sv' : 'Emil',
+	'ja' : 'Sakura',
 }
+
 en_languages = {
     'arab' : 'ar',
 	'arabe' : 'ar',
@@ -89,6 +91,8 @@ en_languages = {
     'spanish' : 'es',
     'espagnol' : 'es',
     'sweden' : 'sv',
+	'japonais' : 'ja',
+	
 }
 
 
@@ -115,4 +119,6 @@ def translateText(text,language):
 			print t_text
 			talk(t_text)
 			mouth.setVoice(Voice)
+			
+			
 
