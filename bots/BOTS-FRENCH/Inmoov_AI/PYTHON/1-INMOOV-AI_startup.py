@@ -5,13 +5,16 @@
 # STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ RACHEL AIML + PYTHON ]
 # UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ RACHEL AIML + PYTHON ]
 # -----------------------------------
-# - Inmoov-AI Version 1.5 By Moz4r
+# - Inmoov-AI Version 1.7.2 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
+# - Azure translator by Papaoutai
 # - Grog / Kwatters / and All MRL team
 # - HairyGael
-# - heisenberg333 for help to construct french AIML brain
+# - Heisenberg
+# - Grattounet
+# - Lecagnois
 # -----------------------------------
 # !!! INSTALL : !!!
 # !!! PLEASE copy all aiml files to : develop\ProgramAB\bots\rachel\aiml !!!
@@ -56,11 +59,12 @@ import os
 import shutil
 import hashlib
 import subprocess
-
+import json
+ 
 from subprocess import Popen, PIPE
 
 global Ispeak
-Ispeak=0
+Ispeak=1
 global MoveHeadRandom
 MoveHeadRandom=1
 
@@ -100,7 +104,8 @@ i01.setMute(1)
 
 
 i01.startMouth()
-
+i01.startEar()
+ear = i01.ear
 mouth = i01.mouth
 
 
@@ -253,6 +258,18 @@ def SaveMemory(question,reponse,silent,justPredicates):
 		print "http://www.myai.cloud/shared_memory.php?action=update&question="+urllib2.quote(question)+"&reponse="+urllib2.quote(reponse.replace("'", " "))
 		if silent<>1:
 			chatBot.getResponse("SAVEMEMORY")
+			
+def SaveMemoryPersonal(question,ReturnSubject,record):
+	if str(record)=="0":
+		valueQuestion=chatBot.getPredicate("default",question).decode( "utf8" )
+		if valueQuestion=="unknown":
+			chatBot.getResponse("SaveMemoryPersonal "+ReturnSubject+" "+unicode(question,'utf-8'))
+		else:
+			chatBot.getResponse(ReturnSubject + " " + unicode(question,'utf-8') + " LECTURENOM " + " " + unicode(valueQuestion,'utf-8'))
+	else:
+		chatBot.setPredicate("default",question,record)
+		chatBot.savePredicates()
+			
 
 
 chatBot.startSession("ProgramAB", "default", "rachel")
@@ -331,13 +348,7 @@ def Yes(data):
 			
 def talk(data):
 	
-	#VieAleatoire.stopClock()
 	if data!="":
-		try:
-			ear.stopListening()
-		except: 
-			pass
-		sleep(0.3)
 		try:
 			ear.stopListening()
 		except: 
@@ -353,15 +364,13 @@ def talk(data):
 			i01.head.eyeX.moveTo(90)
 
 def talkBlocking(data):
-	sleep(0.1)
-	#VieAleatoire.stopClock()
-	
+		
 	if data!="":
 		try:
 			ear.stopListening()
 		except: 
 			pass
-		sleep(0.1)
+		
 		mouth.speakBlocking(unicode(data,'utf-8'))
 
 
@@ -372,6 +381,7 @@ execfile('../INMOOV-AI_vie_aleatoire-standby_life.py')
 if IsInmoovLeft==1:
 	execfile('../INMOOV-AI_opencv.py')
 execfile('../INMOOV-AI_move_head_random.py')
+execfile('../INMOOV-AI_azure_translator.py')
 #on bloque le micro quand le robot parle
 
 
@@ -387,7 +397,7 @@ def onEndSpeaking(text):
 	if IsInmoovLeft==1:
 		i01.moveHead(90,90,90,90,90)
 	MoveHeadRandom=1
-	sleep(2)
+	sleep(1)
 	if IcanStartToEar==1:
 		try:
 			ear.startListening()
@@ -424,7 +434,8 @@ def onStartSpeaking(text):
 	
 #ear.addTextListener(chatBot)	
 def onText(text):
-	ear.stopListening()	
+	ear.stopListening()
+	talk(" ")
 	print text.replace("'", " ")
 	global Ispeak
 	if Ispeak==0:
@@ -444,7 +455,7 @@ WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
 WebkitSpeachReconitionFix.setInterval(10000)
 
 def WebkitSpeachReconitionON(timedata):
-	sleep(2)
+	
 	global Ispeak
 	if Ispeak==0:
 		try:
@@ -570,7 +581,7 @@ def FindImage(image):
 
 	
 def ClearMemory():
-	chatBot.setPredicate("default","topic","")
+	chatBot.setPredicate("default","topic","default")
 	chatBot.setPredicate("default","QUESTION_WhoOrWhat","")
 	chatBot.setPredicate("default","QUESTION_sujet","")
 	chatBot.setPredicate("default","QUESTION_action","")
@@ -659,14 +670,45 @@ def question(data):
 
 
 
-def loto(phrase,the,lucky):
+def loto(phrase,the,chance,fin):
+	table1 = [(random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)),(random.randint(1,49))]
+	tablefin = []
+	doublon = []
+
+	for i in table1:
+		if i not in tablefin:
+			tablefin.append(i) #supprime les doublons
+		else:
+			doublon.append(i) #extraire les doublons
+			d = len(doublon)
+			while d > 0:
+			#nouveau tirage
+				doublon = []
+				table1 = [(random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)),(random.randint(1,49))]
+				# recherche doublon
+				for i in table1:
+					if i not in tablefin:
+						tablefin.append(i) #supprime les doublons
+					else:
+						doublon.append(i) #extraire les doublons
+					# si il existe doublon d+1 et vite la table
+					if (len(doublon)==1)or(len(doublon)==2)or(len(doublon)==3)or(len(doublon)==4)or(len(doublon)==5):
+						talkBlocking("j ai trouver un doublon , je refais un tirage")
+						d = d+1
+						doublon =[]
+					else:
+						d = 0
+		break
+	# tri la table avant de la dire
+	table1.sort()
 	talkBlocking(phrase)
-	talkBlocking(the+str(random.randint(1,49)))
-	talkBlocking(the+str(random.randint(1,49)))
-	talkBlocking(the+str(random.randint(1,49)))
-	talkBlocking(the+str(random.randint(1,49)))
-	talkBlocking(the+str(random.randint(1,49)))
-	talkBlocking(lucky+str(random.randint(1,10)))
+	talkBlocking(the+str(table1[0]))
+	talkBlocking(the+str(table1[1]))
+	talkBlocking(the+str(table1[2]))
+	talkBlocking(the+str(table1[3]))
+	talkBlocking(the+str(table1[4]))
+	talkBlocking(chance+str(random.randint(1,9)))
+	talkBlocking(fin)
 
 def DisplayPic(pic):
 	r=0
@@ -920,10 +962,9 @@ if IsInmoovLeft==1:
 if IsInmoovLeft==1 and tracking==1:
 	trackHumans()
 
-sleep(5)
+sleep(4)
 
-i01.startEar()
-ear = i01.ear
+
 proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 sleep(0.5)
 webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
