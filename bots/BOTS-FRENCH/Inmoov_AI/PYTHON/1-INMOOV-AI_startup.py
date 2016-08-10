@@ -68,11 +68,7 @@ from subprocess import Popen, PIPE
 
 #check runing folder
 oridir=os.getcwd().replace("\\", "/")
-#fix programab aimlif problems : remove all aimlif files
-try:
-	shutil.rmtree(oridir+'/ProgramAB/bots/'+myAimlFolder+'/aimlif')
-except: 
-	pass
+
 
 # check if a config file exist or create default one
 if os.path.isfile(os.getcwd().replace("develop", "").replace("\\", "/")+'2-INMOOV-AI_config.py'):
@@ -84,6 +80,12 @@ execfile('../2-INMOOV-AI_config.py')
 gesturesPath = os.getcwd().replace("develop", "").replace("\\", "/")+"gestures"
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
 
+#fix programab aimlif problems : remove all aimlif files
+print oridir+'/ProgramAB/bots/'+myAimlFolder+'/aimlif'
+try:
+	shutil.rmtree(oridir+'/ProgramAB/bots/'+myAimlFolder+'/aimlif')
+except: 
+	pass
 
 #some voice emotions
 laugh = [" #LAUGH01# ", " #LAUGH02# ", " #LAUGH03# ", " ", " "]
@@ -369,6 +371,7 @@ execfile('../INMOOV-AI_messenger.py')
 execfile('../INMOOV-AI_wikidata.py')
 execfile('../INMOOV-AI_games.py')
 execfile('../INMOOV-AI_gestures.py')
+execfile('../INMOOV-AI_domotique.py')
 
 # We listen when the robot is starting to speak to avoid ear listening
 # If you click on the webkit mic icon, this trick is broken
