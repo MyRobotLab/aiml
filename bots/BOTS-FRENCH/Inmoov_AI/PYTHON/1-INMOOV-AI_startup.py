@@ -333,10 +333,6 @@ def Yes(data):
 def talk(data):
 	
 	if data!="":
-		try:
-			ear.stopListening()
-		except: 
-			pass
 		mouth.speak(unicode(data,'utf-8'))
 		
 	if IsInmoovLeft==1:
@@ -350,11 +346,6 @@ def talk(data):
 def talkBlocking(data):
 		
 	if data!="":
-		try:
-			ear.stopListening()
-		except: 
-			pass
-		
 		mouth.speakBlocking(unicode(data,'utf-8'))
 
 #We include all InmoovAI mods
@@ -396,10 +387,13 @@ def onEndSpeaking(text):
 		except: 
 			pass
 	WebkitSpeachReconitionFix.startClock()
+	sleep(0.1)
 
 	
 def onStartSpeaking(text):
 
+	global Ispeak
+	Ispeak=1
 	WebkitSpeachReconitionFix.stopClock()
 	global MoveHeadRandom
 	if 'non' in text or 'no' in text:
@@ -412,8 +406,6 @@ def onStartSpeaking(text):
 		MoveHeadRandom=0
 	if MoveHeadRandom==1:
 		MoveHeadTimer.startClock()
-	global Ispeak
-	Ispeak=1
 	try:
 		ear.stopListening()
 	except: 
@@ -427,8 +419,6 @@ def onStartSpeaking(text):
 #We intercept what the robot is listen to change some values
 #here we replace ' by space because AIML doesn't like '
 def onText(text):
-	ear.stopListening()
-	talk(" ")
 	print text.replace("'", " ")
 	global Ispeak
 	if Ispeak==0:
