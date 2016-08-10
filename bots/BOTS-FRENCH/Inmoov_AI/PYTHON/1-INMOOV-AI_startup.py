@@ -2,8 +2,8 @@
 # ##############################################################################
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
-# STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ RACHEL AIML + PYTHON ]
-# UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ RACHEL AIML + PYTHON ]
+# STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ AIML + PYTHON ]
+# UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ AIML + PYTHON ]
 # -----------------------------------
 # - Inmoov-AI Version 1.7.2 By Moz4r
 # - Credit :
@@ -17,7 +17,7 @@
 # - Lecagnois
 # -----------------------------------
 # !!! INSTALL : !!!
-# !!! PLEASE copy all aiml files to : develop\ProgramAB\bots\rachel\aiml !!!
+# !!! PLEASE copy all aiml files to : develop\ProgramAB\bots\YOUR_BOT_NAME\aiml !!!
 # !!! AND https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-FRENCH/INMOOV_AI/TXT to the root of MRL
 # !!! + https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-ENGLISH/INMOOV_AI/TXT
 #
@@ -44,6 +44,8 @@
 version=17
 IcanStartToEar=0
 
+#Python libraries
+
 import urllib2
 from java.lang import String
 import random
@@ -60,19 +62,15 @@ import shutil
 import hashlib
 import subprocess
 import json
- 
 from subprocess import Popen, PIPE
 
-global Ispeak
-Ispeak=1
-global MoveHeadRandom
-MoveHeadRandom=1
 
 
+#check runing folder
 oridir=os.getcwd().replace("\\", "/")
-#fix programab aimlif problems
+#fix programab aimlif problems : remove all aimlif files
 try:
-	shutil.rmtree(oridir+'/ProgramAB/bots/rachel/aimlif')
+	shutil.rmtree(oridir+'/ProgramAB/bots/'+myAimlFolder+'/aimlif')
 except: 
 	pass
 
@@ -92,35 +90,40 @@ laugh = [" #LAUGH01# ", " #LAUGH02# ", " #LAUGH03# ", " ", " "]
 troat = [" #THROAT01# ", " #THROAT02# ", " #THROAT03# ", " ", " ", " "]
 
 
-
+#service pictures
 image=Runtime.createAndStart("ImageDisplay", "ImageDisplay")
 
-
+#service aiml
 Runtime.createAndStart("chatBot", "ProgramAB")
+
+#service wikidata
 wdf=Runtime.createAndStart("wdf", "WikiDataFetcher")
 
+#service inmoov
 i01 = Runtime.createAndStart("i01", "InMoov")
+
+#disable autocheck
 i01.setMute(1)
 
-
+#start acapela and webkit ear
 i01.startMouth()
 i01.startEar()
 ear = i01.ear
 mouth = i01.mouth
 
-
+#start webgui
 webgui = Runtime.create("WebGui","WebGui")
 webgui.autoStartBrowser(False)
 webgui.startService()
 
 #r=image.displayFullScreen("https://i.ytimg.com/vi/tIk1Mc170yg/maxresdefault.jpg",1)
-sleep(0.5)
+sleep(0.1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #webgui.start()
 
 # inmoov init
-
+# check arduino right
 if IsInmoovRight==1:
 
 	right = Runtime.start("i01.right", "Arduino")
@@ -142,7 +145,7 @@ if IsInmoovRight==1:
 	i01.startRightArm(rightPort)
 	i01.startRightHand(rightPort,BoardType)
 	
-	
+# check arduino left	
 if IsInmoovLeft==1:	
 	
 	left = Runtime.start("i01.left", "Arduino")
@@ -208,18 +211,11 @@ if IsInmoovLeft==1:
 	i01.headTracking.pid.setPID("neck",12.0,5.0,0.1)
 		
 	
-	
+# start opencv service
 if IsInmoovLeft==1 or IsInmoovRight==1:
 	opencv = i01.opencv
 	
 
-
- 
-
-
-
-
-	
 
 Runtime.createAndStart("htmlFilter", "HtmlFilter")
 
@@ -244,35 +240,21 @@ mouth.setLanguage(lang)
 
 
 
-chatBot.startSession("ProgramAB", "default", "rachel")
-#ear.addTextListener(chatBot)
+chatBot.startSession("ProgramAB", "default", myAimlFolder)
 chatBot.addTextListener(htmlFilter)
 htmlFilter.addListener("publishText", python.name, "talk") 
 
-def SaveMemory(question,reponse,silent,justPredicates):
-	sleep(0.5)
-	chatBot.savePredicates()
-	if justPredicates==0:
-		ServerResponse="0"
-		RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=update&question="+urllib2.quote(question)+"&reponse="+urllib2.quote(reponse.replace("'", " ")))
-		print "http://www.myai.cloud/shared_memory.php?action=update&question="+urllib2.quote(question)+"&reponse="+urllib2.quote(reponse.replace("'", " "))
-		if silent<>1:
-			chatBot.getResponse("SAVEMEMORY")
-			
-def SaveMemoryPersonal(question,ReturnSubject,record):
-	if str(record)=="0":
-		valueQuestion=chatBot.getPredicate("default",question).decode( "utf8" )
-		if valueQuestion=="unknown":
-			chatBot.getResponse("SaveMemoryPersonal "+ReturnSubject+" "+unicode(question,'utf-8'))
-		else:
-			chatBot.getResponse(ReturnSubject + " " + unicode(question,'utf-8') + " LECTURENOM " + " " + unicode(valueQuestion,'utf-8'))
-	else:
-		chatBot.setPredicate("default",question,record)
-		chatBot.savePredicates()
+
 			
 
+#var to set when robot is speaking
+ 
+global Ispeak
+Ispeak=1
+global MoveHeadRandom
+MoveHeadRandom=1
 
-chatBot.startSession("ProgramAB", "default", "rachel")
+chatBot.startSession("ProgramAB", "default", myAimlFolder)
 #ear.addTextListener(chatBot)
 chatBot.addTextListener(htmlFilter)
 htmlFilter.addListener("publishText", python.name, "talk") 
@@ -373,8 +355,9 @@ def talkBlocking(data):
 		
 		mouth.speakBlocking(unicode(data,'utf-8'))
 
-
-
+#We include all InmoovAI mods
+# -- coding: utf-8 --
+execfile('../INMOOV-AI_memory.py')
 if IhaveEyelids==1:
 	execfile('../INMOOV-AI_paupieres_eyeleads.py')
 execfile('../INMOOV-AI_vie_aleatoire-standby_life.py')
@@ -382,7 +365,13 @@ if IsInmoovLeft==1:
 	execfile('../INMOOV-AI_opencv.py')
 execfile('../INMOOV-AI_move_head_random.py')
 execfile('../INMOOV-AI_azure_translator.py')
-#on bloque le micro quand le robot parle
+execfile('../INMOOV-AI_messenger.py')
+execfile('../INMOOV-AI_wikidata.py')
+execfile('../INMOOV-AI_games.py')
+execfile('../INMOOV-AI_gestures.py')
+
+# We listen when the robot is starting to speak to avoid ear listening
+# If you click on the webkit mic icon, this trick is broken
 
 
 def onEndSpeaking(text):
@@ -432,7 +421,8 @@ def onStartSpeaking(text):
 	#Light(1,1,1)
 	
 	
-#ear.addTextListener(chatBot)	
+#We intercept what the robot is listen to change some values
+#here we replace ' by space because AIML doesn't like '
 def onText(text):
 	ear.stopListening()
 	talk(" ")
@@ -443,14 +433,11 @@ def onText(text):
 	
 
 	
-#on bloque le micro quand le robot parle
-		
 python.subscribe(mouth.getName(),"publishStartSpeaking")
 python.subscribe(mouth.getName(),"publishEndSpeaking")
 
 
-
-
+#Timer function to autostart webkit microphone every 10seconds
 WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
 WebkitSpeachReconitionFix.setInterval(10000)
 
@@ -464,7 +451,8 @@ def WebkitSpeachReconitionON(timedata):
 			pass
 			
 WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")
-# start the clock
+
+
 
 
 		
@@ -489,72 +477,7 @@ def Light(ROUGE_V,VERT_V,BLEU_V):
 		right.digitalWrite(BLEU,BLEU_V)
 
 
-	
-def askWiki(query,question,retour): # retourne la description du sujet (query)
-	#Light(1,0,0)
-	query = unicode(query,'utf-8')# on force le format de police UTF-8 pour prendre en charge les accents
-	if query[1]== "\'" : # Si le sujet contient un apostrophe , on efface tout ce qui est avant ! ( "l'été" -> "été")
-		query2 = query[2:len(query)]
-		query = query2
-	print query # petit affichage de contrôle dans la console python ..
-	word = wdf.cutStart(query) # on enlève le derminant ("le chat" -> "chat")
-	start = wdf.grabStart(query) # on garde que le déterminant ( je ne sais plus pourquoi j'ai eu besoin de ça, mais la fonction existe ...)
-	wikiAnswer = wdf.getDescription(word) # récupère la description su wikidata
-	answer = ( query + " est " + wikiAnswer)
-	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimédia") : # Si le document n'ai pas trouvé , on réponds "je ne sais pas"
-		QueryMemory(question,retour)
-	else:
-		talk(answer)
-	#Light(1,1,1)
-	
-def WikiRaw(query): # retourne la description du sujet (query)
-	#Light(1,0,0)
-	query = unicode(query,'utf-8')# on force le format de police UTF-8 pour prendre en charge les accents
-	if query[1]== "\'" : # Si le sujet contient un apostrophe , on efface tout ce qui est avant ! ( "l'été" -> "été")
-		query2 = query[2:len(query)]
-		query = query2
-	print query # petit affichage de contrôle dans la console python ..
-	word = wdf.cutStart(query) # on enlève le derminant ("le chat" -> "chat")
-	start = wdf.grabStart(query) # on garde que le déterminant ( je ne sais plus pourquoi j'ai eu besoin de ça, mais la fonction existe ...)
-	wikiAnswer = wdf.getDescription(word) # récupère la description su wikidata
-	answer = wikiAnswer
-	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimédia") : # Si le document n'ai pas trouvé , on réponds "je ne sais pas"
-		chatBot.setPredicate("default","WikiRaw","0")
-	else:
-		chatBot.setPredicate("default","WikiRaw",answer)
 
-def getProperty(query, what): # retourne la valeur contenue dans la propriété demandée (what)
-	#Light(1,0,0)
-	query = unicode(query,'utf-8')
-	what = unicode(what,'utf-8')
-	if query[1]== "\'" :
-		query2 = query[2:len(query)]
-		query = query2
-	if what[1]== "\'" :
-		what2 = what[2:len(what)]
-		what = what2
-		print "what = " + what + " - what2 = " + what2
-	ID = "error"
-	# le fichier propriété.txt contient les conversions propriété -> ID . wikidata n'utilise pas des mots mais des codes (monnaie -> P38)	f = codecs.open(unicode('os.getcwd().replace("develop", "").replace("\", "/") + "/propriétés_ID.txt','r',"utf-8") #
-	f = codecs.open(os.getcwd().replace("develop", "").replace("\\", "/")+WikiFile,'r','utf-8') #os.getcwd().replace("develop", "").replace("\\", "/") set you propertiesID.txt path
-	
-	for line in f:
-    		line_textes=line.split(":")
-    		if line_textes[0]== what:
-	    		ID= line_textes[1]
-	f.close()
-	#print "query = " + query + " - what = " + what + " - ID = " + ID
-	wikiAnswer= wdf.getData(query,ID) # récupère la valeur de la propriété si elle existe dans le document
-	answer = ( what +" de " + query + " est " + wikiAnswer)
-	
-	if wikiAnswer == "Not Found !":
-		answer=(question(query+" "+what))
-		sleep(1);
-		chatBot.getResponse(answer)
-	else:
-		talk(answer)
-	#Light(1,1,1)
-	return answer
 	
 def getDate(query, ID):# Cette fonction permet d'afficher une date personnalisée (mardi, le 10 juin, 1975, 12h38 .....)
 	answer = ( wdf.getTime(query,ID,"day") +" " +wdf.getTime(query,ID,"month") + " " + wdf.getTime(query,ID,"year"))
@@ -579,13 +502,7 @@ def FindImage(image):
 	
 
 
-	
-def ClearMemory():
-	chatBot.setPredicate("default","topic","default")
-	chatBot.setPredicate("default","QUESTION_WhoOrWhat","")
-	chatBot.setPredicate("default","QUESTION_sujet","")
-	chatBot.setPredicate("default","QUESTION_action","")
-	chatBot.setPredicate("default","WikiRaw","0")
+
 	
 def UpdateBotName(botname):
 	if str(chatBot.getPredicate("default","bot_id"))=="unknown":
@@ -598,35 +515,8 @@ def UpdateBotName(botname):
 	chatBot.setPredicate("default","botname",botname)
 	chatBot.savePredicates()
 	
-def GetUnreadMessageNumbers():
-	RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=GetUnreadMessageNumbers&bot_id="+str(chatBot.getPredicate("default","bot_id")))
-	print "http://www.myai.cloud/shared_memory.php?action=GetUnreadMessageNumbers&bot_id="+str(chatBot.getPredicate("default","bot_id"))
-	if RetourServer!="0":
-		Light(0,1,1)
-		r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\message.jpg',1)
-		r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\message.jpg',1)
-	else:
-		Light(1,1,1)
-		r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
-		r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
-	chatBot.getResponse("SYSTEM "+RetourServer+ " MESSAGE")
-	
-def GetMessage():
-	RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=GetMessage&bot_id="+str(chatBot.getPredicate("default","bot_id")))
-	print "http://www.myai.cloud/shared_memory.php?action=GetMessage&bot_id="+str(chatBot.getPredicate("default","bot_id"))
-	chatBot.getResponse("SYSTEMREADMESSAGE "+RetourServer)
-	
-def NewMessage(botname,bot_id,question):
-	RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=NewMessage&bot_id="+bot_id+"&botname="+urllib2.quote(botname.replace("'", " "))+"&question="+urllib2.quote(question.replace("'", " ")))
-	print "http://www.myai.cloud/shared_memory.php?action=NewMessage&bot_id="+bot_id+"&botname="+urllib2.quote(botname.replace("'", " "))+"&question="+urllib2.quote(question.replace("'", " "))
-	chatBot.getResponse(RetourServer)
-	
-def CheckRobot(botname):
-	RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=CheckRobot&botname="+urllib2.quote(botname.replace("'", " ")))
-	print "http://www.myai.cloud/shared_memory.php?action=CheckRobot&botname="+urllib2.quote(botname.replace("'", " "))
-	chatBot.getResponse(RetourServer)	
-	
-	
+
+
 	
 def CheckVersion():
 	RetourServer=Parse("http://www.myai.cloud/version.html")
@@ -638,21 +528,12 @@ def CheckVersion():
 		chatBot.getResponse("INEEDUPDATE")
 	
 		
-def QueryMemory(question,retour):
-	RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=select&question="+urllib2.quote(question))
-	
-	if RetourServer!="" and RetourServer!="0":
-		chatBot.getResponse("SAY " + RetourServer)
-	else:
-		chatBot.getResponse(retour)
-	
-		
 def Meteo(data):
 	a = Parse(BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20"))
 	print BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20")
 	mouth.speakBlocking(a)
 	
-
+#this is broken now need fix on myai.cloud
 def question(data):
 	chatBot.getResponse("FINDTHEWEB")
 	a = Parse(BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20"))
@@ -664,51 +545,7 @@ def question(data):
 		return("IDONTUNDERSTAND")
 	else:
 		return("IDONTUNDERSTAND")
-#if IsInmoov==1:
-	#i01.detach()
-#Light(1,1,1)
 
-
-
-def loto(phrase,the,chance,fin):
-	table1 = [(random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)),(random.randint(1,49))]
-	tablefin = []
-	doublon = []
-
-	for i in table1:
-		if i not in tablefin:
-			tablefin.append(i) #supprime les doublons
-		else:
-			doublon.append(i) #extraire les doublons
-			d = len(doublon)
-			while d > 0:
-			#nouveau tirage
-				doublon = []
-				table1 = [(random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)),(random.randint(1,49))]
-				# recherche doublon
-				for i in table1:
-					if i not in tablefin:
-						tablefin.append(i) #supprime les doublons
-					else:
-						doublon.append(i) #extraire les doublons
-					# si il existe doublon d+1 et vite la table
-					if (len(doublon)==1)or(len(doublon)==2)or(len(doublon)==3)or(len(doublon)==4)or(len(doublon)==5):
-						talkBlocking("j ai trouver un doublon , je refais un tirage")
-						d = d+1
-						doublon =[]
-					else:
-						d = 0
-		break
-	# tri la table avant de la dire
-	table1.sort()
-	talkBlocking(phrase)
-	talkBlocking(the+str(table1[0]))
-	talkBlocking(the+str(table1[1]))
-	talkBlocking(the+str(table1[2]))
-	talkBlocking(the+str(table1[3]))
-	talkBlocking(the+str(table1[4]))
-	talkBlocking(chance+str(random.randint(1,9)))
-	talkBlocking(fin)
 
 def DisplayPic(pic):
 	r=0
@@ -727,26 +564,6 @@ def DisplayPic(pic):
 	image.closeAll()
 
 
-def rest():
-	if IsInmoovLeft==1:
-		i01.setHandSpeed("left", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-		i01.setArmSpeed("left", 1.0, 1.0, 1.0, 1.0)
-		i01.setHeadSpeed(0.8, 0.8)
-		i01.setTorsoSpeed(1.0, 1.0, 1.0)
-		i01.moveHead(80,86,82,78,76)
-		i01.moveArm("left",5,90,0,10)
-		i01.moveHand("left",2,2,2,2,2,90)
-		i01.moveTorso(80,90,80)
-		
-	if IsInmoovRight==1:
-		i01.setHandSpeed("right", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-		i01.setArmSpeed("right", 1.0, 1.0, 1.0, 1.0)
-		i01.moveArm("right",5,90,0,12)
-		i01.moveHand("right",2,2,2,2,2,90)
-	
-	if IsInmoovLeft==1 or IsInmoovRight==1:
-		i01.detach()
-  
 def trackHumans():
 	#i01.headTracking.findFace()
 	#i01.opencv.SetDisplayFilter
@@ -754,11 +571,6 @@ def trackHumans():
 	i01.eyesTracking.faceDetect()
 	print "test"
 
-
-
-	
-
-	
 def TakePhoto(messagePhoto):
 	talkBlocking(messagePhoto)
 	global FaceDetected
@@ -832,113 +644,7 @@ def PlayUtub(q,num):
 #gestures
 
 
-def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
-	print side
-	if side=="left":
-		if thumb != -1:
-			i01.leftHand.thumb.attach()
-			i01.leftHand.thumb.moveTo(thumb)
-			
-		if index != -1:
-			i01.leftHand.index.attach()
-			i01.leftHand.index.moveTo(index)
-			
-		if majeure != -1:
-			i01.leftHand.majeure.attach()
-			i01.leftHand.majeure.moveTo(majeure)
-			
-		if ringFinger != -1:
-			i01.leftHand.ringFinger.attach()
-			i01.leftHand.ringFinger.moveTo(ringFinger)
-			
-		if pinky != -1:
-			i01.leftHand.pinky.attach()
-			i01.leftHand.pinky.moveTo(pinky)
-		
-		sleep(1)
-		i01.leftHand.detach()
-			
-	if side=="right":
-		if thumb != -1:
-			i01.rightHand.thumb.attach()
-			i01.rightHand.thumb.moveTo(thumb)
-			
-		if index != -1:
-			i01.rightHand.index.attach()
-			i01.rightHand.index.moveTo(index)
-			
-		if majeure != -1:
-			i01.rightHand.majeure.attach()
-			i01.rightHand.majeure.moveTo(majeure)
-			
-		if ringFinger != -1:
-			i01.rightHand.ringFinger.attach()
-			i01.rightHand.ringFinger.moveTo(ringFinger)
-			
-		if pinky != -1:
-			i01.rightHand.pinky.attach()
-			i01.rightHand.pinky.moveTo(pinky)
-			
-		sleep(1)
-		i01.rightHand.detach()
 
-def LookAtTheSky():
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(00,90)
-	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
-	i01.moveHead(90)
-	
-	
-def LookAtYourFeet():
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(180,90)
-	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
-	i01.moveHead(90)
-	
-	
-def LookAtYourLeft():
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(120,20)
-	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
-	i01.moveHead(90,90)
-	
-def LookAtYourRight():
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(120,160)
-	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
-	i01.moveHead(90,90)
-
-	
-	
-def LookAroundYou():
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(160,160)
-	sleep(1)
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(160,20)
-	sleep(1)
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(20,20)
-	sleep(1)
-	i01.setHeadSpeed(0.98, 0.98)
-	i01.moveHead(20,160)
-	sleep(1)
-	i01.setHeadSpeed(0.92, 0.92)
-	i01.moveHead(90,90)
 	
 	
 	
@@ -986,3 +692,4 @@ sleep(0.5)
 Light(1,1,1)
 NeoPixelF(1)
 talk(" ")
+GetUnreadMessageNumbers("0")
