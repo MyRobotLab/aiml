@@ -62,6 +62,10 @@ import shutil
 import hashlib
 import subprocess
 import json
+import time
+import csv
+from datetime import datetime
+
 from subprocess import Popen, PIPE
 
 
@@ -81,7 +85,7 @@ gesturesPath = (oridir)+"gestures"
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
 
 #fix programab aimlif problems : remove all aimlif files
-print oridir+'/ProgramAB/bots/'+myAimlFolder+'/aimlif'
+print oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif'
 try:
 	shutil.rmtree(oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif')
 except: 
@@ -225,11 +229,11 @@ voiceType=Voice
 
 
 if lang=="FR":
-   WikiFile="prop.txt"
+   WikiFile="BDD/WIKI_prop.txt"
    wdf.setLanguage("fr")
    wdf.setWebSite("frwiki")
 else:
-   WikiFile="propEN.txt"
+   WikiFile="BDD/WIKI_propEN.txt"
    wdf.setLanguage("en")
    wdf.setWebSite("enwiki")
 
@@ -630,6 +634,32 @@ def PlayUtub(q,num):
 	else:
 		webgui.startBrowser("http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8'))
 		print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
+		
+
+def anniversaire(SpeakReturn):
+	maintenant = datetime.now()
+	#On recupere le jour et le mois du jour
+	anniversaire = str(maintenant.strftime('%d/%m'))
+	NoBirthDay=1
+	#On ouvre notre liste perso
+	cr = csv.reader(open(oridir+"BDD/birthday.csv","rb"))
+	for row in cr:
+		#On converti au format date la premiere valeure pour faire des calculs car elle est en texte
+		DateSelect=datetime.strptime(row[0], '%d/%m/%Y')
+		#On filtre uniquement le mois et le jour
+		KeyFounded=str(DateSelect.strftime('%d/%m'))
+		
+		if KeyFounded.startswith(anniversaire):
+			age = (maintenant.year - DateSelect.year)
+		#On envoi le retour a l'aiml ( pour internationalisation )
+			chatBot.getResponse(str(row[1]) + " SYSTEM BIRTHDAY OK " + str(age))
+	if SpeakReturn!="0" and NoBirthDay==1:
+		chatBot.getResponse("SYSTEM BIRTHDAY NOK")
+	
+
+	
+
+
 	
 # ##########################################################	
 
@@ -685,3 +715,4 @@ Light(1,1,1)
 NeoPixelF(1)
 talk(" ")
 GetUnreadMessageNumbers("0")
+anniversaire("0")
