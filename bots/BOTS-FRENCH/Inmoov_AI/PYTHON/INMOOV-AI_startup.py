@@ -639,7 +639,6 @@ def PlayUtub(q,num):
 def anniversaire(SpeakReturn):
 	maintenant = datetime.now()
 	#On recupere le jour et le mois du jour
-	anniversaire = str(maintenant.strftime('%d/%m'))
 	NoBirthDay=1
 	#On ouvre notre liste perso
 	cr = csv.reader(open(oridir+"BDD/birthday.csv","rb"))
@@ -648,11 +647,13 @@ def anniversaire(SpeakReturn):
 		DateSelect=datetime.strptime(row[0], '%d/%m/%Y')
 		#On filtre uniquement le mois et le jour
 		KeyFounded=str(DateSelect.strftime('%d/%m'))
-		
-		if KeyFounded.startswith(anniversaire):
+		#on calcul la différence de jour ( au prochain anniversaire )
+		FakeDate=(datetime.strptime(KeyFounded+"/"+str(maintenant.year), '%d/%m/%Y')-maintenant).days+1
+		#print datetime.strptime(KeyFounded+"/"+str(maintenant.year), '%d/%m/%Y')-maintenant
+		if FakeDate<=7 and FakeDate>=0:
 			age = (maintenant.year - DateSelect.year)
-		#On envoi le retour a l'aiml ( pour internationalisation )
-			chatBot.getResponse(str(row[1]) + " SYSTEM BIRTHDAY OK " + str(age))
+		#On envoi le retour a l'aiml ( pour internationalisation : nom SYSTEM jours_restants BIRTHDAY OK age )
+			chatBot.getResponse(str(row[1]) + " SYSTEM " + str(FakeDate) + " BIRTHDAY OK " + str(age))
 	if SpeakReturn!="0" and NoBirthDay==1:
 		chatBot.getResponse("SYSTEM BIRTHDAY NOK")
 	
