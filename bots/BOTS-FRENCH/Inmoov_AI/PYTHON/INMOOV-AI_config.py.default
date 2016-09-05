@@ -3,9 +3,9 @@
 myBotname=""
 myAimlFolder="rachel" # dossier ou se trouvent vos aiml pas d'accent svp
 # LANGUAGE ( FR/EN )
-lang="EN"
+lang="FR"
 global Voice
-Voice="Ryan" # antoine en francais
+Voice="Antoine" # ryan in english
 # To fetch weather etc [ adresse du serveur fetcher meteo etc ...]
 BotURL="http://myai.cloud/bot1.php"
 units="metric" # or : imperial
@@ -68,6 +68,7 @@ OmoplateLeftMIN=0
 OmoplateLeftMAX=180
 ThumbLeftMIN=0
 ThumbLeftMAX=180
+ThumbLeftInverted=0
 IndexLeftMIN=0
 IndexLeftMAX=180
 majeureLeftMIN=0
@@ -88,6 +89,7 @@ OmoplateRightMIN=0
 OmoplateRightMAX=180
 ThumbRightMIN=0
 ThumbRightMAX=180
+ThumbRightInverted=0
 IndexRightMIN=0
 IndexRightMAX=180
 majeureRightMIN=0

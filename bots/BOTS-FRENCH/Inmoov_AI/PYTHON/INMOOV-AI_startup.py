@@ -5,7 +5,7 @@
 # STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ AIML + PYTHON ]
 # UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ AIML + PYTHON ]
 # -----------------------------------
-# - Inmoov-AI Version 1.7.2 By Moz4r
+# - Inmoov-AI Version 1.8 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -22,14 +22,14 @@
 # !!! + https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-ENGLISH/INMOOV_AI/TXT
 #
 # 
-# I use realTime voice syncronisation but you can check mouthcontrol=1 in 2-INMOOV-AI_config.py 
+# I use realTime voice syncronisation but you can check mouthcontrol=1 in INMOOV-AI_config.py 
 # https://github.com/MyRobotLab/pyrobotlab/blob/master/home/moz4r/mouthcontrol_hardware.ino
 # -
 #  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #  !!!!!!!!!!!!!!!! CONFIG INSIDE THIS FILE !!! / ENTREZ VOS PARAMETRES DANS CE FICHIER  !!!!!!!!!!
 #  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-# 						2-INMOOV-AI_config.py
+# 						INMOOV-AI_config.py
 
 
 # ###
@@ -67,30 +67,29 @@ from subprocess import Popen, PIPE
 
 
 #check runing folder
-oridir=os.getcwd().replace("\\", "/")
-
+oridir=os.getcwd().replace("\\", "/")+"/"
+print oridir
 
 # check if a config file exist or create default one
-if os.path.isfile(os.getcwd().replace("develop", "").replace("\\", "/")+'2-INMOOV-AI_config.py'):
+if os.path.isfile(oridir + 'INMOOV-AI_config.py'):
 	print("ok")
 else:
-	shutil.copyfile(os.getcwd().replace("develop", "").replace("\\", "/")+'2-INMOOV-AI_config.py.default',os.getcwd().replace("develop", "").replace("\\", "/")+'2-INMOOV-AI_config.py')
-execfile('../2-INMOOV-AI_config.py')
+	shutil.copyfile(oridir + 'INMOOV-AI_config.py.default',oridir + 'INMOOV-AI_config.py')
+execfile('INMOOV-AI_config.py')
 	
-gesturesPath = os.getcwd().replace("develop", "").replace("\\", "/")+"gestures"
+gesturesPath = (oridir)+"gestures"
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
 
 #fix programab aimlif problems : remove all aimlif files
 print oridir+'/ProgramAB/bots/'+myAimlFolder+'/aimlif'
 try:
-	shutil.rmtree(oridir+'/ProgramAB/bots/'+myAimlFolder+'/aimlif')
+	shutil.rmtree(oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif')
 except: 
 	pass
 
 #some voice emotions
 laugh = [" #LAUGH01# ", " #LAUGH02# ", " #LAUGH03# ", " ", " "]
 troat = [" #THROAT01# ", " #THROAT02# ", " #THROAT03# ", " ", " ", " "]
-
 
 #service pictures
 image=Runtime.createAndStart("ImageDisplay", "ImageDisplay")
@@ -350,19 +349,19 @@ def talkBlocking(data):
 
 #We include all InmoovAI mods
 # -- coding: utf-8 --
-execfile('../INMOOV-AI_memory.py')
+execfile('INMOOV-AI_memory.py')
 if IhaveEyelids==1:
-	execfile('../INMOOV-AI_paupieres_eyeleads.py')
-execfile('../INMOOV-AI_vie_aleatoire-standby_life.py')
+	execfile('INMOOV-AI_paupieres_eyeleads.py')
+execfile('INMOOV-AI_vie_aleatoire-standby_life.py')
 if IsInmoovLeft==1:
-	execfile('../INMOOV-AI_opencv.py')
-execfile('../INMOOV-AI_move_head_random.py')
-execfile('../INMOOV-AI_azure_translator.py')
-execfile('../INMOOV-AI_messenger.py')
-execfile('../INMOOV-AI_wikidata.py')
-execfile('../INMOOV-AI_games.py')
-execfile('../INMOOV-AI_gestures.py')
-execfile('../INMOOV-AI_domotique.py')
+	execfile('INMOOV-AI_opencv.py')
+execfile('INMOOV-AI_move_head_random.py')
+execfile('INMOOV-AI_azure_translator.py')
+execfile('INMOOV-AI_messenger.py')
+execfile('INMOOV-AI_wikidata.py')
+execfile('INMOOV-AI_games.py')
+execfile('INMOOV-AI_gestures.py')
+execfile('INMOOV-AI_domotique.py')
 
 # We listen when the robot is starting to speak to avoid ear listening
 # If you click on the webkit mic icon, this trick is broken
