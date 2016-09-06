@@ -41,7 +41,7 @@
 
 
 
-version=17
+version=18
 IcanStartToEar=0
 
 #Python libraries
@@ -72,7 +72,7 @@ from subprocess import Popen, PIPE
 
 #check runing folder
 oridir=os.getcwd().replace("\\", "/")+"/"
-print oridir
+#print oridir
 
 # check if a config file exist or create default one
 if os.path.isfile(oridir + 'INMOOV-AI_config.py'):
@@ -85,7 +85,7 @@ gesturesPath = (oridir)+"gestures"
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
 
 #fix programab aimlif problems : remove all aimlif files
-print oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif'
+#print oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif'
 try:
 	shutil.rmtree(oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif')
 except: 
@@ -102,7 +102,7 @@ image=Runtime.createAndStart("ImageDisplay", "ImageDisplay")
 Runtime.createAndStart("chatBot", "ProgramAB")
 
 #service wikidata
-wdf=Runtime.createAndStart("wdf", "WikiDataFetcher")
+Runtime.createAndStart("wdf", "WikiDataFetcher")
 
 #service inmoov
 i01 = Runtime.createAndStart("i01", "InMoov")
@@ -334,6 +334,7 @@ def Yes(data):
 	
 			
 def talk(data):
+	ear.startListening()
 	
 	if data!="":
 		mouth.speak(unicode(data,'utf-8'))
@@ -372,6 +373,7 @@ execfile('INMOOV-AI_domotique.py')
 
 
 def onEndSpeaking(text):
+	print "End speaking debug"
 	global MoveHeadRandom
 	MoveHeadTimer.stopClock()
 	global Ispeak
@@ -383,18 +385,19 @@ def onEndSpeaking(text):
 	if IsInmoovLeft==1:
 		i01.moveHead(90,90,90,90,90)
 	MoveHeadRandom=1
-	sleep(1)
+	
 	if IcanStartToEar==1:
 		try:
 			ear.startListening()
 		except: 
 			pass
 	WebkitSpeachReconitionFix.startClock()
-	sleep(0.1)
+	
 
 	
 def onStartSpeaking(text):
-
+	
+	print "Start speaking debug"
 	global Ispeak
 	Ispeak=1
 	WebkitSpeachReconitionFix.stopClock()
@@ -402,10 +405,10 @@ def onStartSpeaking(text):
 	if 'non' in text or 'no' in text:
 		No('no')
 		MoveHeadRandom=0
-		print("no detected")
+		#print("no detected")
 	if 'oui' in text or 'yes' in text:
 		Yes('yes')
-		print("yes detected")
+		#print("yes detected")
 		MoveHeadRandom=0
 	if MoveHeadRandom==1:
 		MoveHeadTimer.startClock()
@@ -416,13 +419,14 @@ def onStartSpeaking(text):
 	global TimeNoSpeak
 	TimeNoSpeak="OFF"
 	VieAleatoire.stopClock()
+	
 	#Light(1,1,1)
 	
 	
 #We intercept what the robot is listen to change some values
 #here we replace ' by space because AIML doesn't like '
 def onText(text):
-	print text.replace("'", " ")
+	#print text.replace("'", " ")
 	global Ispeak
 	if Ispeak==0:
 		chatBot.getResponse(text.replace("'", " "))
@@ -435,10 +439,10 @@ python.subscribe(mouth.getName(),"publishEndSpeaking")
 
 #Timer function to autostart webkit microphone every 10seconds
 WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
-WebkitSpeachReconitionFix.setInterval(10000)
+WebkitSpeachReconitionFix.setInterval(15000)
 
 def WebkitSpeachReconitionON(timedata):
-	
+	sleep(0.2)
 	global Ispeak
 	if Ispeak==0:
 		try:
@@ -460,7 +464,7 @@ def Parse(utfdata):
 		utfdata = utfdata.decode( "utf8" ).replace(" : ", random.choice(troat))
 	except: 
 		pass
-	print utfdata
+	#print utfdata
 	#Light(1,1,1)
 	return utfdata;
 
@@ -477,7 +481,7 @@ def Light(ROUGE_V,VERT_V,BLEU_V):
 	
 def getDate(query, ID):# Cette fonction permet d'afficher une date personnalisée (mardi, le 10 juin, 1975, 12h38 .....)
 	answer = ( wdf.getTime(query,ID,"day") +" " +wdf.getTime(query,ID,"month") + " " + wdf.getTime(query,ID,"year"))
-	print " La date est : " + answer
+	#print " La date est : " + answer
 	chatBot.getResponse("say Le " + answer)
 	
 def FindImage(image):
@@ -506,7 +510,7 @@ def UpdateBotName(botname):
 	else:
 		bot_id=str(chatBot.getPredicate("default","bot_id"))
 	RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=UpdateBotName&bot_id="+urllib2.quote(bot_id)+"&botname="+urllib2.quote(botname.replace("'", " ")))
-	print "http://www.myai.cloud/shared_memory.php?action=UpdateBotName&bot_id="+urllib2.quote(bot_id)+"&botname="+urllib2.quote(botname.replace("'", " "))
+	#print "http://www.myai.cloud/shared_memory.php?action=UpdateBotName&bot_id="+urllib2.quote(bot_id)+"&botname="+urllib2.quote(botname.replace("'", " "))
 	chatBot.setPredicate("default","bot_id",bot_id)
 	chatBot.setPredicate("default","botname",botname)
 	chatBot.savePredicates()
@@ -516,7 +520,7 @@ def UpdateBotName(botname):
 	
 def CheckVersion():
 	RetourServer=Parse("http://www.myai.cloud/version.html")
-	print str(RetourServer)+' '+str(version)
+	#print str(RetourServer)+' '+str(version)
 	if str(RetourServer)==str(version):
 		print "software is OK"
 		#chatBot.getResponse("IAMUPDATED")
@@ -526,14 +530,14 @@ def CheckVersion():
 		
 def Meteo(data):
 	a = Parse(BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20"))
-	print BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20")
+	#print BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20")
 	mouth.speakBlocking(a)
 	
 #this is broken now need fix on myai.cloud
 def question(data):
 	chatBot.getResponse("FINDTHEWEB")
 	a = Parse(BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20"))
-	print BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20")
+	#print BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20")
 	if a[0]=="0":
 		return("IDONTUNDERSTAND")
 	elif a[0:299]<>"":
@@ -615,7 +619,7 @@ def PhotoProcess(messagePhoto):
 	sleep(0.5)
 	Light(0,0,0)
 	photoFileName = opencv.recordSingleFrame()
-	print "name file is" , os.getcwd()+'\\'+str(photoFileName)
+	#print "name file is" , os.getcwd()+'\\'+str(photoFileName)
 	Light(1,1,1)
 	NeoPixelF(1)
 	DisplayPic(os.getcwd()+'\\'+str(photoFileName))
@@ -633,12 +637,12 @@ def PlayUtub(q,num):
 		webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
 	else:
 		webgui.startBrowser("http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8'))
-		print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
+		#print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
 		
 
 def anniversaire(SpeakReturn):
 	maintenant = datetime.now()
-	#On recupere le jour et le mois du jour
+	#petite vavriable pour faire un retour en cas de non anniversaire
 	NoBirthDay=1
 	#On ouvre notre liste perso
 	cr = csv.reader(open(oridir+"BDD/birthday.csv","rb"))
@@ -652,6 +656,7 @@ def anniversaire(SpeakReturn):
 		#print datetime.strptime(KeyFounded+"/"+str(maintenant.year), '%d/%m/%Y')-maintenant
 		if FakeDate<=7 and FakeDate>=0:
 			age = (maintenant.year - DateSelect.year)
+			NoBirthDay=0
 		#On envoi le retour a l'aiml ( pour internationalisation : nom SYSTEM jours_restants BIRTHDAY OK age )
 			chatBot.getResponse(str(row[1]) + " SYSTEM " + str(FakeDate) + " BIRTHDAY OK " + str(age))
 	if SpeakReturn!="0" and NoBirthDay==1:
@@ -664,24 +669,19 @@ def anniversaire(SpeakReturn):
 	
 # ##########################################################	
 
-#gestures
 
-
-
-	
-	
-	
-#######
 
 
 # program start :
 
 Light(1,1,0)
+
+#on remet à zero certaines variables de l'aiml ( sujets de discussion... )
 ClearMemory()
 if myBotname!="":
 	UpdateBotName(myBotname)
-#print gesturesPath
-CheckVersion()
+
+
 chatBot.getResponse("WAKE_UP")
 
 
@@ -696,13 +696,9 @@ sleep(4)
 
 proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 sleep(0.5)
-webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
+
 Light(1,1,1)
-if lang=="FR":
-   ear.setLanguage("fr-FR")
-python.subscribe(ear.getName(),"publishText")
-IcanStartToEar=1
-WebkitSpeachReconitionFix.startClock()
+
 #r=image.displayFullScreen("http://vignette2.wikia.nocookie.net/worldsofsdn/images/7/7a/Tyrell-corp.jpg",1)
 
 if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.getPredicate("default","botname"))!="default" and str(chatBot.getPredicate("default","botname"))!="":
@@ -714,6 +710,19 @@ sleep(0.5)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
 Light(1,1,1)
 NeoPixelF(1)
-talk(" ")
+
+
+
 GetUnreadMessageNumbers("0")
 anniversaire("0")
+CheckVersion()
+#petit fix pour dire au robot qu'il eut commencer à écouter
+
+sleep(10)
+webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
+if lang=="FR":
+   ear.setLanguage("fr-FR")
+python.subscribe(ear.getName(),"publishText")
+
+WebkitSpeachReconitionFix.startClock()
+IcanStartToEar=1

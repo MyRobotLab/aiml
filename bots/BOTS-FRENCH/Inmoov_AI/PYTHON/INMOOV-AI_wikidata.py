@@ -11,6 +11,7 @@ def askWiki(query,question,retour): # retourne la description du sujet (query)
 	start = wdf.grabStart(query) # on garde que le determinant ( je ne sais plus pourquoi j'ai eu besoin de ca, mais la fonction existe ...)
 	wikiAnswer = wdf.getDescription(word) # recupere la description su wikidata
 	answer = ( query + " est " + wikiAnswer)
+	print wikiAnswer,answer
 	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") : # Si le document n'ai pas trouve , on reponds "je ne sais pas"
 		QueryMemory(question,retour)
 	else:
@@ -46,7 +47,7 @@ def getProperty(query, what): # retourne la valeur contenue dans la propriete de
 		print "what = " + what + " - what2 = " + what2
 	ID = "error"
 	# le fichier propriete.txt contient les conversions propriete -> ID . wikidata n'utilise pas des mots mais des codes (monnaie -> P38)	f = codecs.open(unicode('os.getcwd().replace("develop", "").replace("\", "/") + "/proprietes_ID.txt','r',"utf-8") #
-	f = codecs.open(os.getcwd().replace("develop", "").replace("\\", "/")+WikiFile,'r','utf-8') #os.getcwd().replace("develop", "").replace("\\", "/") set you propertiesID.txt path
+	f = codecs.open(oridir+WikiFile,'r','utf-8') #os.getcwd().replace("develop", "").replace("\\", "/") set you propertiesID.txt path
 	
 	for line in f:
     		line_textes=line.split(":")
