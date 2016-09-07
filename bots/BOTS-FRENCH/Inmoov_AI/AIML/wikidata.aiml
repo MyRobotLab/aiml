@@ -13,7 +13,7 @@
 			<mrl>
 				<service>python</service>
 				<method>exec</method>
-				<param>askWiki("<star/>","C EST QUOI <star/>","JENESAISPASWIKI")</param>
+				<param>askWiki("<star/>","C EST QUOI <star/>","SAY ","JENESAISPASWIKI")</param>
 			</mrl>
       </oob></template>
 </category>
@@ -31,7 +31,7 @@
 			<mrl>
 				<service>python</service>
 				<method>exec</method>
-				<param>askWiki("<star/>","QUI EST <star/>","JENESAISPASWIKI")</param>
+				<param>askWiki("<star/>","QUI EST <star/>","SAY ","JENESAISPASWIKI")</param>
 			</mrl>
       </oob></template>
 </category>
