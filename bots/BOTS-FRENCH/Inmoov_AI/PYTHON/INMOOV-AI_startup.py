@@ -386,6 +386,7 @@ execfile('INMOOV-AI_wikidata.py')
 execfile('INMOOV-AI_games.py')
 execfile('INMOOV-AI_gestures.py')
 execfile('INMOOV-AI_domotique.py')
+execfile(u'INMOOV-AI_dictionaries.py')
 
 # We listen when the robot is starting to speak to avoid ear listening
 # If you click on the webkit mic icon, this trick is broken
@@ -756,3 +757,5 @@ if lang=="FR":
 python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
+#test de dictionaire
+print(Singularize("travaux"),Singularize("nez"),Singularize("vitraux"),Singularize("bocaux"),Singularize("poux"),Singularize("époux"),Singularize("fraises"))

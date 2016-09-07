@@ -105,8 +105,8 @@ WristRightMAX=180
 # translator : https://datamarket.azure.com/dataset/bing/microsofttranslator 
 global Azure_client_id
 global Azure_client_secret
-Azure_client_id = 'your client id'
-Azure_client_secret = 'your client secret'
+Azure_client_id = '7da9defb-7d86-46e4-8607-5b82f280f430'
+Azure_client_secret = 'IgCffuxo0QgHDzKMK1k5bf9/9GpP9ZwWwAaonacAcW0'
  
 param1=0
 param2=0
