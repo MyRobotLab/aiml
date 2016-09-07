@@ -8,12 +8,26 @@ def askWiki(query,question,ReturnOk,ReturnNok): # retourne la description du suj
 		query = query2
 	print query # petit affichage de contrôle dans la console python ..
 	word = wdf.cutStart(query) # on enleve le derminant ("le chat" -> "chat")
+	wordSingular = word=Singularize(word) # on met au singulier pour double test
 	start = wdf.grabStart(query) # on garde que le determinant ( je ne sais plus pourquoi j'ai eu besoin de ca, mais la fonction existe ...)
+	# coucou fred je vais m en servir en tous cas :) bon a terme faudra un autre dico pour detecter le feminin/masculin du premier mot du retour wiki
+	retour = " est un "
+	if start=="du":
+		start="le"
+		retour=" est un "
+	if start=="des":
+		start="les"
+		retour=" sont des "
+	if start=="les":
+		retour=" sont des "
+
 	wikiAnswer = wdf.getDescription(word) # recupere la description su wikidata
-	answer = ( query + " est " + wikiAnswer)
+	answer = ( query + retour + wikiAnswer)
 	print wikiAnswer,answer
-	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") : # Si le document n'ai pas trouve , on reponds "je ne sais pas"
-		QueryMemory(question,ReturnNok)
+	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") : 
+		wikiAnswer = wdf.getDescription(wordSingular)
+	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") : # bon on a toujours pas trouvé, prochaine etape a dev un dico de synonymes
+		QueryMemory(question,ReturnNok) # on balance au service apprentissage
 	else:
 		chatBot.getResponse(ReturnOk + answer)
 		
