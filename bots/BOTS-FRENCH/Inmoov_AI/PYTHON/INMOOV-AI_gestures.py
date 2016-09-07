@@ -72,39 +72,39 @@ def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
 def LookAtTheSky():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(00,90)
 	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
+	i01.setHeadSpeed(0.1, 0.1)
 	i01.moveHead(90)
 	
 	
 def LookAtYourFeet():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(180,90)
 	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
+	i01.setHeadSpeed(0.1, 0.1)
 	i01.moveHead(90)
 	
 	
 def LookAtYourLeft():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(120,20)
 	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
+	i01.setHeadSpeed(0.1, 0.1)
 	i01.moveHead(90,90)
 	
 def LookAtYourRight():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(120,160)
 	sleep(5)
-	i01.setHeadSpeed(0.92, 0.92)
+	i01.setHeadSpeed(0.1, 0.1)
 	i01.moveHead(90,90)
 
 	
@@ -112,17 +112,17 @@ def LookAtYourRight():
 def LookAroundYou():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(160,160)
 	sleep(1)
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(160,20)
 	sleep(1)
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(20,20)
 	sleep(1)
-	i01.setHeadSpeed(0.98, 0.98)
+	i01.setHeadSpeed(0.2, 0.2)
 	i01.moveHead(20,160)
 	sleep(1)
-	i01.setHeadSpeed(0.92, 0.92)
+	i01.setHeadSpeed(0.1, 0.1)
 	i01.moveHead(90,90)

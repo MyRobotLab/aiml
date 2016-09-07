@@ -42,6 +42,7 @@
 
 
 version=18
+global IcanStartToEar
 IcanStartToEar=0
 
 #Python libraries
@@ -75,6 +76,9 @@ oridir=os.getcwd().replace("\\", "/")+"/"
 #print oridir
 
 # check if a config file exist or create default one
+if os.path.isfile(oridir + '2-INMOOV-AI_config.py'):
+	shutil.move(oridir + '2-INMOOV-AI_config.py', oridir + 'INMOOV-AI_config.py')
+
 if os.path.isfile(oridir + 'INMOOV-AI_config.py'):
 	print("ok")
 else:
@@ -105,7 +109,7 @@ Runtime.createAndStart("chatBot", "ProgramAB")
 Runtime.createAndStart("wdf", "WikiDataFetcher")
 
 #service inmoov
-i01 = Runtime.createAndStart("i01", "InMoov")
+i01 = Runtime.create("i01", "InMoov")
 
 #disable autocheck
 i01.setMute(1)
@@ -128,13 +132,93 @@ sleep(0.1)
 #webgui.start()
 
 # inmoov init
-# check arduino right
+
+
+leftHand = Runtime.create("i01.leftHand", "InMoovHand")
+
+
+leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
+leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
+leftHand.majeure.setMinMax(majeureLeftMIN,majeureLeftMAX) 
+leftHand.ringFinger.setMinMax(ringFingerLeftMIN,ringFingerLeftMAX) 
+leftHand.pinky.setMinMax(pinkyLeftMIN,pinkyLeftMAX) 
+leftHand.thumb.map(0,180,ThumbLeftMIN,ThumbLeftMAX) 
+leftHand.index.map(0,180,IndexLeftMIN,IndexLeftMAX) 
+leftHand.majeure.map(0,180,majeureLeftMIN,majeureLeftMAX) 
+leftHand.ringFinger.map(0,180,ringFingerLeftMIN,ringFingerLeftMAX) 
+leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX) 
+
+i01.setHeadSpeed(0.1,0.1,1,1,1)
+head = Runtime.create("i01.head","InMoovHead")
+
+head.jaw.setMinMax(JawMIN,JawMAX)
+head.jaw.map(0,180,JawMIN,JawMAX)
+head.jaw.setRest(0)
+
+head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
+head.eyeX.map(0,180,EyeXMIN,EyeXMAX)
+head.eyeX.setMinMax(0,180)
+head.eyeY.setMinMax(EyeYMIN,EyeYMAX)
+head.eyeY.map(0,180,EyeYMIN,EyeYMAX)
+head.eyeY.setMinMax(0,180)
+head.eyeX.setRest(90)
+head.eyeY.setRest(90)
+head.neck.setMinMax(MinNeck,MaxNeck)
+head.neck.setRest(90)
+head.rothead.setRest(90)
+
+head.rothead.setMinMax(MinRotHead,MinRotHead)
+if RotHeadInverted==1: 
+	head.rothead.map(0,180,MaxRotHead,MinRotHead)
+else:
+	head.rothead.map(0,180,MinRotHead,MaxRotHead)
+
+if NeckInverted==1: 
+	head.neck.map(0,180,MaxNeck,MinNeck)
+else:
+	head.neck.map(0,180,MinNeck,MaxNeck)
+	
+
+#head.rothead.setMinMax(180,180)
+# right servo creation
+
+left = Runtime.create("i01.left", "Arduino")
+right = Runtime.create("i01.right", "Arduino")
+i01 = Runtime.start("i01","InMoov")
+
+
+# check arduino left	
+if IsInmoovLeft==1:
+	i01.setHeadSpeed(0.1,0.1)
+	i01.startHead(leftPort)
+	i01.setHeadSpeed(0.1,0.1)
+	head.neck.setMinMax(0,180)
+	head.rothead.setMinMax(0,180)
+	head.neck.rest()
+	head.rothead.rest()
+	i01.startLeftHand(leftPort,"")
+	
+	if MRLmouthControl==1:
+		i01.startMouthControl(leftPort)
+		i01.mouthControl.setmouth(0,180)
+		
+	i01.startLeftArm(leftPort)
+	torso = i01.startTorso(leftPort)
+	
+	i01.head.eyeY.rest()
+	i01.head.eyeX.rest()
+
+	i01.startEyesTracking(leftPort,22,24)
+	i01.startHeadTracking(leftPort)
+	
+	
+
 if IsInmoovRight==1:
 
-	right = Runtime.start("i01.right", "Arduino")
+	
 	right.publishState()
 	right.connect(rightPort)
-	sleep(1)
+	
 	if IhaveLights==1:
 
 		right.pinMode(ROUGE, Arduino.OUTPUT)
@@ -148,78 +232,13 @@ if IsInmoovRight==1:
 	
 	
 	i01.startRightArm(rightPort)
-	i01.startRightHand(rightPort,BoardType)
+	i01.startRightHand(rightPort)
 	
-# check arduino left	
-if IsInmoovLeft==1:	
-	
-	left = Runtime.start("i01.left", "Arduino")
-	left.publishState()
-	left.connect(leftPort)
-	sleep(1)
-	i01.startLeftHand(leftPort,"")
-	head = Runtime.create("i01.head","InMoovHead")
-	if MRLmouthControl==1:
-		head.jaw.setMinMax(JawMIN,JawMAX)
-		head.jaw.map(0,180,JawMIN,JawMAX)
-		head.jaw.setRest(0)
-		i01.startMouthControl(leftPort)
-		i01.mouthControl.setmouth(0,180)
-	i01.setHeadSpeed(0.5, 0.5)
-	i01.startHead(leftPort,BoardType)
-	i01.startLeftArm(leftPort)
-		
-	i01.leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
-	i01.leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
-	i01.leftHand.majeure.setMinMax(majeureLeftMIN,majeureLeftMAX) 
-	i01.leftHand.ringFinger.setMinMax(ringFingerLeftMIN,ringFingerLeftMAX) 
-	i01.leftHand.pinky.setMinMax(pinkyLeftMIN,pinkyLeftMAX) 
-	i01.leftHand.thumb.map(0,180,ThumbLeftMIN,ThumbLeftMAX) 
-	i01.leftHand.index.map(0,180,IndexLeftMIN,IndexLeftMAX) 
-	i01.leftHand.majeure.map(0,180,majeureLeftMIN,majeureLeftMAX) 
-	i01.leftHand.ringFinger.map(0,180,ringFingerLeftMIN,ringFingerLeftMAX) 
-	i01.leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX) 
 
-	
-	torso = i01.startTorso(leftPort)
-	
-	i01.head.neck.setMinMax(MinNeck,MaxNeck)
-	if param1==1: #param1 = inversion du servo du cou
-		i01.head.neck.map(0,180,MaxNeck,MinNeck)
-	else:
-		i01.head.neck.map(0,180,MinNeck,MaxNeck)
-	i01.head.neck.setMinMax(0,180)
-	
-	i01.head.rothead.setMinMax(MinRotHead,MinRotHead)
-	if param2==1: #param2 = inversion du servo du cou
-		i01.head.rothead.map(0,180,MaxRotHead,MinRotHead)
-	else:
-		i01.head.rothead.map(0,180,MinRotHead,MaxRotHead)
-		
-	i01.head.rothead.setMinMax(0,180)
-	i01.moveHead(80,86,40,78,76)
-	i01.head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
-	i01.head.eyeX.map(0,180,EyeXMIN,EyeXMAX)
-	i01.head.eyeX.setMinMax(0,180)
-	i01.head.eyeY.setMinMax(EyeYMIN,EyeYMAX)
-	i01.head.eyeY.map(0,180,EyeYMIN,EyeYMAX)
-	i01.head.eyeY.setMinMax(0,180)
-	i01.head.eyeX.setRest(90)
-	i01.head.eyeY.setRest(90)
-	i01.head.eyeY.rest()
-	i01.head.eyeX.rest()
-	i01.startEyesTracking(leftPort)
-	i01.startHeadTracking(leftPort)
-	i01.eyesTracking.pid.setPID("eyeX",20.0,5.0,0.1)
-	i01.eyesTracking.pid.setPID("eyeY",20.0,5.0,0.1)
-	i01.headTracking.pid.setPID("rothead",12.0,5.0,0.1)
-	i01.headTracking.pid.setPID("neck",12.0,5.0,0.1)
-		
-	
 # start opencv service
 if IsInmoovLeft==1 or IsInmoovRight==1:
 	opencv = i01.opencv
-	
+
 
 
 Runtime.createAndStart("htmlFilter", "HtmlFilter")
@@ -238,7 +257,7 @@ else:
    wdf.setWebSite("enwiki")
 
 
-sleep(1)
+sleep(0.1)
 mouth.setVoice(voiceType)
 mouth.setLanguage(lang)
 
@@ -281,7 +300,7 @@ def No(data):
 	MoveHeadRandom=0
 	if IsInmoovLeft==1:
 		#i01.attach()
-		i01.setHeadSpeed(0.98, 0.98)
+		i01.setHeadSpeed(0.1, 0.1)
 		i01.moveHead(80,130)
 		sleep(0.5)
 		i01.moveHead(80,90)
@@ -309,7 +328,7 @@ def Yes(data):
 	MoveHeadRandom=0
 	if IsInmoovLeft==1:
 		#i01.attach()
-		i01.setHeadSpeed(0.98, 0.98)
+		i01.setHeadSpeed(0.1, 0.1)
 		i01.moveHead(130,90)
 		sleep(0.5)
 		i01.moveHead(50,93)
@@ -373,6 +392,7 @@ execfile('INMOOV-AI_domotique.py')
 
 
 def onEndSpeaking(text):
+	global IcanStartToEar
 	print "End speaking debug"
 	global MoveHeadRandom
 	MoveHeadTimer.stopClock()
@@ -392,7 +412,7 @@ def onEndSpeaking(text):
 		except: 
 			pass
 	WebkitSpeachReconitionFix.startClock()
-	
+	IcanStartToEar=1
 
 	
 def onStartSpeaking(text):
@@ -526,7 +546,7 @@ def CheckVersion():
 		#chatBot.getResponse("IAMUPDATED")
 	else:
 		chatBot.getResponse("INEEDUPDATE")
-	
+		sleep(3)
 		
 def Meteo(data):
 	a = Parse(BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20"))
@@ -659,11 +679,21 @@ def anniversaire(SpeakReturn):
 			NoBirthDay=0
 		#On envoi le retour a l'aiml ( pour internationalisation : nom SYSTEM jours_restants BIRTHDAY OK age )
 			chatBot.getResponse(str(row[1]) + " SYSTEM " + str(FakeDate) + " BIRTHDAY OK " + str(age))
+			sleep(4)
 	if SpeakReturn!="0" and NoBirthDay==1:
 		chatBot.getResponse("SYSTEM BIRTHDAY NOK")
 	
 
-	
+def ShutDown():
+	MoveHeadRandom=0
+	talkBlocking("Extinction")
+	if IsInmoovLeft==1:
+		i01.setHeadSpeed(0.3, 0.3)
+		i01.moveHead(0,0)
+	sleep(4)
+	i01.detach()
+	sleep(1)
+	runtime.shutdown()
 
 
 	
@@ -682,7 +712,7 @@ if myBotname!="":
 	UpdateBotName(myBotname)
 
 
-chatBot.getResponse("WAKE_UP")
+
 
 
 rest()
@@ -691,11 +721,9 @@ if IsInmoovLeft==1:
 if IsInmoovLeft==1 and tracking==1:
 	trackHumans()
 
-sleep(4)
 
 
 proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-sleep(0.5)
 
 Light(1,1,1)
 
@@ -703,26 +731,28 @@ Light(1,1,1)
 
 if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.getPredicate("default","botname"))!="default" and str(chatBot.getPredicate("default","botname"))!="":
 	UpdateBotName(str(chatBot.getPredicate("default","botname")))
+
 #if str(chatBot.getPredicate("default","bot_id"))!="unknown":
 	#chatBot.getResponse("MESSAGESCHECK")
-sleep(0.5)
+
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
 Light(1,1,1)
 NeoPixelF(1)
 
-
+webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
+sleep(4)
 
 GetUnreadMessageNumbers("0")
 anniversaire("0")
 CheckVersion()
+sleep(2)
+chatBot.getResponse("WAKE_UP")
 #petit fix pour dire au robot qu'il eut commencer à écouter
 
-sleep(10)
-webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
+
 if lang=="FR":
    ear.setLanguage("fr-FR")
 python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
-IcanStartToEar=1
