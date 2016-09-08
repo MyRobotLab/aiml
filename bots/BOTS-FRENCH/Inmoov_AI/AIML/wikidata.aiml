@@ -5,6 +5,13 @@
 <category><pattern>QU EST-CE QUE *</pattern>
 <template><srai>c est quoi <star/></srai></template>
 </category>
+<category><pattern>QU EST-CE QU *</pattern>
+<template><srai>c est quoi <star/></srai></template>
+</category>
+<category><pattern>C EST QUI *</pattern>
+<template><srai>c est quoi <star/></srai></template>
+</category>
+
 <category><pattern>C EST QUOI *</pattern>
 <template><think>
 <set name="QUESTION_WhoOrWhat"><star/></set> <set name="QUESTION_action">C EST QUOI </set>
