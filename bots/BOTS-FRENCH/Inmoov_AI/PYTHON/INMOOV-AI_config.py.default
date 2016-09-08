@@ -1,11 +1,11 @@
 #Robot Name
 #please, there is no verifications ! don't use an other used robot name ( usefull to use Inmoov Messenger )
 myBotname=""
-myAimlFolder="rachel" # dossier ou se trouvent vos aiml pas d'accent svp
+myAimlFolder="inmoovai" # dossier ou se trouvent vos aiml pas d'accent svp
 # LANGUAGE ( FR/EN )
-lang="EN"
+lang="FR"
 global Voice
-Voice="Ryan" # antoine en francais
+Voice="Antoine" # ryan in english
 # To fetch weather etc [ adresse du serveur fetcher meteo etc ...]
 BotURL="http://myai.cloud/bot1.php"
 units="metric" # or : imperial
@@ -49,8 +49,10 @@ PaupiereMIN=10
 PaupiereMAX=50
 MinRotHead=0
 MaxRotHead=180
+RotHeadInverted=0
 MinNeck=0
 MaxNeck=180
+NeckInverted=0
 JawMIN=0
 JawMAX=180
 JawInverted=0
@@ -68,6 +70,7 @@ OmoplateLeftMIN=0
 OmoplateLeftMAX=180
 ThumbLeftMIN=0
 ThumbLeftMAX=180
+ThumbLeftInverted=0
 IndexLeftMIN=0
 IndexLeftMAX=180
 majeureLeftMIN=0
@@ -88,6 +91,7 @@ OmoplateRightMIN=0
 OmoplateRightMAX=180
 ThumbRightMIN=0
 ThumbRightMAX=180
+ThumbRightInverted=0
 IndexRightMIN=0
 IndexRightMAX=180
 majeureRightMIN=0

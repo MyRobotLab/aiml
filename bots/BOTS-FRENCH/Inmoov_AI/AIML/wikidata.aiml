@@ -5,6 +5,13 @@
 <category><pattern>QU EST-CE QUE *</pattern>
 <template><srai>c est quoi <star/></srai></template>
 </category>
+<category><pattern>QU EST-CE QU *</pattern>
+<template><srai>c est quoi <star/></srai></template>
+</category>
+<category><pattern>C EST QUI *</pattern>
+<template><srai>c est quoi <star/></srai></template>
+</category>
+
 <category><pattern>C EST QUOI *</pattern>
 <template><think>
 <set name="QUESTION_WhoOrWhat"><star/></set> <set name="QUESTION_action">C EST QUOI </set>
@@ -13,7 +20,7 @@
 			<mrl>
 				<service>python</service>
 				<method>exec</method>
-				<param>askWiki("<star/>","C EST QUOI <star/>","JENESAISPASWIKI")</param>
+				<param>askWiki("<star/>","C EST QUOI <star/>","SAY ","JENESAISPASWIKI")</param>
 			</mrl>
       </oob></template>
 </category>
@@ -23,18 +30,15 @@
 
 
 
-
-
-
-
-
-
 <category><pattern>QUI EST *</pattern>
-<template><oob>
+<template><think>
+<set name="QUESTION_WhoOrWhat"><star/></set> <set name="QUESTION_action">QUI EST </set>
+</think>
+<oob>
 			<mrl>
 				<service>python</service>
 				<method>exec</method>
-				<param>askWiki(" <star/>")</param>
+				<param>askWiki("<star/>","QUI EST <star/>","SAY ","JENESAISPASWIKI")</param>
 			</mrl>
       </oob></template>
 </category>
