@@ -24,6 +24,12 @@ def askWiki(query,question,ReturnOk,ReturnNok): # retourne la description du suj
 	if start=="la":
 		retour=" est un, ou une, "
 		WeCutTheFirstWord=1
+	if start=="une":
+		retour=" est un, ou une, "
+		WeCutTheFirstWord=1
+	if start=="un":
+		retour=" est un, ou une, "
+		WeCutTheFirstWord=1
 	if start=="des":
 		start="les"
 		retour=" sont des "
