@@ -183,12 +183,12 @@
 
 
 <category><pattern># tu aimes *</pattern>
-<template>
+<template><think><set name="QUESTION_WhoOrWhat"><star index="2" /></set> <set name="QUESTION_action">C EST QUOI </set></think>
 <oob>
 			<mrl>
 				<service>python</service>
 				<method>exec</method>
-				<param>askWiki("<star index="2" />","C EST QUOI <star index="2" />","SYSTEM JAIME_JAIMEAS ","JENESAISPASWIKI")</param>
+				<param>askWiki("<star index="2" />","C EST QUOI <star index="2" />","SYSTEM JAIME_JAIMEAS ","JENESAISPASWIKI_JAIME_JAIMEPAS <star index="2" />")</param>
 			</mrl>
 </oob>
 

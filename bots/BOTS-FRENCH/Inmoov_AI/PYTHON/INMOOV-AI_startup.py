@@ -41,7 +41,7 @@
 
 
 
-version=18
+version=19
 global IcanStartToEar
 IcanStartToEar=0
 
@@ -132,17 +132,14 @@ sleep(0.1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #webgui.start()
 
-# inmoov init
+# inmoov servo configuration
 
 left = Runtime.create("i01.left", "Arduino")
 leftHand = Runtime.create("i01.leftHand", "InMoovHand")
 leftArm = Runtime.create("i01.leftArm", "InMoovArm")
-
 right=Runtime.create("i01.right", "Arduino")
 rightHand = Runtime.create("i01.rightHand", "InMoovHand")
 rightArm = Runtime.create("i01.rightArm", "InMoovArm")
-
-
 head = Runtime.create("i01.head","InMoovHead")
 
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
@@ -156,9 +153,23 @@ leftHand.majeure.map(0,180,majeureLeftMIN,majeureLeftMAX)
 leftHand.ringFinger.map(0,180,ringFingerLeftMIN,ringFingerLeftMAX) 
 leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX) 
 
+rightHand.thumb.setMinMax(ThumbRightMIN,ThumbRightMAX) 
+rightHand.index.setMinMax(IndexRightMIN,IndexRightMAX) 
+rightHand.majeure.setMinMax(majeureRightMIN,majeureRightMAX) 
+rightHand.ringFinger.setMinMax(ringFingerRightMIN,ringFingerRightMAX) 
+rightHand.pinky.setMinMax(pinkyRightMIN,pinkyRightMAX) 
+rightHand.thumb.map(0,180,ThumbRightMIN,ThumbRightMAX) 
+rightHand.index.map(0,180,IndexRightMIN,IndexRightMAX) 
+rightHand.majeure.map(0,180,majeureRightMIN,majeureRightMAX) 
+rightHand.ringFinger.map(0,180,ringFingerRightMIN,ringFingerRightMAX) 
+rightHand.pinky.map(0,180,majeureRightMIN,majeureRightMAX)
 
 head.jaw.setMinMax(JawMIN,JawMAX)
-head.jaw.map(0,180,JawMIN,JawMAX)
+if JawInverted==1:
+	head.jaw.map(0,180,JawMAX,JawMIN)
+else:
+	head.jaw.map(0,180,JawMIN,JawMAX)
+head.jaw.setMinMax(0,180)
 head.jaw.setRest(0)
 
 head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
@@ -173,7 +184,6 @@ head.neck.setMinMax(MinNeck,MaxNeck)
 head.neck.setRest(90)
 head.rothead.setMinMax(MinRotHead,MinRotHead)
 
-
 if RotHeadInverted==1: 
 	head.rothead.map(0,180,MaxRotHead,MinRotHead)
 else:
@@ -184,31 +194,17 @@ if NeckInverted==1:
 else:
 	head.neck.map(0,180,MinNeck,MaxNeck)
 	
-
-rightHand.thumb.setMinMax(ThumbRightMIN,ThumbRightMAX) 
-rightHand.index.setMinMax(IndexRightMIN,IndexRightMAX) 
-rightHand.majeure.setMinMax(majeureRightMIN,majeureRightMAX) 
-rightHand.ringFinger.setMinMax(ringFingerRightMIN,ringFingerRightMAX) 
-rightHand.pinky.setMinMax(pinkyRightMIN,pinkyRightMAX) 
-rightHand.thumb.map(0,180,ThumbRightMIN,ThumbRightMAX) 
-rightHand.index.map(0,180,IndexRightMIN,IndexRightMAX) 
-rightHand.majeure.map(0,180,majeureRightMIN,majeureRightMAX) 
-rightHand.ringFinger.map(0,180,ringFingerRightMIN,ringFingerRightMAX) 
-rightHand.pinky.map(0,180,majeureRightMIN,majeureRightMAX) 
+#start the arduino
 	
-
-i01.setHeadSpeed(0.2,0.2)
-i01 = Runtime.start("i01","InMoov")
-i01.startAll(leftPort, rightPort)
-sleep(1)
-
-# check arduino left	
 if IsInmoovArduino==1:
+	i01 = Runtime.start("i01","InMoov")
+	i01.startAll(leftPort, rightPort)
+	sleep(1)
+
 	left = Runtime.start("i01.left", "Arduino")
 	i01.startHead(leftPort)
 	head.rothead.setSpeed(0.2)
 	head.neck.setSpeed(0.2)
-	#i01.setHeadSpeed(0.9,0.9)
 	head.neck.setMinMax(0,180)
 	head.rothead.setMinMax(0,180)
 	head.rothead.moveTo(1)
@@ -233,6 +229,7 @@ if IsInmoovArduino==1:
 	i01.startRightHand(rightPort,"")
 	i01.startRightArm(rightPort)
 	
+#gestion des mouvement latéraux de la tete ( mod pistons de Bob )
 	
 	HeadSide = Runtime.start("HeadSide","Servo")
 	HeadSide.setMinMax(MinHeadSide , MaxHeadSide)
@@ -245,11 +242,6 @@ if IsInmoovArduino==1:
 	HeadSide.setRest(90)
 	HeadSide.setSpeed(0.2)
 
-#gestion des mouvement latéraux de la tete ( mod pistons de Bob )
-
-
-# start opencv service
-if IsInmoovArduino==1:
 	opencv = i01.opencv
 
 Runtime.createAndStart("htmlFilter", "HtmlFilter")
@@ -303,7 +295,11 @@ NeoPixelF(3)
 
 			
 def talk(data):
-	ear.startListening()
+	if data[0:2]=="l ":
+		data=data.replace("l ", "l'")
+	data=data.replace(" l ", " l'")
+	
+	ear.startListening() #fix onclick micro
 	
 	if data!="":
 		mouth.speak(unicode(data,'utf-8'))
@@ -332,8 +328,9 @@ if IsInmoovArduino==1:
 execfile('INMOOV-AI_move_head_random.py')
 execfile('INMOOV-AI_azure_translator.py')
 execfile('INMOOV-AI_messenger.py')
-execfile('INMOOV-AI_wikidata.py')
+execfile('INMOOV-AI_KnowledgeFetchers.py')
 execfile('INMOOV-AI_games.py')
+execfile('INMOOV-AI_reminders.py')
 execfile('INMOOV-AI_gestures.py')
 execfile('INMOOV-AI_domotique.py')
 execfile(u'INMOOV-AI_dictionaries.py')
@@ -453,21 +450,23 @@ def getDate(query, ID):# Cette fonction permet d'afficher une date personnalisée
 	#print " La date est : " + answer
 	chatBot.getResponse("say Le " + answer)
 	
-def FindImage(image):
-	try:
-		image = image.decode( "utf8" )
-	except: 
-		pass
-	mouth.speak(image)
-	#PLEASE USE REAL LANGUAGE PARAMETER :
-	#lang=XX ( FR/EN/RU/IT etc...)
-	#A FAKE LANGUAGE WORKS BUT DATABASE WILL BROKE
-	a = Parse(BotURL+"&type=pic&pic="+urllib2.quote(image).replace(" ", "%20"))
+
 	
-	DisplayPic(a)
-	print BotURL+"&type=pic&pic="+urllib2.quote(image).replace(" ", "%20")
-	#Light(1,1,1)
-			
+def DisplayPic(pic):
+	r=0
+	try:
+		r=image.displayFullScreen(pic,1)
+	except: 
+		chatBot.getResponse("PICTUREPROBLEM")
+		pass
+	time.sleep(0.1)
+	try:
+		r=image.displayFullScreen(pic,1)
+	except:
+		pass
+	time.sleep(10)
+	image.exitFS()
+	image.closeAll()			
 	
 
 
@@ -502,35 +501,7 @@ def Meteo(data):
 	#print BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20")
 	mouth.speakBlocking(a)
 	
-#this is broken now need fix on myai.cloud
-def question(data):
-	chatBot.getResponse("FINDTHEWEB")
-	a = Parse(BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20"))
-	#print BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20")
-	if a[0]=="0":
-		return("IDONTUNDERSTAND")
-	elif a[0:299]<>"":
-		#return(a[0:299])
-		return("IDONTUNDERSTAND")
-	else:
-		return("IDONTUNDERSTAND")
 
-
-def DisplayPic(pic):
-	r=0
-	try:
-		r=image.displayFullScreen(pic,1)
-	except: 
-		chatBot.getResponse("PICTUREPROBLEM")
-		pass
-	time.sleep(0.1)
-	try:
-		r=image.displayFullScreen(pic,1)
-	except:
-		pass
-	time.sleep(10)
-	image.exitFS()
-	image.closeAll()
 
 
 def trackHumans():
@@ -609,28 +580,7 @@ def PlayUtub(q,num):
 		#print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
 		
 
-def anniversaire(SpeakReturn):
-	maintenant = datetime.now()
-	#petite vavriable pour faire un retour en cas de non anniversaire
-	NoBirthDay=1
-	#On ouvre notre liste perso
-	cr = csv.reader(open(oridir+"BDD/birthday.csv","rb"))
-	for row in cr:
-		#On converti au format date la premiere valeure pour faire des calculs car elle est en texte
-		DateSelect=datetime.strptime(row[0], '%d/%m/%Y')
-		#On filtre uniquement le mois et le jour
-		KeyFounded=str(DateSelect.strftime('%d/%m'))
-		#on calcul la différence de jour ( au prochain anniversaire )
-		FakeDate=(datetime.strptime(KeyFounded+"/"+str(maintenant.year), '%d/%m/%Y')-maintenant).days+1
-		#print datetime.strptime(KeyFounded+"/"+str(maintenant.year), '%d/%m/%Y')-maintenant
-		if FakeDate<=7 and FakeDate>=0:
-			age = (maintenant.year - DateSelect.year)
-			NoBirthDay=0
-		#On envoi le retour a l'aiml ( pour internationalisation : nom SYSTEM jours_restants BIRTHDAY OK age )
-			chatBot.getResponse(str(row[1]) + " SYSTEM " + str(FakeDate) + " BIRTHDAY OK " + str(age))
-			sleep(4)
-	if SpeakReturn!="0" and NoBirthDay==1:
-		chatBot.getResponse("SYSTEM BIRTHDAY NOK")
+
 	
 
 def ShutDown():
@@ -653,8 +603,6 @@ def ShutDown():
 # ##########################################################	
 
 
-
-
 # program start :
 
 Light(1,1,0)
@@ -665,17 +613,12 @@ if myBotname!="":
 	UpdateBotName(myBotname)
 
 
-
-
-
 rest()
 if IsInmoovArduino==1:
 	i01.head.attach()
 	#head.rothead.setSpeed(0.2)
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
-
-
 
 proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
@@ -711,4 +654,4 @@ python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
 #test de dictionaire
-print(Singularize("travaux"),Singularize("nez"),Singularize("vitraux"),Singularize("bocaux"),Singularize("poux"),Singularize("époux"),Singularize("fraises"))
+#print(Singularize("travaux"),Singularize("nez"),Singularize("vitraux"),Singularize("bocaux"),Singularize("poux"),Singularize("époux"),Singularize("fraises"))

@@ -13,29 +13,32 @@ def askWiki(query,question,ReturnOk,ReturnNok): # retourne la description du suj
 	# coucou fred je vais m en servir en tous cas :) bon a terme faudra un autre dico pour detecter le feminin/masculin du premier mot du retour wiki
 	
 	WeCutTheFirstWord=0 #on enleve le/la/les etc... uniqument si présent
-	retour = " est un, ou une, "
+	retour = " c'est un, ou une, "
 	if start=="du":
 		start="le"
-		retour=" est un, ou une, "
+		retour=" c'est un, ou une, "
 		WeCutTheFirstWord=1
 	if start=="le":
-		retour=" est un, ou une, "
+		retour=" c'est un, ou une, "
+		WeCutTheFirstWord=1
+	if start=="l":
+		retour=" c'est un, ou une, "
 		WeCutTheFirstWord=1
 	if start=="la":
-		retour=" est un, ou une, "
+		retour=" c'est un, ou une, "
 		WeCutTheFirstWord=1
 	if start=="une":
-		retour=" est un, ou une, "
+		retour=" c'est un, ou une, "
 		WeCutTheFirstWord=1
 	if start=="un":
-		retour=" est un, ou une, "
+		retour=" c'est un, ou une, "
 		WeCutTheFirstWord=1
 	if start=="des":
 		start="les"
-		retour=" sont des "
+		retour=" ce sont des "
 		WeCutTheFirstWord=1
 	if start=="les":
-		retour=" sont des "
+		retour=" ce sont des "
 		WeCutTheFirstWord=1
 
 	if WeCutTheFirstWord==1:
@@ -45,19 +48,21 @@ def askWiki(query,question,ReturnOk,ReturnNok): # retourne la description du suj
 	wordSingular = word=Singularize(word) # on met au singulier pour double test
 	
 	wikiAnswer = wdf.getDescription(word) # recupere la description su wikidata
+
 	answer = ( query + retour + wikiAnswer)
-	print wikiAnswer,answer
-	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") : 
+	
+	print unicode(wikiAnswer[-9:],'utf-8')
+	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimédia"): 
 		wikiAnswer = wdf.getDescription(wordSingular)
-	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") : # bon on a toujours pas trouvé, prochaine etape a dev un dico de synonymes
-		QueryMemory(question,ReturnNok) # on balance au service apprentissage
+	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimédia"): # bon on a toujours pas trouvé, prochaine etape a dev un dico de synonymes
+		QueryMemory(question,ReturnNok,ReturnOk) # on balance au service apprentissage
 	else:
 		chatBot.getResponse(ReturnOk + answer)
 		
 	#Light(1,1,1)
 
 
-def getProperty(query, what): # retourne la valeur contenue dans la propriete demandee (what)
+def getProperty(query, what, question, ReturnOk, ReturnNok): # retourne la valeur contenue dans la propriete demandee (what)
 	#Light(1,0,0)
 	query = unicode(query,'utf-8')
 	what = unicode(what,'utf-8')
@@ -84,11 +89,36 @@ def getProperty(query, what): # retourne la valeur contenue dans la propriete de
 	
 	answer = ( what +" de " + query + " est " + wikiAnswer)
 	print ID,answer,what,query,wikiAnswer
-	if wikiAnswer == "Not Found !":
-		answer=(question(query+" "+what))
-		sleep(1);
-		chatBot.getResponse(answer)
+	if (wikiAnswer == "Not Found !") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") or (unicode(wikiAnswer[-9:],'utf-8') == u"Wikimedia") : # bon on a toujours pas trouvé, prochaine etape a dev un dico de synonymes
+		QueryMemory(question,ReturnNok,"SAY") # on balance au service apprentissage
 	else:
-		talk(answer)
+		chatBot.getResponse(ReturnOk + answer)
+
+	
+def FindImage(image):
+	try:
+		image = image.decode( "utf8" )
+	except: 
+		pass
+	mouth.speak(image)
+	#PLEASE USE REAL LANGUAGE PARAMETER :
+	#lang=XX ( FR/EN/RU/IT etc...)
+	#A FAKE LANGUAGE WORKS BUT DATABASE WILL BROKE
+	a = Parse(BotURL+"&type=pic&pic="+urllib2.quote(image).replace(" ", "%20"))
+	
+	DisplayPic(a)
+	print BotURL+"&type=pic&pic="+urllib2.quote(image).replace(" ", "%20")
 	#Light(1,1,1)
-	return answer
+
+#this is broken now need fix on myai.cloud
+def question(data):
+	chatBot.getResponse("FINDTHEWEB")
+	a = Parse(BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20"))
+	#print BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20")
+	if a[0]=="0":
+		return("IDONTUNDERSTAND")
+	elif a[0:299]<>"":
+		#return(a[0:299])
+		return("IDONTUNDERSTAND")
+	else:
+		return("IDONTUNDERSTAND")

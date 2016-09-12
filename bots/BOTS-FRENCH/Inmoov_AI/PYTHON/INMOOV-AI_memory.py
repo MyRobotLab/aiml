@@ -24,13 +24,13 @@ def ClearMemory():
 	chatBot.setPredicate("default","QUESTION_WhoOrWhat","")
 	chatBot.setPredicate("default","QUESTION_sujet","")
 	chatBot.setPredicate("default","QUESTION_action","")
-	chatBot.setPredicate("default","WikiRaw","0")
+
 	
 		
-def QueryMemory(question,retour):
+def QueryMemory(question,retourNok,retourOk):
 	RetourServer=Parse("http://www.myai.cloud/shared_memory.php?action=select&question="+urllib2.quote(question))
 	
 	if RetourServer!="" and RetourServer!="0":
-		chatBot.getResponse("SAY " + RetourServer)
+		chatBot.getResponse(retourOk + " " + RetourServer)
 	else:
-		chatBot.getResponse(retour)
+		chatBot.getResponse(retourNok)
