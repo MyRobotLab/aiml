@@ -35,6 +35,37 @@
 </template>
 </category>
 
+<category><pattern>COMMENT S APPELLE LE * DE *</pattern>
+<template>
+<think><set name="topic">SaveMemoryPersonal</set></think>
+<think><set name="QuestionCommentSappelle"><star index="2" /></set></think>
+<think><set name="QuestionCommentSappelleSujet">LE <star /> DE </set></think>
+	<oob>
+        <mrl>
+            <service>python</service>
+            <method>exec</method>
+             <param>SaveMemoryPersonal("<star index="2" />","LE <star /> DE","0")</param>
+		</mrl>
+	</oob>
+</template>
+</category>
+
+
+
+<category><pattern>COMMENT S APPELLE LA * DE *</pattern>
+<template>
+<think><set name="topic">SaveMemoryPersonal</set></think>
+<think><set name="QuestionCommentSappelle"><star index="2" /></set></think>
+<think><set name="QuestionCommentSappelleSujet">LA <star /> DE </set></think>
+	<oob>
+        <mrl>
+            <service>python</service>
+            <method>exec</method>
+             <param>SaveMemoryPersonal("<star index="2" />","LA <star /> DE","0")</param>
+		</mrl>
+	</oob>
+</template>
+</category>
 
 <!-- fonctions -->
 

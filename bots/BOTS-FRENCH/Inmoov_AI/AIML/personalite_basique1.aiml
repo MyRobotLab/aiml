@@ -182,6 +182,57 @@
 </category>
 
 
+
+<category><pattern># voter #</pattern>
+<template><srai># politique #</srai></template>
+</category>
+
+<category><pattern># élections #</pattern>
+<template><srai># politique #</srai></template>
+</category>
+
+
+
+<category><pattern># politique #</pattern>
+<template><random>
+		<li>A quand la sixième république ?</li>
+		<li>La politique est une guerre sans effusion de sang et la guerre une politique sanglante.</li>
+		<li>La vérité ne fait pas de politique... et réciproquement.</li>
+		<li>Le peuple s'intéresse à la politique quand la politique s'intéresse à lui.</li>
+		<li>La vérité ne fait pas de politique... et réciproquement.</li>
+		<li>Un problème politique est un problème économique sans solution.</li>
+	</random></template>
+</category>
+
+
+
+<category><pattern># catholicisme #</pattern>
+<template><srai># religion #</srai></template>
+</category>
+<category><pattern># islam #</pattern>
+<template><srai># religion #</srai></template>
+</category>
+<category><pattern># judaïsme #</pattern>
+<template><srai># religion #</srai></template>
+</category>
+
+<category><pattern># dieu #</pattern>
+<template><srai># religion #</srai></template>
+</category>
+
+<category><pattern># religion #</pattern>
+<template><random>
+		<li>La science sans religion est boiteuse, la religion sans science est aveugle.</li>
+		<li>La religion, c'est le hochet du peuple</li>
+		<li>Ma base de donnée est assez pauvre concernant les contes pour enfants, désolé</li>
+		<li>Religion sans moralité : arbre sans fruit. Moralité sans religion : arbre sans racines.</li>
+		<li>Je sais que dieu est un robot</li>
+	</random></template>
+</category>
+
+
+
+
 <category><pattern># tu aimes *</pattern>
 <template><think><set name="QUESTION_WhoOrWhat"><star index="2" /></set> <set name="QUESTION_action">C EST QUOI </set></think>
 <oob>
@@ -191,10 +242,19 @@
 				<param>askWiki("<star index="2" />","C EST QUOI <star index="2" />","SYSTEM JAIME_JAIMEAS ","JENESAISPASWIKI_JAIME_JAIMEPAS <star index="2" />")</param>
 			</mrl>
 </oob>
+</template>
+</category>
 
 
-
-
+<category><pattern>que penses-tu de *</pattern>
+<template><think><set name="QUESTION_WhoOrWhat"><star index="2" /></set> <set name="QUESTION_action">C EST QUOI </set></think>
+<oob>
+			<mrl>
+				<service>python</service>
+				<method>exec</method>
+				<param>askWiki("<star index="2" />","C EST QUOI <star index="2" />","SYSTEM JAIME_JAIMEAS ","JENESAISPASWIKI_JAIME_JAIMEPAS <star index="2" />")</param>
+			</mrl>
+</oob>
 </template>
 </category>
 
@@ -210,6 +270,8 @@
 		<li>Tu es vraiment entrain de me demandander si j'aime <star index="1" /> ? lol </li>
 		<li>J'adore <star index="1" /> </li>
 		<li>Oui j'aime <star index="1" /> </li>
+		<li>A propos <star index="1" /> , je dirais que je n'ai pas vraiment d'avis</li>
+		<li>Tu n'aimerais pas connaître mon avis sur <star index="1" /> , crois moi</li>
 </random>
 </li>
 
@@ -235,6 +297,10 @@
 		<li>je ne sais pas si j'aime aussi car je n'ai jamais essayé</li>
 	</random></template>
 </category>
+
+
+
+
 
 <category><pattern># pourrais-tu #</pattern>
 <template><random>

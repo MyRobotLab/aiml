@@ -1,9 +1,6 @@
-
 # ##############################################################################
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
-# STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ AIML + PYTHON ]
-# UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ AIML + PYTHON ]
 # -----------------------------------
 # - Inmoov-AI Version 1.8 By Moz4r
 # - Credit :
@@ -16,10 +13,12 @@
 # - Grattounet
 # - Lecagnois
 # -----------------------------------
-# !!! INSTALL : !!!
-# !!! PLEASE copy all aiml files to : develop\ProgramAB\bots\YOUR_BOT_NAME\aiml !!!
-# !!! AND https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-FRENCH/INMOOV_AI/TXT to the root of MRL
-# !!! + https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-ENGLISH/INMOOV_AI/TXT
+#									multilingual base python script
+#							( you just need translate all the aiml :)
+# -----------------------------------
+# !!! INSTALL : ( if you get this from github ) !!!
+# !!! PLEASE copy all aiml files to : ProgramAB\bots\YOUR_BOT_NAME\aiml !!!
+# !!! AND https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-FRENCH/INMOOV_AI/BDD + SOUND + PICTURES to the root of MRL
 #
 # 
 # I use realTime voice syncronisation but you can check mouthcontrol=1 in INMOOV-AI_config.py 
@@ -399,6 +398,10 @@ def onText(text):
 	if Ispeak==0:
 		chatBot.getResponse(text.replace("'", " "))
 	
+	 #we close pictures
+	image.exitFS()
+	image.closeAll()
+	
 
 	
 python.subscribe(mouth.getName(),"publishStartSpeaking")
@@ -464,9 +467,8 @@ def DisplayPic(pic):
 		r=image.displayFullScreen(pic,1)
 	except:
 		pass
-	time.sleep(10)
-	image.exitFS()
-	image.closeAll()			
+	
+			
 	
 
 
