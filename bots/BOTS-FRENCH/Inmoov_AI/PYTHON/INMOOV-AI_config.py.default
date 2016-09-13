@@ -40,13 +40,23 @@ tracking=0
 # !!! IMPORTANT !!! Your Servos Values :
 
 #Eyeleads / paupieres
-global PaupiereMIN
-global PaupiereMAX
-PaupiereArduino="left"
+global PaupiereGaucheMIN
+global PaupiereGaucheMAX
+global PaupiereDroiteMIN
+global PaupiereDroiteMAX
+global IhaveEyelids
+
+# 1 servo = IhaveEyelids=1 2 servo = IhaveEyelids=2
 IhaveEyelids=0
-PaupiereServoPin = 27
-PaupiereMIN=10
-PaupiereMAX=50
+PaupiereArduino="right"
+PaupiereInverted=0
+PaupiereGaucheServoPin = 27
+PaupiereGaucheMIN=10
+PaupiereGaucheMAX=50
+PaupiereDroiteServoPin = 28
+PaupiereDroiteMIN=10
+PaupiereDroiteMAX=50
+
 
 MinRotHead=0
 MaxRotHead=180
@@ -135,17 +145,26 @@ WristRightMIN=0
 WristRightMAX=180
 
 TorsoArduino="left"
-TorsoTopArduinoMin="0"
-TorsoTopArduinoMax="180"
+TorsoTopMin=0
+TorsoTopMax=180
 
-TorsoBottomMin="0"
-TorsoBottomMax="180"
+TorsoMidMin=0
+TorsoMidMax=180
+
+TorsoBottomMin=0
+TorsoBottomMax=180
 
 # translator : https://datamarket.azure.com/dataset/bing/microsofttranslator 
 global Azure_client_id
 global Azure_client_secret
 Azure_client_id = 'your client id'
 Azure_client_secret = 'your client secret'
+
+#
+GoogleAPIa=''
+GoogleAPIb=''
+GoogleAPIc=''
+GoogleAPId=''
  
 param1=0
 param2=0

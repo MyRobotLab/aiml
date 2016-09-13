@@ -115,18 +115,7 @@ i01 = Runtime.create("i01", "InMoov")
 i01.setMute(1)
 
 #start acapela and webkit ear
-i01.startMouth()
-i01.startEar()
-ear = i01.ear
-mouth = i01.mouth
 
-#start webgui
-webgui = Runtime.create("WebGui","WebGui")
-webgui.autoStartBrowser(False)
-webgui.startService()
-
-#r=image.displayFullScreen("https://i.ytimg.com/vi/tIk1Mc170yg/maxresdefault.jpg",1)
-sleep(0.1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #webgui.start()
@@ -140,6 +129,17 @@ right=Runtime.create("i01.right", "Arduino")
 rightHand = Runtime.create("i01.rightHand", "InMoovHand")
 rightArm = Runtime.create("i01.rightArm", "InMoovArm")
 head = Runtime.create("i01.head","InMoovHead")
+torso = Runtime.create("i01.torso", "InMoovTorso")
+
+torso.topStom.setMinMax(TorsoTopMin,TorsoTopMax)
+torso.topStom.map(0,180,TorsoTopMin,TorsoTopMax)
+torso.topStom.setMinMax(0,180)
+
+torso.midStom.setMinMax(TorsoMidMin,TorsoMidMax)
+torso.midStom.map(0,180,TorsoMidMin,TorsoMidMax)
+torso.midStom.setMinMax(0,180)
+torso.topStom.setRest(90)
+torso.midStom.setRest(90)
 
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
 leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
@@ -215,8 +215,10 @@ if IsInmoovArduino==1:
 	if MRLmouthControl==1:
 		i01.startMouthControl(leftPort)
 		i01.mouthControl.setmouth(0,180)
-		
-	torso = i01.startTorso(leftPort)
+	if TorsoArduino=="left":	
+		torso = i01.startTorso(leftPort)
+	else:
+		torso = i01.startTorso(rightPort)
 	
 	i01.head.eyeY.rest()
 	i01.head.eyeX.rest()
@@ -242,6 +244,19 @@ if IsInmoovArduino==1:
 	HeadSide.setSpeed(0.2)
 
 	opencv = i01.opencv
+	
+i01.startMouth()
+i01.startEar()
+ear = i01.ear
+mouth = i01.mouth
+
+#start webgui
+webgui = Runtime.create("WebGui","WebGui")
+webgui.autoStartBrowser(False)
+webgui.startService()
+
+#r=image.displayFullScreen("https://i.ytimg.com/vi/tIk1Mc170yg/maxresdefault.jpg",1)
+sleep(0.1)
 
 Runtime.createAndStart("htmlFilter", "HtmlFilter")
 

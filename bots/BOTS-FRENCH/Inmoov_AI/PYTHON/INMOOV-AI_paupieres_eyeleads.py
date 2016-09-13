@@ -1,24 +1,41 @@
-PaupiereServo = Runtime.start("PaupiereServo","Servo")
-PaupiereServo.setMinMax(PaupiereMIN , PaupiereMAX)
-PaupiereServo.attach(right, PaupiereServoPin)
+PaupiereServoGauche = Runtime.start("PaupiereServoGauche","Servo")
+PaupiereServoGauche.setMinMax(PaupiereGaucheMIN , PaupiereGaucheMAX)
+PaupiereServoDroite = Runtime.start("PaupiereServoDroite","Servo")
+PaupiereServoDroite.setMinMax(PaupiereDroiteMIN , PaupiereDroiteMAX)
+
+if PaupiereArduino=="left":
+	PaupiereServoGauche.attach(left, PaupiereGaucheServoPin)
+else:
+	PaupiereServoGauche.attach(right, PaupiereGaucheServoPin)
+
+if PaupiereArduino=="left" and IhaveEyelids==2:
+	PaupiereServoDroite.attach(left, PaupiereDroiteServoPin)
+else:
+	PaupiereServoDroite.attach(right, PaupiereDroiteServoPin)
+
 
 
 clock = Runtime.start("clock","Clock")
 clock.setInterval(1000)
 # define a ticktock method
-def ticktock(timedata):
-	PaupiereServo.moveTo(PaupiereMIN)
+def clignement(timedata):
+	PaupiereServoGauche.moveTo(PaupiereGaucheMIN)
+	PaupiereServoDroite.moveTo(PaupiereDroiteMIN)
 	sleep(0.12)
-	PaupiereServo.moveTo(PaupiereMAX)
+	PaupiereServoGauche.moveTo(PaupiereGaucheMAX)
+	PaupiereServoDroite.moveTo(PaupiereDroiteMAX)
+	
 #on fait un double clignement ou pas
 	if random.randint(0,1)==1:
 		sleep(0.2)
-		PaupiereServo.moveTo(PaupiereMIN)
+		PaupiereServoGauche.moveTo(PaupiereGaucheMIN)
+		PaupiereServoDroite.moveTo(PaupiereDroiteMIN)
 		sleep(0.12)
-		PaupiereServo.moveTo(PaupiereMAX)
+		PaupiereServoGauche.moveTo(PaupiereGaucheMAX)
+		PaupiereServoDroite.moveTo(PaupiereDroiteMAX)
 #on redefini une valeur aleatoire pour le prochain clignement
 	clock.setInterval(random.randint(10000,30000))
 #create a message routes
-clock.addListener("pulse", python.name, "ticktock")
+clock.addListener("pulse", python.name, "clignement")
 # start the clock
 clock.startClock()
