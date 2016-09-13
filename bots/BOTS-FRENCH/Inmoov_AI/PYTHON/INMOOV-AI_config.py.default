@@ -25,9 +25,6 @@ DiyServo3 = "COMX"
 DiyServo4 = "COMX"
 
 
-#Eyeleads / paupieres
-IhaveEyelids=0
-PaupiereServoPin = 27
 
 # Ligh if you have / led RGB with pins
 IhaveLights = 0
@@ -42,8 +39,12 @@ tracking=0
 
 # !!! IMPORTANT !!! Your Servos Values :
 
+#Eyeleads / paupieres
 global PaupiereMIN
 global PaupiereMAX
+PaupiereArduino="left"
+IhaveEyelids=0
+PaupiereServoPin = 27
 PaupiereMIN=10
 PaupiereMAX=50
 
@@ -82,40 +83,64 @@ RotateLeftMAX=180
 
 OmoplateLeftMIN=0
 OmoplateLeftMAX=180
+
 ThumbLeftMIN=0
 ThumbLeftMAX=180
 ThumbLeftInverted=0
+
 IndexLeftMIN=0
 IndexLeftMAX=180
+
 majeureLeftMIN=0
 majeureLeftMAX=180
+
 ringFingerLeftMIN=0
 ringFingerLeftMAX=180
+
 pinkyLeftMIN=0
 pinkyLeftMAX=0
+
 WristLeftMIN=0
 WristLeftMAX=180
+
 BicepsRightMIN=0
 BicepsRightMAX=180
+
 ShoulderRightMIN=0
 ShoulderRightMAX=180
+
 RotateRightMIN=0
 RotateRightMAX=180
+
 OmoplateRightMIN=0
 OmoplateRightMAX=180
+
 ThumbRightMIN=0
 ThumbRightMAX=180
 ThumbRightInverted=0
+
 IndexRightMIN=0
 IndexRightMAX=180
+
 majeureRightMIN=0
 majeureRightMAX=180
+
 ringFingerRightMIN=0
 ringFingerRightMAX=180
+
 pinkyRightMIN=0
 pinkyRightMAX=0
+
 WristRightMIN=0
 WristRightMAX=180
+
+TorsoArduino="left"
+TorsoTopArduinoMin="0"
+TorsoTopArduinoMax="180"
+
+TorsoBottomMin="0"
+TorsoBottomMax="180"
+
 # translator : https://datamarket.azure.com/dataset/bing/microsofttranslator 
 global Azure_client_id
 global Azure_client_secret
