@@ -1,23 +1,78 @@
 
 def rest():
-	if IsInmoovLeft==1:
+	if IsInmoovArduino==1:
 		i01.setHandSpeed("left", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 		i01.setArmSpeed("left", 1.0, 1.0, 1.0, 1.0)
-		i01.setHeadSpeed(0.8, 0.8)
+		i01.setHeadSpeed(0.2, 0.2)
 		i01.setTorsoSpeed(1.0, 1.0, 1.0)
 		i01.moveHead(80,86,82,78,76)
 		i01.moveArm("left",5,90,0,10)
 		i01.moveHand("left",2,2,2,2,2,90)
 		i01.moveTorso(80,90,80)
-		
-	if IsInmoovRight==1:
 		i01.setHandSpeed("right", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 		i01.setArmSpeed("right", 1.0, 1.0, 1.0, 1.0)
 		i01.moveArm("right",5,90,0,12)
 		i01.moveHand("right",2,2,2,2,2,90)
-	
-	if IsInmoovLeft==1 or IsInmoovRight==1:
+		HeadSide.rest()
 		i01.detach()
+		
+def No(data):
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	# WE MOVE THE ROTHEAD OR PISTONMOD
+	if IsInmoovArduino==1:
+		if random.randint(0,1)==1:
+			#i01.attach()
+			i01.setHeadSpeed(0.3, 0.3)
+			i01.moveHead(80,130)
+			sleep(0.5)
+			i01.moveHead(80,50)
+			sleep(0.5)
+			i01.moveHead(81,130)
+			sleep(0.5)
+			i01.moveHead(79,50)
+			sleep(0.5)
+			i01.moveHead(83,130)
+			sleep(1)
+			i01.moveHead(80,90)
+			i01.head.jaw.rest()
+		else:
+			HeadSide.setSpeed(0.3)
+			HeadSide.moveTo(50)
+			sleep(0.5)
+			HeadSide.moveTo(120)
+			sleep(1)
+			HeadSide.moveTo(90)
+			i01.head.jaw.rest()
+
+def Yes(data):
+	global MoveHeadRandom
+	MoveHeadRandom=0
+	if IsInmoovArduino==1:
+		#i01.attach()
+		i01.setHeadSpeed(0.3, 0.3)
+		i01.moveHead(130,90)
+		sleep(0.5)
+		i01.moveHead(50,93)
+		sleep(0.5)
+		i01.moveHead(130,90)
+		sleep(0.5)
+	#Light(0,1,1)
+	if IsInmoovArduino==1:
+		i01.moveHead(60,91)
+		sleep(0.5)
+		i01.moveHead(120,88)
+	if IsInmoovArduino==1:
+		i01.moveHead(70,90)
+		sleep(0.5)
+		i01.moveHead(95,90)
+	sleep(0.5)
+	#Light(1,1,1)
+	if IsInmoovArduino==1:
+		i01.moveHead(90,90)
+	if IsInmoovArduino==1:
+		i01.head.jaw.rest()
+	
 
 def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
 	print side

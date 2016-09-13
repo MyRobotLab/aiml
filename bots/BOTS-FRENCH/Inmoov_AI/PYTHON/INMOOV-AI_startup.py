@@ -1,9 +1,6 @@
-
 # ##############################################################################
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
-# STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ AIML + PYTHON ]
-# UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ AIML + PYTHON ]
 # -----------------------------------
 # - Inmoov-AI Version 1.8 By Moz4r
 # - Credit :
@@ -16,10 +13,12 @@
 # - Grattounet
 # - Lecagnois
 # -----------------------------------
-# !!! INSTALL : !!!
-# !!! PLEASE copy all aiml files to : develop\ProgramAB\bots\YOUR_BOT_NAME\aiml !!!
-# !!! AND https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-FRENCH/INMOOV_AI/TXT to the root of MRL
-# !!! + https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-ENGLISH/INMOOV_AI/TXT
+#									multilingual base python script
+#							( you just need translate all the aiml :)
+# -----------------------------------
+# !!! INSTALL : ( if you get this from github ) !!!
+# !!! PLEASE copy all aiml files to : ProgramAB\bots\YOUR_BOT_NAME\aiml !!!
+# !!! AND https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-FRENCH/INMOOV_AI/BDD + SOUND + PICTURES to the root of MRL
 #
 # 
 # I use realTime voice syncronisation but you can check mouthcontrol=1 in INMOOV-AI_config.py 
@@ -41,7 +40,7 @@
 
 
 
-version=18
+version=19
 global IcanStartToEar
 IcanStartToEar=0
 
@@ -66,8 +65,8 @@ import json
 import time
 import csv
 from datetime import datetime
-
 from subprocess import Popen, PIPE
+from org.myrobotlab.service import Servo
 
 
 
@@ -83,6 +82,7 @@ if os.path.isfile(oridir + 'INMOOV-AI_config.py'):
 	print("ok")
 else:
 	shutil.copyfile(oridir + 'INMOOV-AI_config.py.default',oridir + 'INMOOV-AI_config.py')
+
 execfile('INMOOV-AI_config.py')
 	
 gesturesPath = (oridir)+"gestures"
@@ -131,11 +131,15 @@ sleep(0.1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #webgui.start()
 
-# inmoov init
+# inmoov servo configuration
 
-
+left = Runtime.create("i01.left", "Arduino")
 leftHand = Runtime.create("i01.leftHand", "InMoovHand")
-
+leftArm = Runtime.create("i01.leftArm", "InMoovArm")
+right=Runtime.create("i01.right", "Arduino")
+rightHand = Runtime.create("i01.rightHand", "InMoovHand")
+rightArm = Runtime.create("i01.rightArm", "InMoovArm")
+head = Runtime.create("i01.head","InMoovHead")
 
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
 leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
@@ -148,11 +152,23 @@ leftHand.majeure.map(0,180,majeureLeftMIN,majeureLeftMAX)
 leftHand.ringFinger.map(0,180,ringFingerLeftMIN,ringFingerLeftMAX) 
 leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX) 
 
-i01.setHeadSpeed(0.1,0.1,1,1,1)
-head = Runtime.create("i01.head","InMoovHead")
+rightHand.thumb.setMinMax(ThumbRightMIN,ThumbRightMAX) 
+rightHand.index.setMinMax(IndexRightMIN,IndexRightMAX) 
+rightHand.majeure.setMinMax(majeureRightMIN,majeureRightMAX) 
+rightHand.ringFinger.setMinMax(ringFingerRightMIN,ringFingerRightMAX) 
+rightHand.pinky.setMinMax(pinkyRightMIN,pinkyRightMAX) 
+rightHand.thumb.map(0,180,ThumbRightMIN,ThumbRightMAX) 
+rightHand.index.map(0,180,IndexRightMIN,IndexRightMAX) 
+rightHand.majeure.map(0,180,majeureRightMIN,majeureRightMAX) 
+rightHand.ringFinger.map(0,180,ringFingerRightMIN,ringFingerRightMAX) 
+rightHand.pinky.map(0,180,majeureRightMIN,majeureRightMAX)
 
 head.jaw.setMinMax(JawMIN,JawMAX)
-head.jaw.map(0,180,JawMIN,JawMAX)
+if JawInverted==1:
+	head.jaw.map(0,180,JawMAX,JawMIN)
+else:
+	head.jaw.map(0,180,JawMIN,JawMAX)
+head.jaw.setMinMax(0,180)
 head.jaw.setRest(0)
 
 head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
@@ -165,9 +181,8 @@ head.eyeX.setRest(90)
 head.eyeY.setRest(90)
 head.neck.setMinMax(MinNeck,MaxNeck)
 head.neck.setRest(90)
-head.rothead.setRest(90)
-
 head.rothead.setMinMax(MinRotHead,MinRotHead)
+
 if RotHeadInverted==1: 
 	head.rothead.map(0,180,MaxRotHead,MinRotHead)
 else:
@@ -178,31 +193,29 @@ if NeckInverted==1:
 else:
 	head.neck.map(0,180,MinNeck,MaxNeck)
 	
+#start the arduino
+	
+if IsInmoovArduino==1:
+	i01 = Runtime.start("i01","InMoov")
+	i01.startAll(leftPort, rightPort)
+	sleep(1)
 
-#head.rothead.setMinMax(180,180)
-# right servo creation
-
-left = Runtime.create("i01.left", "Arduino")
-right = Runtime.create("i01.right", "Arduino")
-i01 = Runtime.start("i01","InMoov")
-
-
-# check arduino left	
-if IsInmoovLeft==1:
-	i01.setHeadSpeed(0.1,0.1)
+	left = Runtime.start("i01.left", "Arduino")
 	i01.startHead(leftPort)
-	i01.setHeadSpeed(0.1,0.1)
+	head.rothead.setSpeed(0.2)
+	head.neck.setSpeed(0.2)
 	head.neck.setMinMax(0,180)
 	head.rothead.setMinMax(0,180)
+	head.rothead.moveTo(1)
 	head.neck.rest()
-	head.rothead.rest()
+	head.rothead.setRest(90)
 	i01.startLeftHand(leftPort,"")
+	i01.startLeftArm(leftPort)
 	
 	if MRLmouthControl==1:
 		i01.startMouthControl(leftPort)
 		i01.mouthControl.setmouth(0,180)
 		
-	i01.startLeftArm(leftPort)
 	torso = i01.startTorso(leftPort)
 	
 	i01.head.eyeY.rest()
@@ -211,41 +224,28 @@ if IsInmoovLeft==1:
 	i01.startEyesTracking(leftPort,22,24)
 	i01.startHeadTracking(leftPort)
 	
-	
-
-if IsInmoovRight==1:
-
-	
-	right.publishState()
-	right.connect(rightPort)
-	
-	if IhaveLights==1:
-
-		right.pinMode(ROUGE, Arduino.OUTPUT)
-		right.pinMode(VERT, Arduino.OUTPUT)
-		right.pinMode(BLEU, Arduino.OUTPUT)
-		
-
-		right.digitalWrite(ROUGE,1)
-		right.digitalWrite(VERT,0)
-		right.digitalWrite(BLEU,1)
-	
-	
+	right = Runtime.start("i01.right", "Arduino")
+	i01.startRightHand(rightPort,"")
 	i01.startRightArm(rightPort)
-	i01.startRightHand(rightPort)
 	
+#gestion des mouvement latéraux de la tete ( mod pistons de Bob )
+	
+	HeadSide = Runtime.start("HeadSide","Servo")
+	HeadSide.setMinMax(MinHeadSide , MaxHeadSide)
+	if HeadSideArduino=="left":
+		HeadSide.attach(left, HeadSidePin)
+	else:
+		HeadSide.attach(right, HeadSidePin)
+	HeadSide.map(0,180,MinHeadSide,MaxHeadSide)
+	HeadSide.setMinMax(0,180)
+	HeadSide.setRest(90)
+	HeadSide.setSpeed(0.2)
 
-# start opencv service
-if IsInmoovLeft==1 or IsInmoovRight==1:
 	opencv = i01.opencv
-
-
 
 Runtime.createAndStart("htmlFilter", "HtmlFilter")
 
-
 voiceType=Voice
-
 
 if lang=="FR":
    WikiFile="BDD/WIKI_prop.txt"
@@ -261,15 +261,11 @@ sleep(0.1)
 mouth.setVoice(voiceType)
 mouth.setLanguage(lang)
 
-
-
-
 chatBot.startSession("ProgramAB", "default", myAimlFolder)
 chatBot.addTextListener(htmlFilter)
 htmlFilter.addListener("publishText", python.name, "talk") 
 
-
-			
+		
 
 #var to set when robot is speaking
  
@@ -295,70 +291,19 @@ def NeoPixelF(valNeo):
 
 NeoPixelF(3)
 
-def No(data):
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	if IsInmoovLeft==1:
-		#i01.attach()
-		i01.setHeadSpeed(0.1, 0.1)
-		i01.moveHead(80,130)
-		sleep(0.5)
-		i01.moveHead(80,90)
-		sleep(0.5)
-		i01.moveHead(80,50)
-		sleep(0.5)
-	#Light(0,1,1)
-	if IsInmoovLeft==1:
-		i01.moveHead(81,90)
-		sleep(0.5)
-		i01.moveHead(79,130)
-	if IsInmoovLeft==1:
-		i01.moveHead(80,90)
-		sleep(0.5)
-		i01.moveHead(83,50)
-	sleep(0.5)
-	#Light(1,1,1)
-	if IsInmoovLeft==1:
-		i01.moveHead(80,90)
-	if IsInmoovLeft==1:
-		i01.head.jaw.rest()
 
-def Yes(data):
-	global MoveHeadRandom
-	MoveHeadRandom=0
-	if IsInmoovLeft==1:
-		#i01.attach()
-		i01.setHeadSpeed(0.1, 0.1)
-		i01.moveHead(130,90)
-		sleep(0.5)
-		i01.moveHead(50,93)
-		sleep(0.5)
-		i01.moveHead(130,90)
-		sleep(0.5)
-	#Light(0,1,1)
-	if IsInmoovLeft==1:
-		i01.moveHead(60,91)
-		sleep(0.5)
-		i01.moveHead(120,88)
-	if IsInmoovLeft==1:
-		i01.moveHead(70,90)
-		sleep(0.5)
-		i01.moveHead(95,90)
-	sleep(0.5)
-	#Light(1,1,1)
-	if IsInmoovLeft==1:
-		i01.moveHead(90,90)
-	if IsInmoovLeft==1:
-		i01.head.jaw.rest()
-	
 			
 def talk(data):
-	ear.startListening()
+	if data[0:2]=="l ":
+		data=data.replace("l ", "l'")
+	data=data.replace(" l ", " l'")
+	
+	ear.startListening() #fix onclick micro
 	
 	if data!="":
 		mouth.speak(unicode(data,'utf-8'))
 		
-	if IsInmoovLeft==1:
+	if IsInmoovArduino==1:
 		if random.randint(1,3)==1:
 			i01.head.eyeX.moveTo(0)
 			sleep(2)
@@ -377,13 +322,14 @@ execfile('INMOOV-AI_memory.py')
 if IhaveEyelids==1:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
 execfile('INMOOV-AI_vie_aleatoire-standby_life.py')
-if IsInmoovLeft==1:
+if IsInmoovArduino==1:
 	execfile('INMOOV-AI_opencv.py')
 execfile('INMOOV-AI_move_head_random.py')
 execfile('INMOOV-AI_azure_translator.py')
 execfile('INMOOV-AI_messenger.py')
-execfile('INMOOV-AI_wikidata.py')
+execfile('INMOOV-AI_KnowledgeFetchers.py')
 execfile('INMOOV-AI_games.py')
+execfile('INMOOV-AI_reminders.py')
 execfile('INMOOV-AI_gestures.py')
 execfile('INMOOV-AI_domotique.py')
 execfile(u'INMOOV-AI_dictionaries.py')
@@ -403,7 +349,7 @@ def onEndSpeaking(text):
 	VieAleatoire.startClock()
 	TimeNoSpeak="OFF"
 	#Light(0,0,0)
-	if IsInmoovLeft==1:
+	if IsInmoovArduino==1:
 		i01.moveHead(90,90,90,90,90)
 	MoveHeadRandom=1
 	
@@ -452,6 +398,10 @@ def onText(text):
 	if Ispeak==0:
 		chatBot.getResponse(text.replace("'", " "))
 	
+	 #we close pictures
+	image.exitFS()
+	image.closeAll()
+	
 
 	
 python.subscribe(mouth.getName(),"publishStartSpeaking")
@@ -492,10 +442,8 @@ def Parse(utfdata):
 
 		
 def Light(ROUGE_V,VERT_V,BLEU_V):
-	if IhaveLights==1 and IsInmoovRight==1:
-		right.digitalWrite(ROUGE,ROUGE_V)
-		right.digitalWrite(VERT,VERT_V)
-		right.digitalWrite(BLEU,BLEU_V)
+	if IhaveLights==1 and IsInmoovArduino==1:
+		print 0
 
 
 
@@ -505,20 +453,21 @@ def getDate(query, ID):# Cette fonction permet d'afficher une date personnalisée
 	#print " La date est : " + answer
 	chatBot.getResponse("say Le " + answer)
 	
-def FindImage(image):
-	try:
-		image = image.decode( "utf8" )
-	except: 
-		pass
-	mouth.speak(image)
-	#PLEASE USE REAL LANGUAGE PARAMETER :
-	#lang=XX ( FR/EN/RU/IT etc...)
-	#A FAKE LANGUAGE WORKS BUT DATABASE WILL BROKE
-	a = Parse(BotURL+"&type=pic&pic="+urllib2.quote(image).replace(" ", "%20"))
+
 	
-	DisplayPic(a)
-	print BotURL+"&type=pic&pic="+urllib2.quote(image).replace(" ", "%20")
-	#Light(1,1,1)
+def DisplayPic(pic):
+	r=0
+	try:
+		r=image.displayFullScreen(pic,1)
+	except: 
+		chatBot.getResponse("PICTUREPROBLEM")
+		pass
+	time.sleep(0.1)
+	try:
+		r=image.displayFullScreen(pic,1)
+	except:
+		pass
+	
 			
 	
 
@@ -554,35 +503,7 @@ def Meteo(data):
 	#print BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20")
 	mouth.speakBlocking(a)
 	
-#this is broken now need fix on myai.cloud
-def question(data):
-	chatBot.getResponse("FINDTHEWEB")
-	a = Parse(BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20"))
-	#print BotURL+"&type=question&question="+urllib2.quote(data).replace(" ", "%20")
-	if a[0]=="0":
-		return("IDONTUNDERSTAND")
-	elif a[0:299]<>"":
-		#return(a[0:299])
-		return("IDONTUNDERSTAND")
-	else:
-		return("IDONTUNDERSTAND")
 
-
-def DisplayPic(pic):
-	r=0
-	try:
-		r=image.displayFullScreen(pic,1)
-	except: 
-		chatBot.getResponse("PICTUREPROBLEM")
-		pass
-	time.sleep(0.1)
-	try:
-		r=image.displayFullScreen(pic,1)
-	except:
-		pass
-	time.sleep(10)
-	image.exitFS()
-	image.closeAll()
 
 
 def trackHumans():
@@ -661,46 +582,27 @@ def PlayUtub(q,num):
 		#print "http://www.myai.cloud/utub/?num="+str(num)+"&q="+str(q).encode('utf-8')
 		
 
-def anniversaire(SpeakReturn):
-	maintenant = datetime.now()
-	#petite vavriable pour faire un retour en cas de non anniversaire
-	NoBirthDay=1
-	#On ouvre notre liste perso
-	cr = csv.reader(open(oridir+"BDD/birthday.csv","rb"))
-	for row in cr:
-		#On converti au format date la premiere valeure pour faire des calculs car elle est en texte
-		DateSelect=datetime.strptime(row[0], '%d/%m/%Y')
-		#On filtre uniquement le mois et le jour
-		KeyFounded=str(DateSelect.strftime('%d/%m'))
-		#on calcul la différence de jour ( au prochain anniversaire )
-		FakeDate=(datetime.strptime(KeyFounded+"/"+str(maintenant.year), '%d/%m/%Y')-maintenant).days+1
-		#print datetime.strptime(KeyFounded+"/"+str(maintenant.year), '%d/%m/%Y')-maintenant
-		if FakeDate<=7 and FakeDate>=0:
-			age = (maintenant.year - DateSelect.year)
-			NoBirthDay=0
-		#On envoi le retour a l'aiml ( pour internationalisation : nom SYSTEM jours_restants BIRTHDAY OK age )
-			chatBot.getResponse(str(row[1]) + " SYSTEM " + str(FakeDate) + " BIRTHDAY OK " + str(age))
-			sleep(4)
-	if SpeakReturn!="0" and NoBirthDay==1:
-		chatBot.getResponse("SYSTEM BIRTHDAY NOK")
+
 	
 
 def ShutDown():
-	MoveHeadRandom=0
 	talkBlocking("Extinction")
-	if IsInmoovLeft==1:
+	MoveHeadRandom=0
+	sleep(1)
+	if IsInmoovArduino==1:
 		i01.setHeadSpeed(0.3, 0.3)
-		i01.moveHead(0,0)
+		i01.moveHead(0,180)
+		HeadSide.moveTo(90)
 	sleep(4)
+	
+	HeadSide.detach()
 	i01.detach()
 	sleep(1)
-	runtime.shutdown()
+	#runtime.shutdown()
 
 
 	
 # ##########################################################	
-
-
 
 
 # program start :
@@ -713,16 +615,12 @@ if myBotname!="":
 	UpdateBotName(myBotname)
 
 
-
-
-
 rest()
-if IsInmoovLeft==1:
+if IsInmoovArduino==1:
 	i01.head.attach()
-if IsInmoovLeft==1 and tracking==1:
+	#head.rothead.setSpeed(0.2)
+if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
-
-
 
 proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
@@ -758,4 +656,4 @@ python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
 #test de dictionaire
-print(Singularize("travaux"),Singularize("nez"),Singularize("vitraux"),Singularize("bocaux"),Singularize("poux"),Singularize("époux"),Singularize("fraises"))
+#print(Singularize("travaux"),Singularize("nez"),Singularize("vitraux"),Singularize("bocaux"),Singularize("poux"),Singularize("époux"),Singularize("fraises"))
