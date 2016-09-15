@@ -82,8 +82,8 @@ if os.path.isfile(oridir + 'INMOOV-AI_config.py'):
 	print("ok")
 else:
 	shutil.copyfile(oridir + 'INMOOV-AI_config.py.default',oridir + 'INMOOV-AI_config.py')
-
-execfile('INMOOV-AI_config.py')
+# -- coding: utf-8 --
+execfile(u'INMOOV-AI_config.py')
 	
 gesturesPath = (oridir)+"gestures"
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
