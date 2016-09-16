@@ -338,7 +338,7 @@ def talkBlocking(data):
 #We include all InmoovAI mods
 # -- coding: utf-8 --
 execfile('INMOOV-AI_memory.py')
-if IhaveEyelids==1:
+if IhaveEyelids==1 or IhaveEyelids==2:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
 execfile(u'INMOOV-AI_timers.py')
 if IsInmoovArduino==1:
