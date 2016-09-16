@@ -105,6 +105,34 @@
       <srai>DEBOUT</srai>
     </template>
   </category>
+  
+   <category>
+    <pattern>ECOUTE</pattern>
+    <template>
+      <srai>DEBOUT</srai>
+    </template>
+  </category>
+  
+    <category>
+    <pattern>éCOUTE</pattern>
+    <template>
+      <srai>DEBOUT</srai>
+    </template>
+  </category>
+  
+    <category>
+    <pattern>ECOUTES</pattern>
+    <template>
+      <srai>DEBOUT</srai>
+    </template>
+  </category>
+  
+    <category>
+    <pattern>éCOUTEs</pattern>
+    <template>
+      <srai>DEBOUT</srai>
+    </template>
+  </category>
 
   <category>
     <pattern>FERME TA GUEULE</pattern>

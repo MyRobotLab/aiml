@@ -41,8 +41,12 @@
 
 
 version=19
+#EN : We wait startup before robot can start to ear
 global IcanStartToEar
+#EN : After timer we don't want the robot listen everything we say
+global IcanEarOnlyKnowsWords
 IcanStartToEar=0
+IcanEarOnlyKnowsWords=-1
 
 #Python libraries
 
@@ -336,7 +340,7 @@ def talkBlocking(data):
 execfile('INMOOV-AI_memory.py')
 if IhaveEyelids==1:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
-execfile('INMOOV-AI_vie_aleatoire-standby_life.py')
+execfile(u'INMOOV-AI_timers.py')
 if IsInmoovArduino==1:
 	execfile('INMOOV-AI_opencv.py')
 execfile('INMOOV-AI_move_head_random.py')
@@ -375,7 +379,10 @@ def onEndSpeaking(text):
 			pass
 	WebkitSpeachReconitionFix.startClock()
 	IcanStartToEar=1
-
+	IcanEarOnlyKnowsWords=-1
+	StopListenTimer.stopClock()
+	StopListenTimer.startClock()
+	
 	
 def onStartSpeaking(text):
 	
@@ -613,6 +620,13 @@ def ShutDown():
 	HeadSide.detach()
 	i01.detach()
 	sleep(1)
+	
+	
+def IdontUnderstand():
+	if IcanEarOnlyKnowsWords<=0:
+		chatBot.getResponse("IDONTUNDERSTAND")
+	else:
+		print "robot doesnt understand"
 	#runtime.shutdown()
 
 
