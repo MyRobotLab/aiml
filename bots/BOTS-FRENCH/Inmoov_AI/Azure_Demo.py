@@ -41,29 +41,28 @@ male_languages = {
     'no' : 'Olav',
     'es' : 'Antonio',
     'sv' : 'Emil',
-	'ja' : 'Sakura',
+    'ja' : 'Sakura',
 }
 
 #Translate to :
 en_languages = {
     'arab' : 'ar',
-	'arabe' : 'ar',
+    'arabe' : 'ar',
     'danish' : 'da',
     'dutch' : 'nl',
     'english' : 'en',
-	'anglais' : 'en',
+    'anglais' : 'en',
     'french' : 'fr',
     'german' : 'de',
-	'allemand' : 'de',
+    'allemand' : 'de',
     'greek' : 'el',
     'italian' : 'it',
-	'italien' : 'it',
+    'italien' : 'it',
     'norway' : 'no',
     'spanish' : 'es',
     'espagnol' : 'es',
     'sweden' : 'sv',
-	'japonais' : 'ja',
-	
+    'japonais' : 'ja',
 }
 
 
