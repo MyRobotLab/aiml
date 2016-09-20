@@ -7,7 +7,7 @@ Runtime.createAndStart("mouth", "AcapelaSpeech")
 AzureTranslator=Runtime.createAndStart("AzureTranslator", "AzureTranslator")
 sleep(0.1)
 #initiate azure
-AzureTranslator.setCredentials("7da9defb-7d86-46e4-8607-5b82f280f430","IgCffuxo0QgHDzKMK1k5bf9/9GpP9ZwWwAaonacAcW0") # KEY and SECRET azure credentials
+AzureTranslator.setCredentials("YOUR_KEY_HERE_7da9defb-7d86-etc...","YOUR_SECRET_HERE_IgCffuxo-etc...") # KEY and SECRET azure credentials
 #voice output
 mouth.setVoice("Ryan")
 mouth.setLanguage("EN")
@@ -69,15 +69,22 @@ en_languages = {
 
 #main function
 def translateText(text,language):
-	
-	AzureTranslator.detectLanguage(text)
+
 	#AzureTranslator.fromLanguage('en')
 	RealLang="0"
 	try:
 		RealLang=en_languages[language]
 	except: 
-		mouth.speak("I don't know this language, i am so sorry. Or you made a mistake dude")
+		mouth.speak("I dont know this language, i am so sorry, or you made a mistake dude")
 	print RealLang
+	
+	try:
+		AzureTranslator.detectLanguage(text)
+	except:
+		mouth.speak("Check your azure credentials please ! I can't do all the work for you, i am just a robot")
+		RealLang="0"
+	
+	
 	if RealLang!="0":
 		AzureTranslator.toLanguage(RealLang)
 		sleep(0.5)
@@ -94,7 +101,7 @@ def translateText(text,language):
 
 
 		if 'Cannot find an active Azure Market Place' in t_text:
-			mouth.speak("There is a problem with azure, i am so sorry")
+			mouth.speak("There is a problem with azure, i am so sorry. Or maybe I am tired")
 		else:
 			#change acapela voice
 			mouth.setVoice(male_languages[RealLang])  
