@@ -5,9 +5,9 @@ StopListenTimer.setInterval(60000)
 StopListenTimer = Runtime.start("StopListenTimer","Clock")
 
 def StopListenTimerFunc(timedata):
-	print "IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
 	global IcanEarOnlyKnowsWords
 	IcanEarOnlyKnowsWords+=1
+	print "IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
 
 StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
 # start the clock

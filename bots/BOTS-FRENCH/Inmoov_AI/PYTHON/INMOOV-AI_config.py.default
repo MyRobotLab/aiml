@@ -182,8 +182,8 @@ TorsoBottomMax=180
 # translator : https://datamarket.azure.com/dataset/bing/microsofttranslator 
 global Azure_client_id
 global Azure_client_secret
-Azure_client_id = '896cfb2d-8019-44d9-9621-9a900a294983'
-Azure_client_secret = 'dLHJ/mbjIj02esBHiqZPVNUR4ZbIAPVntsPTlbCTf2s'
+Azure_client_id = 'X-X-X-X-X'
+Azure_client_secret = 'XXXXX'
  
 #
 GoogleAPIa=''

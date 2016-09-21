@@ -9,7 +9,7 @@
       <template>
         <condition name="name">
           <li value="default">Salut ! je souhaiterais faire connaissance, puis-je avoir ton prénom ?</li>
-          <li>Bonjour<get name="name"/></li>
+          <li>Bonjour <get name="name"/></li>
         </condition>
       </template>
     </category>
@@ -53,7 +53,7 @@
       <pattern>JE NE SUIS PAS #</pattern>
       <that># BONJOUR #</that>
       <template>
-        <srai>JE NE M APPELLE PAS #<star/></srai>
+        <srai>JE NE M APPELLE PAS <star/></srai>
       </template>
     </category>
     
@@ -75,14 +75,14 @@
     <category>
       <pattern>JE M APPELLE *</pattern>
       <template>
-        <srai>MON NOM EST<star/></srai>
+        <srai>MON NOM EST <star/></srai>
       </template>
     </category>
     
     <category>
       <pattern>*</pattern><that># AVOIR TON PRÉNOM #</that>
       <template>
-        <srai>MON NOM EST<star/></srai>
+        <srai>MON NOM EST <star/></srai>
       </template>
     </category>
     
@@ -92,7 +92,7 @@
         <think>
           <set name="genre">homme</set>
         </think>
-        <li value="homme">Enchanté monsieur<get name="name"/>.</li>
+        <li value="homme">Enchanté monsieur <get name="name"/>.</li>
         . au fait tu as quel age ?
       </template>
     </category>
@@ -103,7 +103,7 @@
         <think>
           <set name="genre">femme</set>
         </think>
-        <li value="femme">Enchanté madame<get name="name"/>, je dis madame car vous semblez un peu vielle pour dire mademoiselle.</li>
+        <li value="femme">Enchanté madame <get name="name"/>, je dis madame car vous semblez un peu vielle pour dire mademoiselle.</li>
         . au fait tu as quel age ?
       </template>
     </category>
