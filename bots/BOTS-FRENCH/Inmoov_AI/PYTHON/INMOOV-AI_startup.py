@@ -664,8 +664,9 @@ if myBotname!="":
 
 rest()
 
-i01.head.attach()
-head.rothead.setSpeed(0.2)
+if IsInmoovArduino==1:
+	i01.head.attach()
+	head.rothead.setSpeed(0.2)
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
 
