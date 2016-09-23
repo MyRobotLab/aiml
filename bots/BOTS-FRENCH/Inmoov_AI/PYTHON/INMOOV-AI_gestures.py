@@ -3,7 +3,7 @@ def rest():
 	if IsInmoovArduino==1:
 		i01.setHandSpeed("left", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 		i01.setArmSpeed("left", 1.0, 1.0, 1.0, 1.0)
-		i01.setHeadSpeed(0.2, 0.2)
+		i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 		i01.setTorsoSpeed(1.0, 1.0, 1.0)
 		i01.moveHead(80,86,82,78,76)
 		i01.moveArm("left",5,90,0,10)
@@ -38,7 +38,7 @@ def No(data):
 			i01.moveHead(80,90)
 			i01.head.jaw.rest()
 		else:
-			HeadSide.setSpeed(0.3)
+			HeadSide.setSpeed(PistonSideSpeed+0.1)
 			HeadSide.moveTo(50)
 			sleep(0.5)
 			HeadSide.moveTo(120)
@@ -53,7 +53,7 @@ def Yes(data):
 	MoveHeadRandom=0
 	if IsInmoovArduino==1:
 		#i01.attach()
-		i01.setHeadSpeed(0.3, 0.3)
+		i01.setHeadSpeed(RotHeadSpeed+0.1, NeckSpeed+0.1)
 		i01.moveHead(130,90)
 		sleep(0.5)
 		i01.moveHead(50,93)
@@ -132,39 +132,39 @@ def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
 def LookAtTheSky():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(0,90)
 	sleep(5)
-	i01.setHeadSpeed(0.1, 0.1)
+	i01.setHeadSpeed(RotHeadSpeed-0.1, NeckSpeed-0.1)
 	i01.moveHead(90)
 	
 	
 def LookAtYourFeet():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(180,90)
 	sleep(5)
-	i01.setHeadSpeed(0.1, 0.1)
+	i01.setHeadSpeed(RotHeadSpeed-0.1, NeckSpeed-0.1)
 	i01.moveHead(90)
 	
 	
 def LookAtYourLeft():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(120,20)
 	sleep(5)
-	i01.setHeadSpeed(0.1, 0.1)
+	i01.setHeadSpeed(RotHeadSpeed-0.1, NeckSpeed-0.1)
 	i01.moveHead(90,90)
 	
 def LookAtYourRight():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(120,160)
 	sleep(5)
-	i01.setHeadSpeed(0.1, 0.1)
+	i01.setHeadSpeed(RotHeadSpeed-0.1, NeckSpeed-0.1)
 	i01.moveHead(90,90)
 
 	
@@ -172,17 +172,17 @@ def LookAtYourRight():
 def LookAroundYou():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(160,160)
 	sleep(1)
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(160,20)
 	sleep(1)
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(20,20)
 	sleep(1)
-	i01.setHeadSpeed(0.2, 0.2)
+	i01.setHeadSpeed(RotHeadSpeed, NeckSpeed)
 	i01.moveHead(20,160)
 	sleep(1)
-	i01.setHeadSpeed(0.1, 0.1)
+	i01.setHeadSpeed(RotHeadSpeed-0.1, NeckSpeed-0.1)
 	i01.moveHead(90,90)

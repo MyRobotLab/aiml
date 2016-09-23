@@ -2,12 +2,12 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 1.8.2 By Moz4r
+# - Inmoov-AI Version 2.0.0 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
 # - Azure translator by Papaoutai
-# - Grog / Kwatters / and All MRL team
+# - Grog / Kwatters / Calamity and All MRL team
 # - HairyGael
 # - Heisenberg
 # - Grattounet
@@ -41,7 +41,7 @@
 
 
 
-version=19
+version=20
 #EN : We wait startup before robot can start to ear
 global IcanStartToEar
 #EN : After timer we don't want the robot listen everything we say
@@ -187,7 +187,7 @@ head.eyeY.setRest(90)
 head.neck.setMinMax(MinNeck,MaxNeck)
 head.neck.setRest(90)
 head.rothead.setMinMax(MinRotHead,MinRotHead)
-
+head.rothead.setRest(90)
 if RotHeadInverted==1: 
 	head.rothead.map(0,180,MaxRotHead,MinRotHead)
 else:
@@ -211,7 +211,10 @@ if IsInmoovArduino==1:
 	
 	left = Runtime.start("i01.left", "Arduino")
 	
-	head.rothead.setSpeed(0.2)
+	head.rothead.setSpeed(RotHeadSpeed)
+	head.neck.setSpeed(NeckSpeed)
+	head.neck.setMinMax(0,180)
+	head.rothead.setMinMax(0,180)
 	
 	
 	i01.startHead(leftPort)
@@ -220,12 +223,6 @@ if IsInmoovArduino==1:
 	
 
 	
-	head.neck.setSpeed(0.2)
-
-	head.neck.setMinMax(0,180)
-	head.rothead.setMinMax(0,180)
-	head.neck.rest()
-	head.rothead.setRest(90)
 	i01.startLeftHand(leftPort,"")
 	i01.startLeftArm(leftPort)
 	
@@ -249,16 +246,18 @@ if IsInmoovArduino==1:
 	
 #gestion des mouvement latéraux de la tete ( mod pistons de Bob )
 	
-	HeadSide = Runtime.start("HeadSide","Servo")
+	HeadSide = Runtime.create("HeadSide","Servo")
 	HeadSide.setMinMax(MinHeadSide , MaxHeadSide)
-	if HeadSideArduino=="left":
-		HeadSide.attach(left, HeadSidePin)
-	else:
-		HeadSide.attach(right, HeadSidePin)
 	HeadSide.map(0,180,MinHeadSide,MaxHeadSide)
 	HeadSide.setMinMax(0,180)
 	HeadSide.setRest(90)
-	HeadSide.setSpeed(0.2)
+	HeadSide.setSpeed(PistonSideSpeed)
+	HeadSide = Runtime.start("HeadSide","Servo")
+	if HeadSideArduino=="left":
+		HeadSide.attach(left, HeadSidePin, 90, 5)
+	else:
+		HeadSide.attach(right, HeadSidePin, 90, 5)
+
 
 	opencv = i01.opencv
 	
@@ -629,7 +628,7 @@ def ShutDown():
 	MoveHeadRandom=0
 	sleep(1)
 	if IsInmoovArduino==1:
-		i01.setHeadSpeed(0.3, 0.3)
+		i01.setHeadSpeed(RotHeadSpeed+0.1, NeckSpeed+0.1)
 		i01.moveHead(0,180)
 		HeadSide.moveTo(90)
 	sleep(4)
@@ -666,7 +665,7 @@ rest()
 
 if IsInmoovArduino==1:
 	i01.head.attach()
-	head.rothead.setSpeed(0.2)
+	
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
 

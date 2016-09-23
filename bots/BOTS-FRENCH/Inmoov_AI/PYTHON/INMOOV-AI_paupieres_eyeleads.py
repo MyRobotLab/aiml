@@ -1,5 +1,5 @@
-PaupiereServoGauche = Runtime.start("PaupiereServoGauche","Servo")
-PaupiereServoDroite = Runtime.start("PaupiereServoDroite","Servo")
+PaupiereServoGauche = Runtime.createAndStart("PaupiereServoGauche","Servo")
+PaupiereServoDroite = Runtime.createAndStart("PaupiereServoDroite","Servo")
 
 
 PaupiereDroiteMINPaupiereInverted=PaupiereDroiteMIN
@@ -18,22 +18,19 @@ if IsInmoovArduino==1:
 
 	if PaupiereArduino=="left":
 	  if IhaveEyelids==1 or IhaveEyelids==2:
-		PaupiereServoGauche.attach(left, PaupiereGaucheServoPin)
+		PaupiereServoGauche.attach(left, PaupiereGaucheServoPin, PaupiereGaucheMIN, 5)
 	else:
 	  if IhaveEyelids==1 or IhaveEyelids==2:
-		PaupiereServoGauche.attach(right, PaupiereGaucheServoPin)
+		PaupiereServoGauche.attach(right, PaupiereGaucheServoPin, PaupiereGaucheMIN, 5)
 
 	if PaupiereArduino=="left":
 	  if IhaveEyelids==2:
-		
 		PaupiereServoDroite.setMinMax(PaupiereDroiteMIN , PaupiereDroiteMAX)
-		PaupiereServoDroite.attach(left, PaupiereDroiteServoPin)
+		PaupiereServoDroite.attach(left, PaupiereDroiteServoPin, PaupiereDroiteMIN, 5)
 	else:
 	  if IhaveEyelids==2:
-		
 		PaupiereServoDroite.setMinMax(PaupiereDroiteMIN , PaupiereDroiteMAX)
-		PaupiereServoDroite.attach(right, PaupiereDroiteServoPin)
-
+		PaupiereServoDroite.attach(right, PaupiereDroiteServoPin, PaupiereDroiteMIN, 5)
 
 
 	clock = Runtime.start("clock","Clock")
