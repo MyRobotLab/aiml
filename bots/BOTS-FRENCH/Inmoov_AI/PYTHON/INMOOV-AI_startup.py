@@ -326,7 +326,7 @@ def talk(data):
 		data=data.replace("l ", "l'")
 	data=data.replace(" l ", " l'")
 	
-	#ear.startListening() #fix onclick micro
+	ear.startListening() #fix onclick micro
 	
 	if data!="":
 		mouth.speak(unicode(data,'utf-8'))
