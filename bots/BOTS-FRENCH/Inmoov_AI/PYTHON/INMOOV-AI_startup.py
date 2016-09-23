@@ -216,15 +216,10 @@ if IsInmoovArduino==1:
 	head.rothead.setRest(90)
 	head.neck.setMinMax(0,180)
 	head.rothead.setMinMax(0,180)
-	
-	
+
 	i01.startHead(leftPort)
-	
-	#head.rothead.attach("i01.left", 13, 45)
-	
-  head.rothead.setSpeed(RotHeadSpeed)
-  head.neck.setSpeed(NeckSpeed)
-	
+	head.rothead.setSpeed(RotHeadSpeed)
+	head.neck.setSpeed(NeckSpeed)	
 	i01.startLeftHand(leftPort,"")
 	i01.startLeftArm(leftPort)
 	
