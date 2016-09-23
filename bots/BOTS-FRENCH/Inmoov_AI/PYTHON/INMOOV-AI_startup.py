@@ -187,7 +187,7 @@ head.eyeY.setRest(90)
 head.neck.setMinMax(MinNeck,MaxNeck)
 head.neck.setRest(90)
 head.rothead.setMinMax(MinRotHead,MinRotHead)
-head.rothead.setRest(90)
+
 if RotHeadInverted==1: 
 	head.rothead.map(0,180,MaxRotHead,MinRotHead)
 else:
@@ -211,8 +211,9 @@ if IsInmoovArduino==1:
 	
 	left = Runtime.start("i01.left", "Arduino")
 	
-	head.rothead.setSpeed(RotHeadSpeed)
-	head.neck.setSpeed(NeckSpeed)
+	head.rothead.setSpeed(0.1)
+	head.neck.setSpeed(0.1)
+	head.rothead.setRest(90)
 	head.neck.setMinMax(0,180)
 	head.rothead.setMinMax(0,180)
 	
@@ -221,7 +222,8 @@ if IsInmoovArduino==1:
 	
 	#head.rothead.attach("i01.left", 13, 45)
 	
-
+  head.rothead.setSpeed(RotHeadSpeed)
+  head.neck.setSpeed(NeckSpeed)
 	
 	i01.startLeftHand(leftPort,"")
 	i01.startLeftArm(leftPort)

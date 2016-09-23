@@ -136,7 +136,7 @@ def LookAtTheSky():
 	i01.moveHead(0,90)
 	sleep(5)
 	i01.setHeadSpeed(RotHeadSpeed-0.1, NeckSpeed-0.1)
-	i01.moveHead(90)
+	i01.moveHead(90,90)
 	
 	
 def LookAtYourFeet():
@@ -146,7 +146,7 @@ def LookAtYourFeet():
 	i01.moveHead(180,90)
 	sleep(5)
 	i01.setHeadSpeed(RotHeadSpeed-0.1, NeckSpeed-0.1)
-	i01.moveHead(90)
+	i01.moveHead(90,90)
 	
 	
 def LookAtYourLeft():
