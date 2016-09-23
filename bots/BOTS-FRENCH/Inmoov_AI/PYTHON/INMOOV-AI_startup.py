@@ -2,16 +2,17 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 1.8 By Moz4r
+# - Inmoov-AI Version 2.0.0 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
 # - Azure translator by Papaoutai
-# - Grog / Kwatters / and All MRL team
+# - Grog / Kwatters / Calamity and All MRL team
 # - HairyGael
 # - Heisenberg
 # - Grattounet
 # - Lecagnois
+# - Dom
 # -----------------------------------
 #									multilingual base python script
 #							( you just need translate all the aiml :)
@@ -40,9 +41,13 @@
 
 
 
-version=19
+version=20
+#EN : We wait startup before robot can start to ear
 global IcanStartToEar
+#EN : After timer we don't want the robot listen everything we say
+global IcanEarOnlyKnowsWords
 IcanStartToEar=0
+IcanEarOnlyKnowsWords=-1
 
 #Python libraries
 
@@ -82,8 +87,8 @@ if os.path.isfile(oridir + 'INMOOV-AI_config.py'):
 	print("ok")
 else:
 	shutil.copyfile(oridir + 'INMOOV-AI_config.py.default',oridir + 'INMOOV-AI_config.py')
-
-execfile('INMOOV-AI_config.py')
+# -- coding: utf-8 --
+execfile(u'INMOOV-AI_config.py')
 	
 gesturesPath = (oridir)+"gestures"
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
@@ -115,18 +120,7 @@ i01 = Runtime.create("i01", "InMoov")
 i01.setMute(1)
 
 #start acapela and webkit ear
-i01.startMouth()
-i01.startEar()
-ear = i01.ear
-mouth = i01.mouth
 
-#start webgui
-webgui = Runtime.create("WebGui","WebGui")
-webgui.autoStartBrowser(False)
-webgui.startService()
-
-#r=image.displayFullScreen("https://i.ytimg.com/vi/tIk1Mc170yg/maxresdefault.jpg",1)
-sleep(0.1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #webgui.start()
@@ -140,6 +134,17 @@ right=Runtime.create("i01.right", "Arduino")
 rightHand = Runtime.create("i01.rightHand", "InMoovHand")
 rightArm = Runtime.create("i01.rightArm", "InMoovArm")
 head = Runtime.create("i01.head","InMoovHead")
+torso = Runtime.create("i01.torso", "InMoovTorso")
+
+torso.topStom.setMinMax(TorsoTopMin,TorsoTopMax)
+torso.topStom.map(0,180,TorsoTopMin,TorsoTopMax)
+torso.topStom.setMinMax(0,180)
+
+torso.midStom.setMinMax(TorsoMidMin,TorsoMidMax)
+torso.midStom.map(0,180,TorsoMidMin,TorsoMidMax)
+torso.midStom.setMinMax(0,180)
+torso.topStom.setRest(90)
+torso.midStom.setRest(90)
 
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
 leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
@@ -182,7 +187,7 @@ head.eyeY.setRest(90)
 head.neck.setMinMax(MinNeck,MaxNeck)
 head.neck.setRest(90)
 head.rothead.setMinMax(MinRotHead,MinRotHead)
-
+head.rothead.setRest(90)
 if RotHeadInverted==1: 
 	head.rothead.map(0,180,MaxRotHead,MinRotHead)
 else:
@@ -196,27 +201,38 @@ else:
 #start the arduino
 	
 if IsInmoovArduino==1:
+	
+	
+	#i01.startHead(leftPort)
+	
 	i01 = Runtime.start("i01","InMoov")
-	i01.startAll(leftPort, rightPort)
-	sleep(1)
-
+	#i01.startHead(leftPort)
+	#i01.startAll(leftPort, rightPort)
+	
 	left = Runtime.start("i01.left", "Arduino")
-	i01.startHead(leftPort)
-	head.rothead.setSpeed(0.2)
-	head.neck.setSpeed(0.2)
+	
+	head.rothead.setSpeed(RotHeadSpeed)
+	head.neck.setSpeed(NeckSpeed)
 	head.neck.setMinMax(0,180)
 	head.rothead.setMinMax(0,180)
-	head.rothead.moveTo(1)
-	head.neck.rest()
-	head.rothead.setRest(90)
+	
+	
+	i01.startHead(leftPort)
+	
+	#head.rothead.attach("i01.left", 13, 45)
+	
+
+	
 	i01.startLeftHand(leftPort,"")
 	i01.startLeftArm(leftPort)
 	
 	if MRLmouthControl==1:
 		i01.startMouthControl(leftPort)
 		i01.mouthControl.setmouth(0,180)
-		
-	torso = i01.startTorso(leftPort)
+	if TorsoArduino=="left":	
+		torso = i01.startTorso(leftPort)
+	else:
+		torso = i01.startTorso(rightPort)
 	
 	i01.head.eyeY.rest()
 	i01.head.eyeX.rest()
@@ -230,18 +246,33 @@ if IsInmoovArduino==1:
 	
 #gestion des mouvement latéraux de la tete ( mod pistons de Bob )
 	
-	HeadSide = Runtime.start("HeadSide","Servo")
+	HeadSide = Runtime.create("HeadSide","Servo")
 	HeadSide.setMinMax(MinHeadSide , MaxHeadSide)
-	if HeadSideArduino=="left":
-		HeadSide.attach(left, HeadSidePin)
-	else:
-		HeadSide.attach(right, HeadSidePin)
 	HeadSide.map(0,180,MinHeadSide,MaxHeadSide)
 	HeadSide.setMinMax(0,180)
 	HeadSide.setRest(90)
-	HeadSide.setSpeed(0.2)
+	HeadSide.setSpeed(PistonSideSpeed)
+	HeadSide = Runtime.start("HeadSide","Servo")
+	if HeadSideArduino=="left":
+		HeadSide.attach(left, HeadSidePin, 90, 5)
+	else:
+		HeadSide.attach(right, HeadSidePin, 90, 5)
+
 
 	opencv = i01.opencv
+	
+i01.startMouth()
+i01.startEar()
+ear = i01.ear
+mouth = i01.mouth
+
+#start webgui
+webgui = Runtime.create("WebGui","WebGui")
+webgui.autoStartBrowser(False)
+webgui.startService()
+
+#r=image.displayFullScreen("https://i.ytimg.com/vi/tIk1Mc170yg/maxresdefault.jpg",1)
+sleep(0.1)
 
 Runtime.createAndStart("htmlFilter", "HtmlFilter")
 
@@ -298,7 +329,7 @@ def talk(data):
 		data=data.replace("l ", "l'")
 	data=data.replace(" l ", " l'")
 	
-	ear.startListening() #fix onclick micro
+	#ear.startListening() #fix onclick micro
 	
 	if data!="":
 		mouth.speak(unicode(data,'utf-8'))
@@ -319,9 +350,9 @@ def talkBlocking(data):
 #We include all InmoovAI mods
 # -- coding: utf-8 --
 execfile('INMOOV-AI_memory.py')
-if IhaveEyelids==1:
+if IhaveEyelids==1 or IhaveEyelids==2:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
-execfile('INMOOV-AI_vie_aleatoire-standby_life.py')
+execfile(u'INMOOV-AI_timers.py')
 if IsInmoovArduino==1:
 	execfile('INMOOV-AI_opencv.py')
 execfile('INMOOV-AI_move_head_random.py')
@@ -340,6 +371,7 @@ execfile(u'INMOOV-AI_dictionaries.py')
 
 def onEndSpeaking(text):
 	global IcanStartToEar
+	global IcanEarOnlyKnowsWords
 	print "End speaking debug"
 	global MoveHeadRandom
 	MoveHeadTimer.stopClock()
@@ -360,10 +392,16 @@ def onEndSpeaking(text):
 			pass
 	WebkitSpeachReconitionFix.startClock()
 	IcanStartToEar=1
+	StopListenTimer.stopClock()
+	IcanEarOnlyKnowsWords=-1
+	StopListenTimer.startClock()
+	#sleep(0.2)
 
 	
-def onStartSpeaking(text):
 	
+def onStartSpeaking(text):
+
+	#sleep(0.2)
 	print "Start speaking debug"
 	global Ispeak
 	Ispeak=1
@@ -590,7 +628,7 @@ def ShutDown():
 	MoveHeadRandom=0
 	sleep(1)
 	if IsInmoovArduino==1:
-		i01.setHeadSpeed(0.3, 0.3)
+		i01.setHeadSpeed(RotHeadSpeed+0.1, NeckSpeed+0.1)
 		i01.moveHead(0,180)
 		HeadSide.moveTo(90)
 	sleep(4)
@@ -598,6 +636,14 @@ def ShutDown():
 	HeadSide.detach()
 	i01.detach()
 	sleep(1)
+	
+	
+def IdontUnderstand():
+	global IcanEarOnlyKnowsWords
+	if IcanEarOnlyKnowsWords<=0:
+		chatBot.getResponse("IDONTUNDERSTAND")
+	else:
+		print "robot doesnt understand"
 	#runtime.shutdown()
 
 
@@ -616,9 +662,10 @@ if myBotname!="":
 
 
 rest()
+
 if IsInmoovArduino==1:
 	i01.head.attach()
-	#head.rothead.setSpeed(0.2)
+	
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
 
@@ -638,15 +685,12 @@ if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.get
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\logo.jpg',1)
 Light(1,1,1)
 NeoPixelF(1)
-
-webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
-sleep(4)
-
+CheckVersion()
 GetUnreadMessageNumbers("0")
 anniversaire("0")
-CheckVersion()
-sleep(2)
 chatBot.getResponse("WAKE_UP")
+sleep(4)
+webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
 #petit fix pour dire au robot qu'il eut commencer à écouter
 
 
