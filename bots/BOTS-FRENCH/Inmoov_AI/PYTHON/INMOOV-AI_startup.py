@@ -48,7 +48,11 @@ global IcanStartToEar
 global IcanEarOnlyKnowsWords
 IcanStartToEar=0
 IcanEarOnlyKnowsWords=-1
-
+#Robot state
+global RobotIsStarted
+global RobotIsSleepingSoft
+RobotIsStarted=0
+RobotIsSleepingSoft=0
 #Python libraries
 
 import urllib2
@@ -391,7 +395,17 @@ def onEndSpeaking(text):
 	IcanStartToEar=1
 	StopListenTimer.stopClock()
 	IcanEarOnlyKnowsWords=-1
+	global RobotIsSleepingSoft
+	if RobotIsSleepingSoft==1:
+		RobotIsSleepingSoft=0
+		PaupiereAttach(1)
+		sleep(0.1)
+		PositionPaupiere(180,180,0.3)
+		sleep(3)
+		clockPaupiere.startClock()
 	StopListenTimer.startClock()
+	
+	
 	#sleep(0.2)
 
 	
@@ -628,12 +642,16 @@ def ShutDown():
 		i01.setHeadSpeed(RotHeadSpeed+0.1, NeckSpeed+0.1)
 		i01.moveHead(0,180)
 		HeadSide.moveTo(90)
-	sleep(4)
-	
+		clockPaupiere.stopClock()
+		sleep(0.2)
+		PositionPaupiere(0,0,0.5)
+	sleep(5)
+	PaupiereServoGauche.detach()
+	PaupiereServoDroite.detach()
 	HeadSide.detach()
 	i01.detach()
 	sleep(1)
-	
+	runtime.exit()
 	
 def IdontUnderstand():
 	global IcanEarOnlyKnowsWords

@@ -6,8 +6,18 @@ StopListenTimer = Runtime.start("StopListenTimer","Clock")
 
 def StopListenTimerFunc(timedata):
 	global IcanEarOnlyKnowsWords
+	global RobotIsSleepingSoft
 	IcanEarOnlyKnowsWords+=1
 	print "IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
+	if IcanEarOnlyKnowsWords==1:
+	
+		RobotIsSleepingSoft=1
+		PositionPaupiere(90,90,0.3)
+		clockPaupiere.stopClock()
+		sleep(3)
+		PaupiereAttach(0)
+		
+	
 
 StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
 # start the clock
