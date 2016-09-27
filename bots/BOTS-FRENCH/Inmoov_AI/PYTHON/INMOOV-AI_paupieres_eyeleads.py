@@ -13,14 +13,15 @@ def PositionPaupiere(posGauche,posDroite,vitesse):
 			PaupiereServoDroite.moveTo(posDroite)
 			
 def PaupiereAttach(status):
-	if status==0:
-		PaupiereServoGauche.detach()
-		if IhaveEyelids==2:
-			PaupiereServoDroite.detach()
-	else:
-		PaupiereServoGauche.attach()
-		if IhaveEyelids==2:
-			PaupiereServoDroite.attach()
+	if IsInmoovArduino==1:
+		if status==0:
+			PaupiereServoGauche.detach()
+			if IhaveEyelids==2:
+				PaupiereServoDroite.detach()
+		else:
+			PaupiereServoGauche.attach()
+			if IhaveEyelids==2:
+				PaupiereServoDroite.attach()
 			
 			
 PaupiereServoGauche.map(0,180,PaupiereGaucheMIN,PaupiereGaucheMAX)

@@ -13,7 +13,10 @@ def StopListenTimerFunc(timedata):
 	
 		RobotIsSleepingSoft=1
 		PositionPaupiere(90,90,0.3)
-		clockPaupiere.stopClock()
+		try:
+			clockPaupiere.stopClock()
+		except: 
+			pass
 		sleep(3)
 		PaupiereAttach(0)
 		

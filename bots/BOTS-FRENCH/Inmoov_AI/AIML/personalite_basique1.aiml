@@ -381,6 +381,58 @@
         <srai># pourrais-tu #</srai>
       </template>
     </category>
+	
+	<category>
+      <pattern>DIS *</pattern>
+      <template>
+        <star/>
+      </template>
+    </category>
+	
+		<category>
+      <pattern>FAIS LE Perroquet</pattern>
+      <template>
+        <oob>
+          <mrl>
+            <service>python</service>
+            <method>exec</method>
+            <param>ParrotModFunc(1)</param>
+          </mrl>
+        </oob>
+      </template>
+    </category>
+	
+	    <category>
+      <pattern>FAIT LE Perroquet</pattern>
+      <template>
+        <srai>FAIS LE Perroquet</srai>
+      </template>
+    </category>
+	
+			<category>
+      <pattern>STOP Perroquet</pattern>
+      <template>
+        <oob>
+          <mrl>
+            <service>python</service>
+            <method>exec</method>
+            <param>ParrotModFunc(0)</param>
+          </mrl>
+        </oob>
+      </template>
+    </category>
+	
+		<category>
+      <pattern>SYSTEM PARROT *</pattern>
+      <template>
+	   <think><set name="parrot"> <star index="1"/></set></think>
+		<condition>
+		 <li name="parrot" value="0">Ok tan pis, c'était rigolo au final</li>
+		 <li name="parrot" value="1">FAIS LE PERROQUET, sans déconner je suis vraiment programmé pour ça ?</li>
+		</condition>
+      </template>
+    </category>
+	
   </topic>
 
 </aiml>

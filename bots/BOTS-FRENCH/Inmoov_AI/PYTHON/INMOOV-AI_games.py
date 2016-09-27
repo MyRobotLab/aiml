@@ -37,3 +37,8 @@ def loto(phrase,the,chance,fin):
 	talkBlocking(the+str(table1[4]))
 	talkBlocking(chance+str(random.randint(1,9)))
 	talkBlocking(fin)
+	
+def ParrotModFunc(ParrotModVal):
+	global ParrotMod
+	ParrotMod=ParrotModVal
+	chatBot.getResponse("SYSTEM PARROT " + str(ParrotModVal))

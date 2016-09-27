@@ -188,11 +188,18 @@ TorsoMidMax=180
 TorsoBottomMin=0
 TorsoBottomMax=180
 
+# API API API API
+
 # translator : https://datamarket.azure.com/dataset/bing/microsofttranslator 
 global Azure_client_id
 global Azure_client_secret
 Azure_client_id = 'XXX-XXX-44d9-9621-9a900a294983'
 Azure_client_secret = 'XXX/XXX2esBHiqZPVNUR4ZbIAPVntsPTlbCTf2s'
+
+# weather : http://openweathermap.org/appid 
+WeatherMapMeteoApi="XXX"
+Town="Paris"
+units="metric"
  
 #
 GoogleAPIa=''

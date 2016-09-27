@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.0.0 By Moz4r
+# - Inmoov-AI Version 2.0.1 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -53,9 +53,12 @@ global RobotIsStarted
 global RobotIsSleepingSoft
 RobotIsStarted=0
 RobotIsSleepingSoft=0
+global ParrotMod
+ParrotMod=0
 #Python libraries
 
 import urllib2
+
 from java.lang import String
 import random
 import threading
@@ -347,6 +350,19 @@ def talkBlocking(data):
 		
 	if data!="":
 		mouth.speakBlocking(unicode(data,'utf-8'))
+		
+		
+def Parse(utfdata):
+	#Light(1,1,0)
+	utfdata = urllib2.urlopen(utfdata).read()
+	utfdata = utfdata.replace("&#039;", "'").replace("http://fr.answers.yahoo.com/question/ind...", "")
+	try:
+		utfdata = utfdata.decode( "utf8" ).replace(" : ", random.choice(troat))
+	except: 
+		pass
+	#print utfdata
+	#Light(1,1,1)
+	return utfdata;
 
 #We include all InmoovAI mods
 # -- coding: utf-8 --
@@ -365,6 +381,8 @@ execfile('INMOOV-AI_reminders.py')
 execfile('INMOOV-AI_gestures.py')
 execfile('INMOOV-AI_domotique.py')
 execfile(u'INMOOV-AI_dictionaries.py')
+execfile(u'INMOOV-AI_WeatherMap_Meteo.py')
+
 
 # We listen when the robot is starting to speak to avoid ear listening
 # If you click on the webkit mic icon, this trick is broken
@@ -443,11 +461,15 @@ def onStartSpeaking(text):
 #here we replace ' by space because AIML doesn't like '
 def onText(text):
 	#print text.replace("'", " ")
-	global Ispeak
-	if Ispeak==0:
-		chatBot.getResponse(text.replace("'", " "))
 	
-	 #we close pictures
+	global Ispeak
+	global ParrotMod
+	if Ispeak==0:
+		if ParrotMod==0:
+			chatBot.getResponse(text.replace("'", " "))
+		else:
+			chatBot.getResponse("SAY " + text)
+		 #we close pictures
 	image.exitFS()
 	image.closeAll()
 	
@@ -476,17 +498,7 @@ WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconit
 
 
 		
-def Parse(utfdata):
-	#Light(1,1,0)
-	utfdata = urllib2.urlopen(utfdata).read()
-	utfdata = utfdata.replace("&#039;", "'").replace("http://fr.answers.yahoo.com/question/ind...", "")
-	try:
-		utfdata = utfdata.decode( "utf8" ).replace(" : ", random.choice(troat))
-	except: 
-		pass
-	#print utfdata
-	#Light(1,1,1)
-	return utfdata;
+
 
 
 		
@@ -547,11 +559,7 @@ def CheckVersion():
 		chatBot.getResponse("INEEDUPDATE")
 		sleep(3)
 		
-def Meteo(data):
-	a = Parse(BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20"))
-	#print BotURL+"&type=meteo&units="+units+"&city="+urllib2.quote(data).replace(" ", "%20")
-	mouth.speakBlocking(a)
-	
+
 
 
 
@@ -652,6 +660,9 @@ def ShutDown():
 	i01.detach()
 	sleep(1)
 	runtime.exit()
+	
+
+	
 	
 def IdontUnderstand():
 	global IcanEarOnlyKnowsWords
