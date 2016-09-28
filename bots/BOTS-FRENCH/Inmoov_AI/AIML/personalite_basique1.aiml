@@ -139,7 +139,7 @@
       <template>
         <random>
           <li>ah, oui, <star index="1" /> ans. c'est un peu vieux , lol .  tu peux me poser des questions aussi , si tu veux</li>
-          <li>ok, <star index="1" /> ans.je suis un peu plus jeune que toi . c'est pour cela que j'ai encore plein de choses à  apprendre.</li>
+          <li>ok, <star index="1" /> ans. je suis un peu plus jeune que toi . c'est pour cela que j'ai encore plein de choses à  apprendre.</li>
           <li>oh, <star index="1" /> ans. et toutes ses dents . je sais , je suis drole . d'ailleurs je connais pleins de blagues trop géniales , a moins que tu préfères connaitre la meteo .</li>
           <li>a <star index="1" /> ans, on attrape vite quelque chose . il suffirais pas d'attraper froid . tu veux connaitre la meteo ou tu préfères une petite blague ?</li>
           <li>compris, <star index="1" /> ans . j'ai bien enregistré les données , je suis maintenant à votre service</li>
