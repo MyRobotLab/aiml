@@ -18,6 +18,8 @@ def Meteo(Town_Parameter):
 
 		#CURRENT TEMPERATURE
 		#print w['main']['temp'] #in kelvin
+		print weather
+		print w
 		cur_temperature = round(float(w['main']['temp']),0)
 		print ("Current Temp:")
 		print (round(cur_temperature, 0))
@@ -59,5 +61,6 @@ def Meteo(Town_Parameter):
 
 	except:
 		chatBot.getResponse("SYSTEM METEO curtemperature 0 lowtemperature 0 hightemperature 0 Town 0 COMMENTAIRE 0")
+		print sys.exc_info()[0]
 		pass
 

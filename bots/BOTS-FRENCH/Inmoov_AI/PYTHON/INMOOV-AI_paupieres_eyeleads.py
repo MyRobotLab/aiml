@@ -5,9 +5,9 @@ PaupiereServoDroite = Runtime.create("PaupiereServoDroite","Servo")
 	
 def PositionPaupiere(posGauche,posDroite,vitesse):
 	if IsInmoovArduino==1:
-		
 		PaupiereServoGauche.setSpeed(vitesse)
 		PaupiereServoDroite.setSpeed(vitesse)
+		PaupiereAttach(1)
 		PaupiereServoGauche.moveTo(posGauche)
 		if IhaveEyelids==2:
 			PaupiereServoDroite.moveTo(posDroite)
@@ -49,7 +49,7 @@ if IsInmoovArduino==1:
 	else:
 	  if IhaveEyelids==2:
 		PaupiereServoDroite.attach(right, PaupiereDroiteServoPin, 0, 10000)
-
+	
 	clockPaupiere = Runtime.start("clockPaupiere","Clock")
 	clockPaupiere.setInterval(1000)
 	# define a ticktock method
@@ -57,6 +57,7 @@ if IsInmoovArduino==1:
 		global RobotIsStarted
 		RobotIsStarted+=1
 		if RobotIsStarted>2:
+			PaupiereAttach(1)
 			PaupiereServoGauche.setSpeed(1)
 			PaupiereServoDroite.setSpeed(1)
 			PositionPaupiere(0,0,1)
@@ -71,11 +72,14 @@ if IsInmoovArduino==1:
 				PositionPaupiere(180,180,1)
 				#on redefini une valeur aleatoire pour le prochain clignement
 		clockPaupiere.setInterval(random.randint(10000,30000))
+		sleep(0.12)
+		PaupiereAttach(0)
 				
 	#create a message routes
 	clockPaupiere.addListener("pulse", python.name, "clignement")
 	# start the clock
 	if RobotIsStarted==0:
 		PositionPaupiere(180,180,0.5)
+		sleep(3)
 		
 	clockPaupiere.startClock()

@@ -7,14 +7,15 @@ def NeoPixelF(valNeo):
 		print(valNeo)
 
 def talk(data):
-	if data[0:2]=="l ":
-		data=data.replace("l ", "l'")
-	data=data.replace(" l ", " l'")
-	
+		
 	ear.startListening() #fix onclick micro
 	
-	if data!="":
-		mouth.speak(unicode(data,'utf-8'))
+	if data:
+		if data!="":
+			if data[0:2]=="l ":
+				data=data.replace("l ", "l'")
+			data=data.replace(" l ", " l'")
+			mouth.speak(unicode(data,'utf-8'))
 		
 	if IsInmoovArduino==1:
 		if random.randint(1,3)==1:
@@ -47,13 +48,13 @@ def Parse(utfdata):
 ##############################################################
 def onEndSpeaking(text):
 	global IcanStartToEar
-	global IcanEarOnlyKnowsWords
-	print "End speaking debug"
 	global MoveHeadRandom
-	MoveHeadTimer.stopClock()
+	global RamdomSpeak
 	global Ispeak
-	Ispeak=0
 	global TimeNoSpeak
+	
+	MoveHeadTimer.stopClock()
+	Ispeak=0
 	VieAleatoire.startClock()
 	TimeNoSpeak="OFF"
 	#Light(0,0,0)
@@ -68,23 +69,30 @@ def onEndSpeaking(text):
 			pass
 	WebkitSpeachReconitionFix.startClock()
 	IcanStartToEar=1
-	StopListenTimer.stopClock()
-	IcanEarOnlyKnowsWords=-1
-	global RobotIsSleepingSoft
-	if RobotIsSleepingSoft==1:
-		RobotIsSleepingSoft=0
-		PaupiereAttach(1)
-		sleep(0.1)
-		PositionPaupiere(180,180,0.3)
-		sleep(3)
-		clockPaupiere.startClock()
-	StopListenTimer.startClock()
+	RamdomSpeak=0
+	
 	#sleep(0.2)
 	
 def onStartSpeaking(text):
+	
+	global RamdomSpeak
+	print "dbg : ",RamdomSpeak
+	global RobotIsSleepingSoft
+	global IcanEarOnlyKnowsWords
+	if RamdomSpeak==0:
+		if RobotIsSleepingSoft==1:
+			if IsInmoovArduino==1:
+				HeadSide.attach()
+				i01.head.attach()
+			RobotIsSleepingSoft=0
+			PaupiereAttach(1)
+			sleep(0.1)
+			PositionPaupiere(180,180,0.3)
+			sleep(3)
+			clockPaupiere.startClock()
+		IcanEarOnlyKnowsWords=-1
+	
 
-	#sleep(0.2)
-	print "Start speaking debug"
 	global Ispeak
 	Ispeak=1
 	WebkitSpeachReconitionFix.stopClock()
@@ -197,7 +205,7 @@ def ShutDown():
 	sleep(1)
 	if IsInmoovArduino==1:
 		i01.setHeadSpeed(RotHeadSpeed+0.1, NeckSpeed+0.1)
-		i01.moveHead(0,180)
+		i01.moveHead(90,90)
 		HeadSide.moveTo(90)
 		clockPaupiere.stopClock()
 		sleep(0.2)

@@ -7,18 +7,19 @@ StopListenTimer = Runtime.start("StopListenTimer","Clock")
 def StopListenTimerFunc(timedata):
 	global IcanEarOnlyKnowsWords
 	global RobotIsSleepingSoft
-	IcanEarOnlyKnowsWords+=1
-	print "IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
+	IcanEarOnlyKnowsWords=IcanEarOnlyKnowsWords+1
+	print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
 	if IcanEarOnlyKnowsWords==1:
-	
+		print "Sleeping mode ON"
 		RobotIsSleepingSoft=1
-		PositionPaupiere(90,90,0.3)
 		try:
 			clockPaupiere.stopClock()
 		except: 
 			pass
+		PositionPaupiere(90,90,0.4)
 		sleep(3)
 		PaupiereAttach(0)
+		rest()
 		
 	
 
@@ -38,7 +39,10 @@ TuTeTais=0
 def OnBalanceUnePhare_Aleatoire(timedata):
 	global TimeNoSpeak
 	global TuTeTais
-	global IcanEarOnlyKnowsWords
+	global RamdomSpeak
+	global RobotIsStarted
+	if RobotIsStarted==1:
+		RamdomSpeak=1
 	
 	VieAleatoire.setInterval(random.randint(60000,600000))
 	if TimeNoSpeak=="ON":
@@ -46,14 +50,12 @@ def OnBalanceUnePhare_Aleatoire(timedata):
 			chatBot.getResponse("ALEATOIRE")
 		else:
 			chatBot.getResponse("ALEATOIRE2")
-		IcanEarOnlyKnowsWords=1
+		
 	if TuTeTais==0:
 		TimeNoSpeak="ON"
 	
 
 def TuTeTais_OuPas(value):
-	global IcanEarOnlyKnowsWords
-	IcanEarOnlyKnowsWords=1
 	global TuTeTais
 	TuTeTais=value
 	

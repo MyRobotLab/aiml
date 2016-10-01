@@ -26,10 +26,10 @@ DiyServo3 = "COMX"
 DiyServo4 = "COMX"
 
 #Vitesses
-DefaultSpeed=0.2
-RotHeadSpeed=0.2
-NeckSpeed=0.2
-PistonSideSpeed=0.2
+DefaultSpeed=0.6
+RotHeadSpeed=0.6
+NeckSpeed=0.6
+PistonSideSpeed=0.6
 
 # Ligh if you have / led RGB with pins
 IhaveLights = 0

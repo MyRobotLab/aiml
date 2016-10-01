@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.0.2 By Moz4r
+# - Inmoov-AI Version 2.0.4 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -55,6 +55,8 @@ RobotIsStarted=0
 RobotIsSleepingSoft=0
 global ParrotMod
 ParrotMod=0
+global RamdomSpeak
+RamdomSpeak=0
 #Python libraries
 
 import urllib2
@@ -84,7 +86,6 @@ from org.myrobotlab.service import Servo
 
 #check runing folder
 oridir=os.getcwd().replace("\\", "/")+"/"
-#print oridir
 
 # check if a config file exist or create default one
 if os.path.isfile(oridir + '2-INMOOV-AI_config.py'):
@@ -101,7 +102,7 @@ gesturesPath = (oridir)+"gestures"
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
 
 #fix programab aimlif problems : remove all aimlif files
-#print oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif'
+
 try:
 	shutil.rmtree(oridir+'ProgramAB/bots/'+myAimlFolder+'/aimlif')
 except: 
@@ -253,10 +254,10 @@ if IsInmoovArduino==1:
 	HeadSide.setSpeed(PistonSideSpeed)
 	HeadSide = Runtime.start("HeadSide","Servo")
 	if HeadSideArduino=="left":
-		HeadSide.attach(left, HeadSidePin, 90, 5)
+		HeadSide.attach(left, HeadSidePin, 90, 500)
 	else:
-		HeadSide.attach(right, HeadSidePin, 90, 5)
-
+		HeadSide.attach(right, HeadSidePin, 90, 500)
+	HeadSide.setSpeed(PistonSideSpeed)
 	opencv = i01.opencv
 	
 i01.startMouth()
@@ -313,7 +314,7 @@ if Neopixel!="COMX":
 # -- coding: utf-8 --
 execfile('INMOOV-AI_divers.py')
 execfile('INMOOV-AI_memory.py')
-if IhaveEyelids==1 or IhaveEyelids==2:
+if IhaveEyelids>0:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
 execfile(u'INMOOV-AI_timers.py')
 if IsInmoovArduino==1:
@@ -353,6 +354,7 @@ rest()
 
 if IsInmoovArduino==1:
 	i01.head.attach()
+	HeadSide.attach()
 	
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
@@ -374,9 +376,9 @@ if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.get
 Light(1,1,1)
 NeoPixelF(1)
 CheckVersion()
-GetUnreadMessageNumbers("0")
 anniversaire("0")
 chatBot.getResponse("WAKE_UP")
+GetUnreadMessageNumbers("0")
 sleep(4)
 webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
 #petit fix pour dire au robot qu'il eut commencer à écouter
@@ -386,5 +388,4 @@ if lang=="FR":
 python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
-#test de dictionaire
-#print(Singularize("travaux"),Singularize("nez"),Singularize("vitraux"),Singularize("bocaux"),Singularize("poux"),Singularize("époux"),Singularize("fraises"))
+RobotIsStarted=1

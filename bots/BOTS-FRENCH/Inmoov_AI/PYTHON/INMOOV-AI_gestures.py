@@ -1,6 +1,9 @@
 
 def rest():
 	if IsInmoovArduino==1:
+		head.neck.setSpeed(NeckSpeed)
+		head.rothead.setSpeed(RotHeadSpeed)
+		HeadSide.setSpeed(PistonSideSpeed)
 		i01.setHandSpeed("left", 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
 		i01.setArmSpeed("left", 1.0, 1.0, 1.0, 1.0)
 		head.neck.setSpeed(NeckSpeed)
@@ -15,7 +18,9 @@ def rest():
 		i01.moveArm("right",5,90,0,12)
 		i01.moveHand("right",2,2,2,2,2,90)
 		HeadSide.rest()
+		sleep(2)
 		i01.detach()
+		HeadSide.detach()
 		
 		
 def No(data):
@@ -23,31 +28,33 @@ def No(data):
 	MoveHeadRandom=0
 	# WE MOVE THE ROTHEAD OR PISTONMOD
 	if IsInmoovArduino==1:
+		head.neck.setSpeed(NeckSpeed+0.37)
+		head.rothead.setSpeed(RotHeadSpeed+0.37)
 		if random.randint(0,1)==1:
 			#i01.attach()
-			head.neck.setSpeed(NeckSpeed)
-			head.rothead.setSpeed(RotHeadSpeed)
-			i01.moveHead(80,130)
-			sleep(0.5)
-			i01.moveHead(80,50)
-			sleep(0.5)
-			i01.moveHead(81,130)
-			sleep(0.5)
-			i01.moveHead(79,50)
-			sleep(0.5)
+			i01.moveHead(80,120)
+			sleep(0.7)
+			i01.moveHead(80,60)
+			sleep(1.4)
+			i01.moveHead(81,120)
+			sleep(1.5)
+			i01.moveHead(79,60)
+			sleep(1.5)
 			i01.moveHead(83,130)
-			sleep(1)
+			sleep(0.7)
 			i01.moveHead(80,90)
 			i01.head.jaw.rest()
 		else:
-			HeadSide.setSpeed(PistonSideSpeed+0.1)
+			HeadSide.setSpeed(PistonSideSpeed+0.37)
 			HeadSide.moveTo(50)
 			sleep(0.5)
 			HeadSide.moveTo(120)
 			sleep(1)
 			HeadSide.moveTo(90)
 			i01.head.jaw.rest()
-		
+		head.neck.setSpeed(NeckSpeed)
+		head.rothead.setSpeed(RotHeadSpeed)
+		HeadSide.setSpeed(PistonSideSpeed)
 		
 
 def Yes(data):
@@ -55,29 +62,28 @@ def Yes(data):
 	MoveHeadRandom=0
 	if IsInmoovArduino==1:
 		#i01.attach()
+		head.neck.setSpeed(NeckSpeed+0.37)
+		head.rothead.setSpeed(RotHeadSpeed+0.37)
+		i01.moveHead(140,90)
+		sleep(0.7)
+		i01.moveHead(50,93)
+		sleep(1.5)
+		i01.moveHead(130,90)
+		sleep(1.6)
+	#Light(0,1,1)
+		i01.moveHead(60,91)
+		sleep(1.3)
+		i01.moveHead(120,88)
+		sleep(1.2)
+		i01.moveHead(70,90)
+		sleep(1.2)
+		i01.moveHead(150,90)
+		sleep(1.2)
+	#Light(1,1,1)
+		i01.moveHead(90,90)
+		i01.head.jaw.rest()
 		head.neck.setSpeed(NeckSpeed)
 		head.rothead.setSpeed(RotHeadSpeed)
-		i01.moveHead(130,90)
-		sleep(0.5)
-		i01.moveHead(50,93)
-		sleep(0.5)
-		i01.moveHead(130,90)
-		sleep(0.5)
-	#Light(0,1,1)
-	if IsInmoovArduino==1:
-		i01.moveHead(60,91)
-		sleep(0.5)
-		i01.moveHead(120,88)
-	if IsInmoovArduino==1:
-		i01.moveHead(70,90)
-		sleep(0.5)
-		i01.moveHead(95,90)
-	sleep(0.5)
-	#Light(1,1,1)
-	if IsInmoovArduino==1:
-		i01.moveHead(90,90)
-	if IsInmoovArduino==1:
-		i01.head.jaw.rest()
 		
 		
 	
