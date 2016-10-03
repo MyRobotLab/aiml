@@ -152,6 +152,13 @@ torso.midStom.setMinMax(TorsoMidMin,TorsoMidMax)
 torso.midStom.map(0,180,TorsoMidMin,TorsoMidMax)
 torso.midStom.setRest(TorsoMidRes)
 
+
+leftArm.bicep.setMinMax(BicepsLeftMIN,BicepsLeftMAX) 
+leftArm.bicep.map(0,180,BicepsLeftMIN,BicepsLeftMAX)
+
+rightArm.bicep.setMinMax(BicepsRightMIN,BicepsRightMAX) 
+rightArm.bicep.map(0,180,BicepsRightMIN,BicepsRightMAX)
+
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
 leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
 leftHand.majeure.setMinMax(majeureLeftMIN,majeureLeftMAX) 
@@ -222,7 +229,7 @@ if IsInmoovArduino==1:
 	i01.startHead(leftPort)
 	head.rothead.setSpeed(RotHeadSpeed)
 	head.neck.setSpeed(NeckSpeed)	
-	i01.startLeftHand(leftPort,"")
+	i01.startLeftHand(leftPort)
 	i01.startLeftArm(leftPort)
 	
 	if MRLmouthControl==1:
