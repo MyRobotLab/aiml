@@ -59,7 +59,8 @@ def onEndSpeaking(text):
 	TimeNoSpeak="OFF"
 	#Light(0,0,0)
 	if IsInmoovArduino==1:
-		i01.moveHead(90,90,90,90,90)
+		head.rest()
+		HeadSide.rest()
 	MoveHeadRandom=1
 	
 	if IcanStartToEar==1:

@@ -86,6 +86,7 @@ HeadSideInverted=0
 HeadSidePin=28
 HeadSideArduino="right"
 
+
 # BOUCHE PIN HP Bluetooth Arduino NANO
 
 JawMIN=0 
@@ -217,3 +218,12 @@ param7=0
 param8=0
 param9=0
 param10=0
+
+HeadSideRest=90
+RotHeadRest=90
+NeckRest=90
+TorsoTopRest=90
+TorsoMidRes=90
+TorsoBottomRest=90
+EyeXRest=90
+EyeYRest=90

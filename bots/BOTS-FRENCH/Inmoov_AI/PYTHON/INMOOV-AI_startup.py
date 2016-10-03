@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.0.4 By Moz4r
+# - Inmoov-AI Version 2.0.5 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -146,13 +146,11 @@ torso = Runtime.create("i01.torso", "InMoovTorso")
 
 torso.topStom.setMinMax(TorsoTopMin,TorsoTopMax)
 torso.topStom.map(0,180,TorsoTopMin,TorsoTopMax)
-torso.topStom.setMinMax(0,180)
+torso.topStom.setRest(TorsoTopRest)
 
 torso.midStom.setMinMax(TorsoMidMin,TorsoMidMax)
 torso.midStom.map(0,180,TorsoMidMin,TorsoMidMax)
-torso.midStom.setMinMax(0,180)
-torso.topStom.setRest(90)
-torso.midStom.setRest(90)
+torso.midStom.setRest(TorsoMidRes)
 
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
 leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
@@ -181,30 +179,31 @@ if JawInverted==1:
 	head.jaw.map(0,180,JawMAX,JawMIN)
 else:
 	head.jaw.map(0,180,JawMIN,JawMAX)
-head.jaw.setMinMax(0,180)
 head.jaw.setRest(0)
 
 head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
 head.eyeX.map(0,180,EyeXMIN,EyeXMAX)
-head.eyeX.setMinMax(0,180)
+head.eyeX.setRest(EyeXRest)
+
 head.eyeY.setMinMax(EyeYMIN,EyeYMAX)
 head.eyeY.map(0,180,EyeYMIN,EyeYMAX)
-head.eyeY.setMinMax(0,180)
-head.eyeX.setRest(90)
-head.eyeY.setRest(90)
+head.eyeY.setRest(EyeYTest)
+
 head.neck.setMinMax(MinNeck,MaxNeck)
-head.neck.setRest(90)
-head.rothead.setMinMax(MinRotHead,MinRotHead)
-
-if RotHeadInverted==1: 
-	head.rothead.map(0,180,MaxRotHead,MinRotHead)
-else:
-	head.rothead.map(0,180,MinRotHead,MaxRotHead)
-
 if NeckInverted==1: 
 	head.neck.map(0,180,MaxNeck,MinNeck)
 else:
 	head.neck.map(0,180,MinNeck,MaxNeck)
+head.neck.setRest(NeckRest)
+
+head.rothead.setMinMax(MinRotHead,MinRotHead)
+if RotHeadInverted==1: 
+	head.rothead.map(0,180,MaxRotHead,MinRotHead)
+else:
+	head.rothead.map(0,180,MinRotHead,MaxRotHead)
+head.rothead.setRest(RotHeadRest)
+
+
 	
 #start the arduino
 if IsInmoovArduino==1:
@@ -218,9 +217,7 @@ if IsInmoovArduino==1:
 	
 	head.rothead.setSpeed(0.1)
 	head.neck.setSpeed(0.1)
-	head.rothead.setRest(90)
-	head.neck.setMinMax(0,180)
-	head.rothead.setMinMax(0,180)
+
 
 	i01.startHead(leftPort)
 	head.rothead.setSpeed(RotHeadSpeed)
@@ -249,15 +246,15 @@ if IsInmoovArduino==1:
 	HeadSide = Runtime.create("HeadSide","Servo")
 	HeadSide.setMinMax(MinHeadSide , MaxHeadSide)
 	HeadSide.map(0,180,MinHeadSide,MaxHeadSide)
-	HeadSide.setMinMax(0,180)
-	HeadSide.setRest(90)
+	HeadSide.setRest(HeadSideRest)
 	HeadSide.setSpeed(PistonSideSpeed)
 	HeadSide = Runtime.start("HeadSide","Servo")
 	if HeadSideArduino=="left":
-		HeadSide.attach(left, HeadSidePin, 90, 500)
+		HeadSide.attach(left, HeadSidePin, HeadSideRest, 500)
 	else:
-		HeadSide.attach(right, HeadSidePin, 90, 500)
+		HeadSide.attach(right, HeadSidePin, HeadSideRest, 500)
 	HeadSide.setSpeed(PistonSideSpeed)
+	
 	opencv = i01.opencv
 	
 i01.startMouth()
