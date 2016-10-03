@@ -187,7 +187,7 @@ head.eyeX.setRest(EyeXRest)
 
 head.eyeY.setMinMax(EyeYMIN,EyeYMAX)
 head.eyeY.map(0,180,EyeYMIN,EyeYMAX)
-head.eyeY.setRest(EyeYTest)
+head.eyeY.setRest(EyeYRest)
 
 head.neck.setMinMax(MinNeck,MaxNeck)
 if NeckInverted==1: 
