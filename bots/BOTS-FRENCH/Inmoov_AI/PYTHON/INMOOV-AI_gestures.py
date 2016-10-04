@@ -20,6 +20,7 @@ def rest():
 		HeadSide.rest()
 		sleep(2)
 		head.rest()
+		head.detach()
 		leftHand.detach()
 		rightHand.detach()
 		leftArm.detach()
@@ -152,6 +153,7 @@ def LookAtTheSky():
 	sleep(5)
 	i01.moveHead(NeckRest,RotHeadRest)
 	
+
 	
 def LookAtYourFeet():
 	global MoveHeadRandom
@@ -197,3 +199,12 @@ def LookAroundYou():
 	i01.moveHead(20,160)
 	sleep(1)
 	i01.moveHead(NeckRest,RotHeadRest)
+
+def BicepsClosed():
+	leftArm.bicep.attach()
+	leftArm.bicep.moveTo(180)
+	rightArm.bicep.attach()
+	rightArm.bicep.moveTo(180)
+	sleep(2)
+	rightArm.bicep.detach()
+	leftArm.bicep.detach()

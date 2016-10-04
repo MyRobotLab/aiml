@@ -129,7 +129,7 @@ i01.setMute(1)
 
 #start acapela and webkit ear
 
-#r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
+r=image.displayFullScreen('pictures\loading.jpg',1)
 #r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
 #webgui.start()
 
@@ -397,4 +397,4 @@ python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
 RobotIsStarted=1
-serial.write(2) 
+BicepsClosed()
