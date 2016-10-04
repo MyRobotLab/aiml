@@ -155,9 +155,13 @@ torso.midStom.setRest(TorsoMidRes)
 
 leftArm.bicep.setMinMax(BicepsLeftMIN,BicepsLeftMAX) 
 leftArm.bicep.map(0,180,BicepsLeftMIN,BicepsLeftMAX)
+leftArm.bicep.setRest(BicepsLeftMIN)
+leftArm.shoulder.setRest(0)
 
 rightArm.bicep.setMinMax(BicepsRightMIN,BicepsRightMAX) 
 rightArm.bicep.map(0,180,BicepsRightMIN,BicepsRightMAX)
+rightArm.bicep.setRest(BicepsRightMIN)
+rightArm.shoulder.setRest(0)
 
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
 leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
@@ -393,3 +397,4 @@ python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
 RobotIsStarted=1
+serial.write(2) 

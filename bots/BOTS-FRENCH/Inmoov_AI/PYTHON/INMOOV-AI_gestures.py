@@ -19,9 +19,14 @@ def rest():
 		torso.rest()
 		HeadSide.rest()
 		sleep(2)
-		i01.detach()
+		head.rest()
+		leftHand.detach()
+		rightHand.detach()
+		leftArm.detach()
+		rightArm.detach()
+		torso.detach()
 		HeadSide.detach()
-		
+			
 		
 def No(data):
 	global MoveHeadRandom
