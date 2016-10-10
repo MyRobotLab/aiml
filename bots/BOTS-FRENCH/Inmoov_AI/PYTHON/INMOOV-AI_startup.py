@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.0.6 By Moz4r
+# - Inmoov-AI Version 2.0.7 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice

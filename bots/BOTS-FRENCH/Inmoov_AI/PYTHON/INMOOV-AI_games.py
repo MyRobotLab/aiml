@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*- 
+
 def loto(phrase,the,chance,fin):
 	table1 = [(random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)), (random.randint(1,49)),(random.randint(1,49))]
 	tablefin = []
@@ -42,3 +44,25 @@ def ParrotModFunc(ParrotModVal):
 	global ParrotMod
 	ParrotMod=ParrotModVal
 	chatBot.getResponse("SYSTEM PARROT " + str(ParrotModVal))
+	
+def PlayWithWords(word):
+	FindImage(word)
+	talkBlocking(word)
+	for i in word.decode( "utf8" ):
+		if i.isalpha():
+			#print "SAY "+i
+			TimeNoSpeak="OFF"
+			folderLetterPic="pictures\\games\\alphabet\\"
+			print folderLetterPic+i+".jpg"
+			try:
+				r=image.displayFullScreen(folderLetterPic+i+".jpg",1)
+			except:
+				pass
+			talkBlocking(i)
+			sleep(2)
+	FindImage(word)
+	sleep(1)
+	image.exitFS()
+	image.closeAll()
+	TimeNoSpeak="ON"
+	
