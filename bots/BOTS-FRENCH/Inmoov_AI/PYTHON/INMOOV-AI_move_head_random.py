@@ -1,5 +1,5 @@
 MoveHeadTimer = Runtime.start("MoveHeadTimer","Clock")
-MoveHeadTimer.setInterval(10)
+MoveHeadTimer.setInterval(1000)
 
 
 def MoveHead(timedata):

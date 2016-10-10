@@ -27,7 +27,17 @@ StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
 # start the clock
 StopListenTimer.startClock()
 
-
+def WebkitSpeachReconitionON(timedata):
+	
+	global Ispeak
+	if Ispeak==0:
+		try:
+			ear.stopListening()
+			sleep(0.2)
+			ear.startListening()
+		except: 
+			pass
+			
 
 #RANDOM TIME ACTIONS
 VieAleatoire = Runtime.start("VieAleatoire","Clock")

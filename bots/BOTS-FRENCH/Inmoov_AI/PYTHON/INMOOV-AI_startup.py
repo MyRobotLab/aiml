@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.0.5 By Moz4r
+# - Inmoov-AI Version 2.0.6 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -225,13 +225,14 @@ if IsInmoovArduino==1:
 	#i01.startAll(leftPort, rightPort)
 	
 	left = Runtime.start("i01.left", "Arduino")
-	
+	head.setSpeed(DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed)
 	head.rothead.setSpeed(0.1)
 	head.neck.setSpeed(0.1)
 
 
 	i01.startHead(leftPort)
-	head.rothead.setSpeed(RotHeadSpeed)
+
+	
 	head.neck.setSpeed(NeckSpeed)	
 	i01.startLeftHand(leftPort)
 	i01.startLeftArm(leftPort)
@@ -272,6 +273,10 @@ i01.startMouth()
 i01.startEar()
 ear = i01.ear
 mouth = i01.mouth
+
+#RELAY CONTROL
+sleep(0.1)
+left.digitalWrite(53,255)
 
 #start webgui
 webgui = Runtime.create("WebGui","WebGui")
@@ -397,4 +402,4 @@ python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
 RobotIsStarted=1
-BicepsClosed()
+#BicepsClosed()

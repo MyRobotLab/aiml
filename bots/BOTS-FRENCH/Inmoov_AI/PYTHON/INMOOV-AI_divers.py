@@ -58,9 +58,7 @@ def onEndSpeaking(text):
 	VieAleatoire.startClock()
 	TimeNoSpeak="OFF"
 	#Light(0,0,0)
-	if IsInmoovArduino==1:
-		head.rest()
-		HeadSide.rest()
+	
 	MoveHeadRandom=1
 	
 	if IcanStartToEar==1:
@@ -135,15 +133,7 @@ def onText(text):
 	image.exitFS()
 	image.closeAll()
 	
-def WebkitSpeachReconitionON(timedata):
-	sleep(0.2)
-	global Ispeak
-	if Ispeak==0:
-		try:
-			ear.startListening()
-		except: 
-			pass
-			
+
 def Light(ROUGE_V,VERT_V,BLEU_V):
 	if IhaveLights==1 and IsInmoovArduino==1:
 		print 0
@@ -213,7 +203,6 @@ def ShutDown():
 		PositionPaupiere(0,0,0.5)
 	sleep(5)
 	PaupiereServoGauche.detach()
-	PaupiereServoDroite.detach()
 	HeadSide.detach()
 	i01.detach()
 	sleep(1)

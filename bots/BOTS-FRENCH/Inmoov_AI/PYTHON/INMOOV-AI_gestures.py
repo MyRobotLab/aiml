@@ -10,6 +10,7 @@ def rest():
 		i01.setArmSpeed("right", 1.0, 1.0, 1.0, 1.0)
 		head.neck.setSpeed(NeckSpeed)
 		head.rothead.setSpeed(RotHeadSpeed)
+		head.rothead.moveTo(RotHeadRest)
 		i01.setTorsoSpeed(1.0, 1.0, 1.0)
 		head.rest()
 		leftHand.rest()
@@ -19,7 +20,6 @@ def rest():
 		torso.rest()
 		HeadSide.rest()
 		sleep(2)
-		head.rest()
 		head.detach()
 		leftHand.detach()
 		rightHand.detach()
@@ -147,7 +147,7 @@ def MoveHand(side,thumb,index,majeure,ringFinger,pinky):
 def LookAtTheSky():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	head.neck.setSpeed(NeckSpeed)
+	head.neck.setSpeed(NeckSpeed+0.2)
 	head.rothead.setSpeed(RotHeadSpeed)
 	i01.moveHead(0,RotHeadRest)
 	sleep(5)
@@ -158,7 +158,7 @@ def LookAtTheSky():
 def LookAtYourFeet():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	head.neck.setSpeed(NeckSpeed)
+	head.neck.setSpeed(NeckSpeed+0.2)
 	head.rothead.setSpeed(RotHeadSpeed)
 	i01.moveHead(180,RotHeadRest)
 	sleep(5)
@@ -169,7 +169,7 @@ def LookAtYourLeft():
 	global MoveHeadRandom
 	MoveHeadRandom=0
 	head.neck.setSpeed(NeckSpeed)
-	head.rothead.setSpeed(RotHeadSpeed)
+	head.rothead.setSpeed(RotHeadSpeed+0.1)
 	i01.moveHead(NeckRest,0)
 	sleep(5)
 	i01.moveHead(NeckRest,RotHeadRest)
@@ -178,7 +178,7 @@ def LookAtYourRight():
 	global MoveHeadRandom
 	MoveHeadRandom=0
 	head.neck.setSpeed(NeckSpeed)
-	head.rothead.setSpeed(RotHeadSpeed)
+	head.rothead.setSpeed(RotHeadSpeed+0.1)
 	i01.moveHead(NeckRest,180)
 	sleep(5)
 	i01.moveHead(NeckRest,RotHeadRest)
@@ -188,8 +188,8 @@ def LookAtYourRight():
 def LookAroundYou():
 	global MoveHeadRandom
 	MoveHeadRandom=0
-	head.neck.setSpeed(NeckSpeed)
-	head.rothead.setSpeed(RotHeadSpeed)
+	head.neck.setSpeed(NeckSpeed+0.2)
+	head.rothead.setSpeed(RotHeadSpeed+0.1)
 	i01.moveHead(160,160)
 	sleep(1)
 	i01.moveHead(160,20)
