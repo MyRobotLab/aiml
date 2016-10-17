@@ -100,7 +100,7 @@ def onStartSpeaking(text):
 		No('no')
 		MoveHeadRandom=0
 		#print("no detected")
-	if 'oui' in text or 'yes' in text:
+	if 'oui' in text or 'yes' in text or '#LAUGH01#' in text:
 		Yes('yes')
 		#print("yes detected")
 		MoveHeadRandom=0
@@ -136,7 +136,10 @@ def onText(text):
 
 def Light(ROUGE_V,VERT_V,BLEU_V):
 	if IhaveLights==1 and IsInmoovArduino==1:
-		print 0
+	
+		right.digitalWrite(ROUGE,ROUGE_V)
+		right.digitalWrite(VERT,VERT_V)
+		right.digitalWrite(BLEU,BLEU_V)	
     
 ##############################################################
 # Cette fonction permet d'afficher une date personnalis(mardi, le 10 juin, 1975, 12h38 .....)	

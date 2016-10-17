@@ -27,14 +27,42 @@ StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
 # start the clock
 StopListenTimer.startClock()
 
-def WebkitSpeachReconitionON(timedata):
+
+LedWebkitListen = Runtime.create("LedWebkitListen","Clock")
+LedWebkitListen.setInterval(8000)
+LedWebkitListen = Runtime.start("LedWebkitListen","Clock")
+
+global LedWebkitListenFuncFix
+LedWebkitListenFuncFix=0
+
+
+def LedWebkitListenFunc(timedata):
+	global LedWebkitListenFuncFix
+	if LedWebkitListenFuncFix==1:
+		Light(1,1,1)
+		LedWebkitListenFuncFix=0
+		LedWebkitListen.stopClock()
+	else:
+		LedWebkitListenFuncFix+=1
+		
 	
+
+LedWebkitListen.addListener("pulse", python.name, "LedWebkitListenFunc")
+# start the clock
+
+
+def WebkitSpeachReconitionON(timedata):
+	global LedWebkitListenFuncFix
 	global Ispeak
 	if Ispeak==0:
 		try:
 			ear.stopListening()
-			sleep(0.2)
+			sleep(0.3)
 			ear.startListening()
+			Light(1,1,0)
+			LedWebkitListenFuncFix=0
+			LedWebkitListen.startClock()
+			
 		except: 
 			pass
 			

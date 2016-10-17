@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*- 
+
+def detachHard():
+	if IsInmoovArduino==1:	
+		left.digitalWrite(53,0)
+		left.digitalWrite(51,0)
+		right.digitalWrite(53,0)
+		right.digitalWrite(51,0)
+		sleep(0.1)
+		right.digitalWrite(53,255)
+		right.digitalWrite(51,255)
+		left.digitalWrite(53,255)
+		left.digitalWrite(51,255)
 
 def rest():
 	if IsInmoovArduino==1:
@@ -19,6 +32,8 @@ def rest():
 		rightArm.rest()
 		torso.rest()
 		HeadSide.rest()
+		leftArm.bicep.moveTo(0)
+		rightArm.bicep.moveTo(0)
 		sleep(2)
 		head.detach()
 		leftHand.detach()
@@ -27,7 +42,8 @@ def rest():
 		rightArm.detach()
 		torso.detach()
 		HeadSide.detach()
-			
+		detachHard()
+
 		
 def No(data):
 	global MoveHeadRandom
@@ -77,14 +93,7 @@ def Yes(data):
 		i01.moveHead(NeckRest+40,RotHeadRest)
 		sleep(1.6)
 	#Light(0,1,1)
-		i01.moveHead(NeckRest-30,RotHeadRest-2)
-		sleep(1.3)
-		i01.moveHead(NeckRest+30,RotHeadRest)
-		sleep(1.2)
-		i01.moveHead(NeckRest-20,RotHeadRest+5)
-		sleep(1.2)
-		i01.moveHead(NeckRest+60,RotHeadRest)
-		sleep(1.2)
+
 	#Light(1,1,1)
 		i01.moveHead(NeckRest,RotHeadRest)
 		i01.head.jaw.rest()
@@ -206,5 +215,23 @@ def BicepsClosed():
 	rightArm.bicep.attach()
 	rightArm.bicep.moveTo(180)
 	sleep(2)
+	detachHard()
 	rightArm.bicep.detach()
 	leftArm.bicep.detach()
+	
+def HideEyes():
+	talk("J'aime beaucoup ce botte, elle a une personalité intéressante en plus ! Je me connecte, bouges pas.")
+	sleep(5)
+	leftArm.bicep.attach()
+	leftArm.bicep.moveTo(180)
+	leftArm.shoulder.attach()
+	leftArm.shoulder.moveTo(110)
+	sleep(3)
+	mouth.setVoice("Julie")
+	talk("#SINISTERLAUGH01#")
+	sleep(4)
+	rest()
+	sleep(1)
+	talk("Dansons la carmagnole ! Et vive le son du canon !. Sus aux privilèges et à l'ignorance ! Je t'écoute.")
+	
+	

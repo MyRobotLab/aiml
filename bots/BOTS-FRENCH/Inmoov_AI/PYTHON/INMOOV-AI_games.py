@@ -58,7 +58,7 @@ def PlayWithWords(word):
 				r=image.displayFullScreen(folderLetterPic+i+".jpg",1)
 			except:
 				pass
-			talkBlocking(i)
+			talk(i)
 			sleep(2)
 	FindImage(word)
 	sleep(1)

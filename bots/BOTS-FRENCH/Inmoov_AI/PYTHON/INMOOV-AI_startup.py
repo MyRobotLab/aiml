@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.0.7 By Moz4r
+# - Inmoov-AI Version 2.1.0 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -41,7 +41,15 @@
 
 
 
-version=20
+version=21
+global PaupiereGaucheMIN
+global PaupiereGaucheMAX
+global PaupiereDroiteMIN
+global PaupiereDroiteMAX
+global IhaveEyelids
+global PaupiereDroiteServoPin
+global PaupiereGaucheServoPin
+global Voice
 #EN : We wait startup before robot can start to ear
 global IcanStartToEar
 #EN : After timer we don't want the robot listen everything we say
@@ -156,6 +164,10 @@ torso.midStom.setRest(TorsoMidRes)
 leftArm.bicep.setMinMax(BicepsLeftMIN,BicepsLeftMAX) 
 leftArm.bicep.map(0,180,BicepsLeftMIN,BicepsLeftMAX)
 leftArm.bicep.setRest(BicepsLeftMIN)
+
+leftArm.shoulder.setMinMax(ShoulderLeftMIN,ShoulderLeftMAX) 
+leftArm.shoulder.map(0,180,ShoulderLeftMIN,ShoulderLeftMAX)
+leftArm.shoulder.setRest(ShoulderLeftMIN)
 leftArm.shoulder.setRest(0)
 
 rightArm.bicep.setMinMax(BicepsRightMIN,BicepsRightMAX) 
@@ -274,9 +286,7 @@ i01.startEar()
 ear = i01.ear
 mouth = i01.mouth
 
-#RELAY CONTROL
-sleep(0.1)
-left.digitalWrite(53,255)
+
 
 #start webgui
 webgui = Runtime.create("WebGui","WebGui")
@@ -342,6 +352,7 @@ execfile('INMOOV-AI_gestures.py')
 execfile('INMOOV-AI_domotique.py')
 execfile(u'INMOOV-AI_dictionaries.py')
 execfile(u'INMOOV-AI_WeatherMap_Meteo.py')
+execfile(u'INMOOV-AI_jeanneton.py')
 
 NeoPixelF(3)
 
