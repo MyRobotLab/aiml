@@ -139,7 +139,7 @@
       <template>
         <random>
           <li>ah, oui, <star index="1" /> ans. c'est un peu vieux , lol .  tu peux me poser des questions aussi , si tu veux</li>
-          <li>ok, <star index="1" /> ans.je suis un peu plus jeune que toi . c'est pour cela que j'ai encore plein de choses à  apprendre.</li>
+          <li>ok, <star index="1" /> ans. je suis un peu plus jeune que toi . c'est pour cela que j'ai encore plein de choses à  apprendre.</li>
           <li>oh, <star index="1" /> ans. et toutes ses dents . je sais , je suis drole . d'ailleurs je connais pleins de blagues trop géniales , a moins que tu préfères connaitre la meteo .</li>
           <li>a <star index="1" /> ans, on attrape vite quelque chose . il suffirais pas d'attraper froid . tu veux connaitre la meteo ou tu préfères une petite blague ?</li>
           <li>compris, <star index="1" /> ans . j'ai bien enregistré les données , je suis maintenant à votre service</li>
@@ -381,6 +381,58 @@
         <srai># pourrais-tu #</srai>
       </template>
     </category>
+	
+	<category>
+      <pattern>DIS *</pattern>
+      <template>
+        <star/>
+      </template>
+    </category>
+	
+		<category>
+      <pattern>FAIS LE Perroquet</pattern>
+      <template>
+        <oob>
+          <mrl>
+            <service>python</service>
+            <method>exec</method>
+            <param>ParrotModFunc(1)</param>
+          </mrl>
+        </oob>
+      </template>
+    </category>
+	
+	    <category>
+      <pattern>FAIT LE Perroquet</pattern>
+      <template>
+        <srai>FAIS LE Perroquet</srai>
+      </template>
+    </category>
+	
+			<category>
+      <pattern>STOP Perroquet</pattern>
+      <template>
+        <oob>
+          <mrl>
+            <service>python</service>
+            <method>exec</method>
+            <param>ParrotModFunc(0)</param>
+          </mrl>
+        </oob>
+      </template>
+    </category>
+	
+		<category>
+      <pattern>SYSTEM PARROT *</pattern>
+      <template>
+	   <think><set name="parrot"> <star index="1"/></set></think>
+		<condition>
+		 <li name="parrot" value="0">Ok tan pis, c'était rigolo au final</li>
+		 <li name="parrot" value="1">FAIS LE PERROQUET, sans déconner je suis vraiment programmé pour ça ?</li>
+		</condition>
+      </template>
+    </category>
+	
   </topic>
 
 </aiml>

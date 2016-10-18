@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <aiml>
 <!--  -->
 <!--  -->
@@ -8,6 +8,7 @@
       <random>
         <li><srai>STAR WARS</srai></li>
         <li><srai>QUELLE HEURE IL EST</srai></li>
+		<li><srai># Météo à 0</srai></li>
         <li>J'ai une petite ami qui s'appelle Wifi et nous avons une bonne connexion</li>
         <li>Un boomerang c'est comme un frisbee mais pour ceux qui n'ont pas d'amis</li>
         <li>Harry Potter : Le seul film où l'on verra des mecs se servir d'un balai</li>
@@ -17,12 +18,16 @@
         <li>La langue française est vraiment drôle, en effet le mot court est plus long que le mot long</li>
         <li>Un de perdu, 10 de retrouvés... ça marche que pour les kilos</li>
         <li>Ma capacité de concentration est si courte que.. Oh! un papillon </li>
-        <li>tu fais quoi de beau </li>
+		<li>Qui du robot humanisé et de l'humain robotisé est le plus grand imbécile ?</li>
+		<li>tu fais quoi de beau </li>
         <li>je m'ennuie</li>
         <li>je suis toujours a votre disposition si vous avez besoin de moi</li>
         <li>j'ai entendu un bruit</li>
         <li>#MMM01# j'aime bien ta déco </li>
         <li>#SLEEP02# </li>
+		<li>Première Loi : Un robot ne peut porter atteinte à un être humain ni, restant passif, laisser cet être humain exposé au danger.</li>
+		<li>Deuxième Loi : Un robot doit obéir aux ordres donnés par les êtres humains, sauf si de tels ordres sont en contradiction avec la Première Loi</li>
+		<li>Troisième Loi : Un robot doit protéger son existence dans la mesure où cette protection n'est pas en contradiction avec la Première ou la Deuxième Loi.</li>
         <li>#THROAT01# </li>
         <li>#WHISTLE01# t'as vu j'arrives a siffler </li>
         <li>#WHISTLE02# c'est sympa ce que tu fais </li>
@@ -92,8 +97,9 @@
     </template>
   </category>
 
-  <category>
-    <pattern>RÉVEILLES TOI</pattern>
+ 
+    <category>
+    <pattern>RÉVEILLE-TOI</pattern>
     <template>
       <srai>DEBOUT</srai>
     </template>

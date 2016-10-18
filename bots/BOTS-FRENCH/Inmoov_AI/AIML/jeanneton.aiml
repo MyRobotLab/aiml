@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+
+
+  <category>
+    <pattern># Jeanneton #</pattern>
+    <template>
+		<think><set name="topic">Jeanneton</set></think>
+		  <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>HideEyes()</param>
+        </mrl>
+      </oob>
+   
+    </template>
+  </category> 
+  
+  
+      <category>
+    <pattern>#  jeanne ton #</pattern>
+    <template>
+      <srai># Jeanneton #</srai>
+    </template>
+  </category>
+ 
+      <category>
+    <pattern>#  jane ton #</pattern>
+    <template>
+      <srai># Jeanneton #</srai>
+    </template>
+  </category>
+
+   <topic name="Jeanneton">
+   <category>
+    <pattern>*</pattern>
+    <template>
+
+	  <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>Jeanneton("<star/>")</param>
+        </mrl>
+      </oob>
+   
+    </template>
+  </category> 
+  </topic>
+  
+</aiml>
+

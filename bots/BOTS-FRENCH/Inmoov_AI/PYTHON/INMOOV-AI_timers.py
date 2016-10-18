@@ -6,14 +6,66 @@ StopListenTimer = Runtime.start("StopListenTimer","Clock")
 
 def StopListenTimerFunc(timedata):
 	global IcanEarOnlyKnowsWords
-	IcanEarOnlyKnowsWords+=1
-	print "IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
+	global RobotIsSleepingSoft
+	IcanEarOnlyKnowsWords=IcanEarOnlyKnowsWords+1
+	print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
+	if IcanEarOnlyKnowsWords==1:
+		print "Sleeping mode ON"
+		RobotIsSleepingSoft=1
+		try:
+			clockPaupiere.stopClock()
+		except: 
+			pass
+		PositionPaupiere(90,90,0.4)
+		sleep(3)
+		PaupiereAttach(0)
+		rest()
+		
+	
 
 StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
 # start the clock
 StopListenTimer.startClock()
 
 
+LedWebkitListen = Runtime.create("LedWebkitListen","Clock")
+LedWebkitListen.setInterval(8000)
+LedWebkitListen = Runtime.start("LedWebkitListen","Clock")
+
+global LedWebkitListenFuncFix
+LedWebkitListenFuncFix=0
+
+
+def LedWebkitListenFunc(timedata):
+	global LedWebkitListenFuncFix
+	if LedWebkitListenFuncFix==1:
+		Light(1,1,1)
+		LedWebkitListenFuncFix=0
+		LedWebkitListen.stopClock()
+	else:
+		LedWebkitListenFuncFix+=1
+		
+	
+
+LedWebkitListen.addListener("pulse", python.name, "LedWebkitListenFunc")
+# start the clock
+
+
+def WebkitSpeachReconitionON(timedata):
+	global LedWebkitListenFuncFix
+	global Ispeak
+	if Ispeak==0:
+		try:
+			ear.stopListening()
+			sleep(0.3)
+			ear.startListening()
+			Light(1,1,0)
+			LedWebkitListenFuncFix=0
+			LedWebkitListen.startClock()
+			
+		except: 
+			pass
+			
 
 #RANDOM TIME ACTIONS
 VieAleatoire = Runtime.start("VieAleatoire","Clock")
@@ -25,7 +77,10 @@ TuTeTais=0
 def OnBalanceUnePhare_Aleatoire(timedata):
 	global TimeNoSpeak
 	global TuTeTais
-	global IcanEarOnlyKnowsWords
+	global RamdomSpeak
+	global RobotIsStarted
+	if RobotIsStarted==1:
+		RamdomSpeak=1
 	
 	VieAleatoire.setInterval(random.randint(60000,600000))
 	if TimeNoSpeak=="ON":
@@ -33,14 +88,12 @@ def OnBalanceUnePhare_Aleatoire(timedata):
 			chatBot.getResponse("ALEATOIRE")
 		else:
 			chatBot.getResponse("ALEATOIRE2")
-		IcanEarOnlyKnowsWords=1
+		
 	if TuTeTais==0:
 		TimeNoSpeak="ON"
 	
 
 def TuTeTais_OuPas(value):
-	global IcanEarOnlyKnowsWords
-	IcanEarOnlyKnowsWords=1
 	global TuTeTais
 	TuTeTais=value
 	

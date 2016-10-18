@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+
+
+  <category>
+    <pattern># biceps #</pattern>
+    <template>
+	  <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>BicepsClosed()</param>
+        </mrl>
+      </oob>
+      <random>
+        <li>C'est fait</li>
+        <li>OK</li>
+        <li>Voilà chef !!!</li>
+      </random>
+    </template>
+  </category> 
+
+ 
+  <category>
+    <pattern># repos #</pattern>
+    <template>
+	  <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>rest()</param>
+        </mrl>
+      </oob>
+      <random>
+        <li>C'est fait</li>
+        <li>OK</li>
+        <li>Voilà chef !!!</li>
+      </random>
+    </template>
+  </category> 
+
+</aiml>
+
