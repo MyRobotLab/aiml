@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.1.0 By Moz4r
+# - Inmoov-AI Version 2.1.1 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -50,6 +50,7 @@ global IhaveEyelids
 global PaupiereDroiteServoPin
 global PaupiereGaucheServoPin
 global Voice
+global openCvModule
 #EN : We wait startup before robot can start to ear
 global IcanStartToEar
 #EN : After timer we don't want the robot listen everything we say
@@ -58,6 +59,8 @@ IcanStartToEar=0
 IcanEarOnlyKnowsWords=-1
 #Robot state
 global RobotIsStarted
+global PleaseRobotDontSleep
+PleaseRobotDontSleep=0
 global RobotIsSleepingSoft
 RobotIsStarted=0
 RobotIsSleepingSoft=0
@@ -143,38 +146,18 @@ r=image.displayFullScreen('pictures\loading.jpg',1)
 
 # inmoov servo configuration
 
+#left arduino
 left = Runtime.create("i01.left", "Arduino")
+left.setBoard(BoardTypeLeft)
 leftHand = Runtime.create("i01.leftHand", "InMoovHand")
 leftArm = Runtime.create("i01.leftArm", "InMoovArm")
-right=Runtime.create("i01.right", "Arduino")
-rightHand = Runtime.create("i01.rightHand", "InMoovHand")
-rightArm = Runtime.create("i01.rightArm", "InMoovArm")
-head = Runtime.create("i01.head","InMoovHead")
-torso = Runtime.create("i01.torso", "InMoovTorso")
-
-torso.topStom.setMinMax(TorsoTopMin,TorsoTopMax)
-torso.topStom.map(0,180,TorsoTopMin,TorsoTopMax)
-torso.topStom.setRest(TorsoTopRest)
-
-torso.midStom.setMinMax(TorsoMidMin,TorsoMidMax)
-torso.midStom.map(0,180,TorsoMidMin,TorsoMidMax)
-torso.midStom.setRest(TorsoMidRes)
-
-
 leftArm.bicep.setMinMax(BicepsLeftMIN,BicepsLeftMAX) 
 leftArm.bicep.map(0,180,BicepsLeftMIN,BicepsLeftMAX)
 leftArm.bicep.setRest(BicepsLeftMIN)
-
 leftArm.shoulder.setMinMax(ShoulderLeftMIN,ShoulderLeftMAX) 
 leftArm.shoulder.map(0,180,ShoulderLeftMIN,ShoulderLeftMAX)
 leftArm.shoulder.setRest(ShoulderLeftMIN)
 leftArm.shoulder.setRest(0)
-
-rightArm.bicep.setMinMax(BicepsRightMIN,BicepsRightMAX) 
-rightArm.bicep.map(0,180,BicepsRightMIN,BicepsRightMAX)
-rightArm.bicep.setRest(BicepsRightMIN)
-rightArm.shoulder.setRest(0)
-
 leftHand.thumb.setMinMax(ThumbLeftMIN,ThumbLeftMAX) 
 leftHand.index.setMinMax(IndexLeftMIN,IndexLeftMAX) 
 leftHand.majeure.setMinMax(majeureLeftMIN,majeureLeftMAX) 
@@ -184,19 +167,8 @@ leftHand.thumb.map(0,180,ThumbLeftMIN,ThumbLeftMAX)
 leftHand.index.map(0,180,IndexLeftMIN,IndexLeftMAX) 
 leftHand.majeure.map(0,180,majeureLeftMIN,majeureLeftMAX) 
 leftHand.ringFinger.map(0,180,ringFingerLeftMIN,ringFingerLeftMAX) 
-leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX) 
-
-rightHand.thumb.setMinMax(ThumbRightMIN,ThumbRightMAX) 
-rightHand.index.setMinMax(IndexRightMIN,IndexRightMAX) 
-rightHand.majeure.setMinMax(majeureRightMIN,majeureRightMAX) 
-rightHand.ringFinger.setMinMax(ringFingerRightMIN,ringFingerRightMAX) 
-rightHand.pinky.setMinMax(pinkyRightMIN,pinkyRightMAX) 
-rightHand.thumb.map(0,180,ThumbRightMIN,ThumbRightMAX) 
-rightHand.index.map(0,180,IndexRightMIN,IndexRightMAX) 
-rightHand.majeure.map(0,180,majeureRightMIN,majeureRightMAX) 
-rightHand.ringFinger.map(0,180,ringFingerRightMIN,ringFingerRightMAX) 
-rightHand.pinky.map(0,180,majeureRightMIN,majeureRightMAX)
-
+leftHand.pinky.map(0,180,majeureLeftMIN,majeureLeftMAX)
+head = Runtime.create("i01.head","InMoovHead")
 head.jaw.setMinMax(JawMIN,JawMAX)
 if JawInverted==1:
 	head.jaw.map(0,180,JawMAX,JawMIN)
@@ -227,25 +199,61 @@ else:
 head.rothead.setRest(RotHeadRest)
 
 
+#right arduino
+right=Runtime.create("i01.right", "Arduino")
+right.setBoard(BoardTypeRight)
+rightHand = Runtime.create("i01.rightHand", "InMoovHand")
+rightArm = Runtime.create("i01.rightArm", "InMoovArm")
+rightArm.bicep.setMinMax(BicepsRightMIN,BicepsRightMAX) 
+rightArm.bicep.map(0,180,BicepsRightMIN,BicepsRightMAX)
+rightArm.bicep.setRest(BicepsRightMIN)
+rightArm.shoulder.setRest(0)
+rightHand.thumb.setMinMax(ThumbRightMIN,ThumbRightMAX) 
+rightHand.index.setMinMax(IndexRightMIN,IndexRightMAX) 
+rightHand.majeure.setMinMax(majeureRightMIN,majeureRightMAX) 
+rightHand.ringFinger.setMinMax(ringFingerRightMIN,ringFingerRightMAX) 
+rightHand.pinky.setMinMax(pinkyRightMIN,pinkyRightMAX) 
+rightHand.thumb.map(0,180,ThumbRightMIN,ThumbRightMAX) 
+rightHand.index.map(0,180,IndexRightMIN,IndexRightMAX) 
+rightHand.majeure.map(0,180,majeureRightMIN,majeureRightMAX) 
+rightHand.ringFinger.map(0,180,ringFingerRightMIN,ringFingerRightMAX) 
+rightHand.pinky.map(0,180,majeureRightMIN,majeureRightMAX)
+
+
+torso = Runtime.create("i01.torso", "InMoovTorso")
+torso.topStom.setMinMax(TorsoTopMin,TorsoTopMax)
+torso.topStom.map(0,180,TorsoTopMin,TorsoTopMax)
+torso.topStom.setRest(TorsoTopRest)
+torso.midStom.setMinMax(TorsoMidMin,TorsoMidMax)
+torso.midStom.map(0,180,TorsoMidMin,TorsoMidMax)
+torso.midStom.setRest(TorsoMidRes)
+
+
+#open cv lattepanda tweak
+opencv = Runtime.create("i01.opencv", "OpenCV")
+opencv.setFrameGrabberType("org.myrobotlab.opencv.SarxosFrameGrabber")
+opencv = Runtime.start("i01.opencv", "OpenCV")
+
+
+
+
+
 	
 #start the arduino
 if IsInmoovArduino==1:
 	
-	#i01.startHead(leftPort)
-	i01 = Runtime.start("i01","InMoov")
-	#i01.startHead(leftPort)
-	#i01.startAll(leftPort, rightPort)
 	
+	i01 = Runtime.start("i01","InMoov")
 	left = Runtime.start("i01.left", "Arduino")
+	
 	head.setSpeed(DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed)
 	head.rothead.setSpeed(0.1)
 	head.neck.setSpeed(0.1)
-
-
 	i01.startHead(leftPort)
-
+	i01.head.eyeY.rest()
+	i01.head.eyeX.rest()
+	head.neck.setSpeed(NeckSpeed)
 	
-	head.neck.setSpeed(NeckSpeed)	
 	i01.startLeftHand(leftPort)
 	i01.startLeftArm(leftPort)
 	
@@ -257,9 +265,6 @@ if IsInmoovArduino==1:
 	else:
 		torso = i01.startTorso(rightPort)
 	
-	i01.head.eyeY.rest()
-	i01.head.eyeX.rest()
-
 	#i01.startHeadTracking(leftPort)
 	
 	right = Runtime.start("i01.right", "Arduino")
@@ -279,7 +284,7 @@ if IsInmoovArduino==1:
 		HeadSide.attach(right, HeadSidePin, HeadSideRest, 500)
 	HeadSide.setSpeed(PistonSideSpeed)
 	
-	opencv = i01.opencv
+	
 	
 i01.startMouth()
 i01.startEar()
@@ -353,6 +358,8 @@ execfile('INMOOV-AI_domotique.py')
 execfile(u'INMOOV-AI_dictionaries.py')
 execfile(u'INMOOV-AI_WeatherMap_Meteo.py')
 execfile(u'INMOOV-AI_jeanneton.py')
+execfile(u'INMOOV-AI_demo_halleffect.py')
+execfile(u'INMOOV-AI_activator.py')
 
 NeoPixelF(3)
 
@@ -414,3 +421,15 @@ python.subscribe(ear.getName(),"publishText")
 WebkitSpeachReconitionFix.startClock()
 RobotIsStarted=1
 #BicepsClosed()
+openCvModule="123"
+#arduino.setSampleRate(9600)  # change thiopenCvModule="123"
+#i01.opencv.setInputSource("Sarxos")
+
+#i01.opencv.setCameraIndex(0)
+#i01.opencv.removeFilters()
+#i01.opencv.addFilter("PyramidDown")
+#i01.opencv.addFilter("Gray")
+#i01.opencv.addFilter("FaceDetect")
+#i01.opencv.setDisplayFilter("FaceDetect")
+#i01.opencv.capture()
+#StartSensorDemo()

@@ -5,21 +5,23 @@ StopListenTimer.setInterval(60000)
 StopListenTimer = Runtime.start("StopListenTimer","Clock")
 
 def StopListenTimerFunc(timedata):
-	global IcanEarOnlyKnowsWords
-	global RobotIsSleepingSoft
-	IcanEarOnlyKnowsWords=IcanEarOnlyKnowsWords+1
-	print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
-	if IcanEarOnlyKnowsWords==1:
-		print "Sleeping mode ON"
-		RobotIsSleepingSoft=1
-		try:
-			clockPaupiere.stopClock()
-		except: 
-			pass
-		PositionPaupiere(90,90,0.4)
-		sleep(3)
-		PaupiereAttach(0)
-		rest()
+	global PleaseRobotDontSleep
+	if PleaseRobotDontSleep==0:
+		global IcanEarOnlyKnowsWords
+		global RobotIsSleepingSoft
+		IcanEarOnlyKnowsWords=IcanEarOnlyKnowsWords+1
+		print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
+		if IcanEarOnlyKnowsWords==1:
+			print "Sleeping mode ON"
+			RobotIsSleepingSoft=1
+			try:
+				clockPaupiere.stopClock()
+			except: 
+				pass
+			PositionPaupiere(90,90,0.4)
+			sleep(3)
+			PaupiereAttach(0)
+			rest()
 		
 	
 
@@ -69,7 +71,7 @@ def WebkitSpeachReconitionON(timedata):
 
 #RANDOM TIME ACTIONS
 VieAleatoire = Runtime.start("VieAleatoire","Clock")
-VieAleatoire.setInterval(60000)
+VieAleatoire.setInterval(120000)
 chatBot.getResponse("SAVEPREDICATES")
 global TimeNoSpeak
 TimeNoSpeak="OFF"
@@ -82,7 +84,7 @@ def OnBalanceUnePhare_Aleatoire(timedata):
 	if RobotIsStarted==1:
 		RamdomSpeak=1
 	
-	VieAleatoire.setInterval(random.randint(60000,600000))
+	VieAleatoire.setInterval(random.randint(120000,600000))
 	if TimeNoSpeak=="ON":
 		if random.randint(0,1)==1:
 			chatBot.getResponse("ALEATOIRE")

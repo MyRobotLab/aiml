@@ -1,31 +1,67 @@
-global FaceDetectedCounter
+global FaceDetectedCounter #FaceDetectedCounter is to prevent artefact face reconition
 FaceDetectedCounter=0
-global FaceDetected
+global FaceDetected #open cv detected a face
 FaceDetected=1
 global startTimerFunction
-
+global posxSquare #position of the left box
+global WidthSquare #size of the face ( small is far )
+WidthSquare=0
+global FaceHadMoved
+FaceHadMoved=0
+from decimal import Decimal
+posxSquare=Decimal(0)
 python.subscribe(opencv.getName(),"publishOpenCVData")
+
 
 NoFaceDetectedTimer = Runtime.start("NoFaceDetectedTimer","Clock")
 NoFaceDetectedTimer.setInterval(20000)
 
 def onOpenCVData(data):
-	#print FaceDetectedCounter
+#This is opencv functions that do jobs
+
+	global posxSquare
+	global openCvModule
+	global WidthSquare
+	global FaceHadMoved
 	global FaceDetectedCounter
-	global FaceDetected
-	if data.getBoundingBoxArray() != None:
-		if not data.getBoundingBoxArray():
-			FaceDetectedCounter=0
-		else:
-			FaceDetectedCounter+=1
-			if FaceDetectedCounter>50 and FaceDetected==0:
-				NoFaceDetectedTimer.stopClock()
-				FaceDetected=1
-				chatBot.getResponse("SYSTEM FACEDETECTED")
-				
-				
+# openCvModule=="photo" : just detect one face
+	if openCvModule=="photo":
+
 		
 		
+		if data.getBoundingBoxArray() != None:
+			if not data.getBoundingBoxArray():
+				FaceDetectedCounter=0
+			else:
+				FaceDetectedCounter+=1
+				if FaceDetectedCounter>50 and FaceDetected==0:
+					NoFaceDetectedTimer.stopClock()
+					FaceDetected=1
+					chatBot.getResponse("SYSTEM FACEDETECTED")
+
+# openCvModule=="123" : just detect if detected face is mooving in the space. 1.2.3 soleil :)
+	if openCvModule=="123":
+		
+		if data.getBoundingBoxArray() != None:
+			if data.getBoundingBoxArray():
+				FaceDetectedCounter+=1
+				rect = data.getBoundingBoxArray().get(0)
+				print FaceDetectedCounter,posxSquare,posxSquare-Decimal(rect.x)
+				if FaceDetectedCounter>10:
+					if posxSquare != 0 and posxSquare-Decimal(rect.x) !=0 and (posxSquare-Decimal(rect.x) <= 0.2) and (posxSquare-Decimal(rect.x) >= -0.2):
+						print "tu as bougez ",posxSquare-Decimal(rect.x)
+								 # Store the information in rect
+					posxSquare = Decimal(rect.x)                                        # Get the x position of the corner
+					posy = rect.y                                        # Get the y position of the corner
+					WidthSquare = rect.width                                       # Get the width
+					h = rect.height  				# Get the height
+				
+			else:
+				FaceDetectedCounter=0
+				
+				
+				
+			
 	
 		
 def NoFaceDetectedTimerFunction(timedata):
@@ -51,6 +87,8 @@ def TakePhoto(messagePhoto):
 	i01.startEyesTracking(leftPort,22,24)
 	i01.eyesTracking.faceDetect()	
 	talkBlocking(messagePhoto)
+	global openCvModule
+	openCvModule = "photo"
 	global FaceDetected
 	global FaceDetectedCounter
 	global startTimerFunction
@@ -59,14 +97,7 @@ def TakePhoto(messagePhoto):
 	Light(0,0,0)
 	startTimerFunction=0
 	NoFaceDetectedTimer.startClock()
-	#opencv.setInputSource("camera")
-	#opencv.setCameraIndex(0)
-	#opencv.addFilter("pdown","PyramidDown")
-	#opencv.setDisplayFilter("pdown")
-	#opencv.capture()
-	#sleep(1)
-	#photoFileName = opencv.recordSingleFrame()
-	#print "name file is" , photoFileName
+
 
 def PhotoProcess(messagePhoto):
 	global FaceDetected

@@ -22,9 +22,16 @@ JawInverted=0
 
 #ARDUINO CONFIG
 IsInmoovArduino=0
-BoardType="atmega2560" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
+BoardTypeLeft="atmega2560" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
+BoardTypeRight="atmega2560" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
 leftPort = "COM4"
 rightPort = "COM5"
+
+#ACTIVATOR
+Activator=0
+ActivatorPort="serial1"
+ActivatorControler="Left"
+BoardTypeActivator="atmega328" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
 
 #PIN RELAIS POUR DETACHEMENT SERVOS
 LeftRelaisArm=53
@@ -33,7 +40,7 @@ RightRelaisArm=53
 RightRelaisHand=51
 
 # ARDUINO SLAVES / ARDUINO SECONDAIRES
-Neopixel = "COMX"
+
 DiyServo1 = "COMX"
 DiyServo2 = "COMX"
 DiyServo3 = "COMX"
