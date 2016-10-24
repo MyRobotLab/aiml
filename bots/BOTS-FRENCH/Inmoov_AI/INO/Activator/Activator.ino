@@ -17,18 +17,7 @@
  *                                                                 *
  * Timer2, Adafruit_NeoPixel, Servo, Wire.                         *
  *                                                                 *
- * Compilateur : Arduino version 1.0.6                             *
- *                                                                 *
- *                                                                 *
- * Commande sur port série:                                        *
- *                                                                 *
- * A: animation                                                    *
- * B: état et valeur tension batterie                              *
- * C: couleur et animation du ring                                 *
- * E: état système                                                 *
- * S: commande module audio                                        *
- * V: version du programme                                         *
- *                                                                 *
+ * Compilateur : Arduino version 1.6.12                            *
  *                                                                 *
  * Fonctionnement:                                                 *
  *                                                                 *
@@ -38,27 +27,15 @@
  * puis l'électronique, et enfin le PC.                            *
  * Nous sommes en mode réveil.                                     *
  * Dés que le PC est démarré avec MRL et tout les services, celui- *
- * ci doit envoyé "E:1," à Activator.                              *
+ * ci doit envoyé une commande à Activator.                        *
  * Celui ci démarre alors en mode normal.                          *
- * On active le ring par C:2, ou C:3, ou C:4, ...                  *
  * Le servo Jaw est active.                                        *
  * Pour éteindre InMoov, MRL doit prévoir de fermer proprement     *
- * tout les services et envoyer E:5, a activator                   *
+ * tout les services et envoyer une commande a activator           *
  * Celui ci va couper les alimentations 30s aprés avoir reçu la    *
  * commandes puis se met en veille.                                *
  *                                                                 *
  *                                                                 *
- * Résumé des commandes d'état:                                    *
- * E:1, mode normal                                                *
- * E:2, mode shutdown                                              *
- * E:3, bouche ouverte                                             *
- * E:4, bouche fermée                                              *
- * E:5, procedure de shutdown                                      *
- * E:6, désactive l'audio pour la bouche                           *
- * E:7, réactive l'audio pour le bouche                            *
- *                                                                 *
- * A chaque commande accepté, Activator répond commande:val,OK     *                                                                *
- * A chaque commande refusé, Activator reponds commande:ERROR      *                                                                 *
  *                                                                 *
  * Suivi des modifications :                                       *
  * Date       | Auteur        | Description                        *
@@ -77,6 +54,9 @@
  *     - Optimisation du code                                      *
  * 13/10/2016 | D. Gyselinck  | V0.8.0 beta test                   *
  *     - Ajout animation pendant le démarrage du PC                *
+ * 21/10/2016 | D. Gyselinck  | V1.0.0 beta test                   *
+ *     - Refonte total du programme avec le protocole MrlComm      *
+ *     - Utilisation de classe pour les différentes fonctions      *
  *                                                                 *
  *                                                                 *
  *                                                                 *
@@ -91,10 +71,10 @@
 #include <MsTimer2.h>
 #include <Servo.h> 
 #include <Wire.h> 
+#include "MrlComm.h"
 
-const String version = "0.8.0";
-// Mettre 1 pour débugger sur port série
-#define DEBUG               1
+const String version = "1.0.0";
+
 // Mettre 1 si le MAX9744 est connecté
 #define MAX9744             0
 // Définition des pins du nano
@@ -109,10 +89,6 @@ const String version = "0.8.0";
 #define OFF_MOT_PIN         11   // PIN D11
 #define PC_POWER_PIN        12   // PIN D12
 #define LED_VEILLEUSE       13   // PIN D13
-#define AUDIO_PIN           0    // PIN A0
-#define AUDIO_SEUIL         1    // PIN A1
-#define BAT1_PIN            2    // PIN A2
-#define BAT2_PIN            3    // PIN A3
 
 // Nombre de pixels du ring
 #define NUMPIXELS           16
@@ -132,51 +108,39 @@ const String version = "0.8.0";
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 // Déclaration de l'objet servo
 Servo jawServo;
+// Objet static MrlComm
+MrlComm mrlComm;
 
 // Déclaration des variables globals
 int sensorVal = 0;
-int bat1Val = 0;
-int bat2Val = 0;
 int audioVal = 0;
 int seuilVal = 0;
-//int serialCount = 0;             
 int cptWait = 0;
 int cptTimer = 0;
-byte rVal = 0;
-byte gVal = 0;
-byte bVal = 0;
 byte srVal = 0;
 byte sgVal = 0;
 byte sbVal = 0;
 
-float bat1Value = 0.0;
-float bat2Value = 0.0;
 int cptBat1Failed = 0;
 int cptBat2Failed = 0;
-int animRequest = 0;
 int icptWait = 0;
+int cptDetach = 0;
 
 unsigned long long processTime;
 
-boolean servoIsEnable = false;
-boolean inmoovIsOn = false;
 boolean batteryEleIsFailed = false;
 boolean batteryMotIsFailed = false;
 boolean neoState = false;
-boolean wakeUp = false;
-boolean shutdownPC = false;
 boolean closeIsRun = false;
 boolean bUpdateRing = false;
 boolean bJawIsOpen = false;
 boolean closeRequest = false;
 boolean openRequest = false;
+boolean openJawRequest = false;
 
-int inbyte;
 int pixelCpt = 0;
 int ucCpt = 0;
 int ucCpt1 = 0;
-
-int8_t volAudio = 31;
 
 
 ///////////////////////////////
@@ -190,7 +154,7 @@ int8_t volAudio = 31;
 void PowerElecON()
 {
   digitalWrite(ON_ELEC_PIN, HIGH);
-  delay(100);
+  delay(200);
   digitalWrite(ON_ELEC_PIN, LOW);
 }
 
@@ -201,7 +165,7 @@ void PowerElecON()
 void PowerElecOFF()
 {
   digitalWrite(OFF_ELEC_PIN, HIGH);
-  delay(100);
+  delay(200);
   digitalWrite(OFF_ELEC_PIN, LOW);
 }
 
@@ -212,7 +176,7 @@ void PowerElecOFF()
 void PowerMotON()
 {
   digitalWrite(ON_MOT_PIN, HIGH);
-  delay(100);
+  delay(200);
   digitalWrite(ON_MOT_PIN, LOW);
 }
 
@@ -223,7 +187,7 @@ void PowerMotON()
 void PowerMotOFF()
 {
   digitalWrite(OFF_MOT_PIN, HIGH);
-  delay(100);
+  delay(200);
   digitalWrite(OFF_MOT_PIN, LOW);
 }
 
@@ -251,7 +215,7 @@ void ProcessTimer()
   
   int i, j;
   
-  if ((inmoovIsOn) || (wakeUp))
+  if ((mrlComm.inmoovIsOn) || (mrlComm.wakeUp))
   {
     // Permet de visualiser le mode RUN
     cpt++;
@@ -271,7 +235,7 @@ void ProcessTimer()
     }
   }
 
-  if (wakeUp)
+  if (mrlComm.wakeUp)
   {
     // Permet de visualiser le mode RUN
     pixels.setPixelColor(pixelCpt, pixels.Color(100,0,0));
@@ -298,11 +262,11 @@ void ProcessTimer()
     cptTimer = 0;
     
     // 5s
-    if (inmoovIsOn)
+    if (mrlComm.inmoovIsOn)
     {
       // Lecture des valeurs analogiques
-      bat1Val = analogRead(BAT1_PIN);
-      bat2Val = analogRead(BAT2_PIN);
+      mrlComm.bat1Val = analogRead(A2);
+      mrlComm.bat2Val = analogRead(A3);
       
       /*if (bat1Value < BAT1_SEUIL)
       {
@@ -335,31 +299,11 @@ void ProcessTimer()
       }*/
 
       // Tension batterie en V
-      bat1Value = map(bat1Val, 0, 1023, 0, 5000) / 1000;
-      bat2Value = map(bat2Val, 0, 1023, 0, 5000) / 1000;
+      mrlComm.bat1Value = map(mrlComm.bat1Val, 0, 1023, 0, 4000) / 1000;
+      mrlComm.bat2Value = map(mrlComm.bat2Val, 0, 1023, 0, 4000) / 1000;
 
-      /*if (DEBUG)
-      {
-        //on affiche la valeur lue sur la liaison série
-        Serial.print("bat1Val = ");
-        Serial.println(bat1Val);
-        Serial.print("bat2Val = ");
-        Serial.println(bat2Val);
-        
-        // On affiche la tension calculée en V
-        Serial.print("Tension batterie 1 = ");
-        Serial.print(bat1Value, 2);
-        Serial.println(" V");
-        Serial.print("Tension batterie 2 = ");
-        Serial.print(bat2Value, 2);
-        Serial.println(" V");
-        
-        // On saute une ligne entre deux affichages
-        Serial.println();
-      }*/
-      
       // Gestion de la mise en veille aprés avoir reçu l'ordre du PC
-      if (shutdownPC)
+      if (mrlComm.shutdownPC)
       {
         cptWait++;
         if (cptWait >= 6)
@@ -370,10 +314,10 @@ void ProcessTimer()
           // A voir si 30s suffit...
           
           cptWait = 0;
-          shutdownPC = false;
-          inmoovIsOn = false;
-          servoIsEnable = false;
-          wakeUp = false;
+          mrlComm.setServoEnable(false);
+          mrlComm.setInmoovIsOn(false);
+          mrlComm.setShutdownPC(false);
+          mrlComm.setWakeUp(false);
           
           shutdownProcess();
         }
@@ -381,7 +325,7 @@ void ProcessTimer()
     }
     else
     {
-      if (!wakeUp)
+      if (!mrlComm.wakeUp)
       {
         // Flash de la veilleuse toutes les 5 secondes
         // Indique que InMoov dort...
@@ -490,10 +434,10 @@ void startupProcess()
   }
   pixels.show();
 
-  /* Vérification du servo de la bouche
+  // Ferme la bouche
   jawServo.attach(JAW_SERVO_PIN);
   jawServo.write(SERVO_MIN);
-  jawServo.write(SERVO_MAX);*/
+  mrlComm.setDetachRequest(true);
 
   delay(2000);
   // Etape 5
@@ -512,7 +456,7 @@ void startupProcess()
   digitalWrite(LED_VEILLEUSE, LOW);
   MsTimer2::start(); 
 
-  wakeUp = true;
+  mrlComm.setWakeUp(true);
   pixelCpt = 0;
 }
 
@@ -542,7 +486,7 @@ void shutdownProcess()
   pixels.show();
 
   // Coupure alimentation électronique générale
-  PowerElecON();
+  PowerElecOFF();
   delay(2000);
 
   // Etape 2
@@ -553,7 +497,7 @@ void shutdownProcess()
   pixels.show();
 
   // Coupure alimentation des moteurs
-  PowerMotON();
+  PowerMotOFF();
   delay(2000);
 
   for (i = 0; i < pixels.numPixels(); i++)
@@ -561,6 +505,9 @@ void shutdownProcess()
     pixels.setPixelColor(i, pixels.Color(0,0,0));
   }
   pixels.show();
+
+  // Met le MAX9744 en veille
+  digitalWrite(MAX9744_SHTDOWN_PIN, LOW);
 
   // Fin du shutdown
   digitalWrite(LED_VEILLEUSE, LOW);
@@ -586,49 +533,6 @@ uint32_t Wheel(byte WheelPos)
     WheelPos -= 170;
     return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
   }
-}
-
-/** 
- * Récuppère un caractère sur le port série
- */
-char getSerialChar()
-{
-  char serialdata = 0;
-  
-  if (Serial.available() > 0)
-  {
-    while (inbyte != ':')
-    {
-      inbyte = Serial.read(); 
-      if (inbyte > 0 && inbyte != ':')
-      {
-        serialdata = inbyte;
-      }
-    }
-    inbyte = 0;
-  }
-
-  return serialdata;
-}
-
-/** 
- * Récuppère un nombre sur le port série
- */
-long getSerialNum()
-{
-  long serialdata = 0;
-  
-  while (inbyte != ',')
-  {
-    inbyte = Serial.read(); 
-    if (inbyte > 0 && inbyte != ',')
-    {
-      serialdata = serialdata * 10 + inbyte - '0';
-    }
-  }
-  inbyte = 0;
-
-  return serialdata;
 }
 
 /** 
@@ -676,9 +580,9 @@ void setup()
   pinMode(PRESENCE_SENSOR_PIN, INPUT_PULLUP);
 
   // Configure la référence des ADCs
-  analogReference(DEFAULT);   // 5V
+  //analogReference(DEFAULT);   // 5V
   //analogReference(INTERNAL);  // 1.1V
-  //analogReference(EXTERNAL);  // AREF
+  analogReference(EXTERNAL);  // AREF
   
   // Initialisation des états
   PowerElecOFF();
@@ -698,18 +602,8 @@ void setup()
   // Init timing
   processTime = superMillis();
   
-  servoIsEnable = false;
-  inmoovIsOn = false;
   batteryEleIsFailed = false;
   batteryMotIsFailed = false;
-
-  Serial.begin(9600);  
-  
-  if (DEBUG)
-  {
-    Serial.println("--- Program startup ---");
-    Serial.println(); 
-  }
 
   if (MAX9744)
   {
@@ -718,11 +612,14 @@ void setup()
     
     // Vérifie la présence du module audio
     // en mettant le volume par défaut
-    if (!setVolume(volAudio)) 
+    if (!setVolume(mrlComm.volAudio)) 
     {
       Serial.println("MAX9744 non trouvé!");
     }
   }
+
+  mrlComm.publishVersion();
+  mrlComm.publishBoardInfo();
 }
 
 /** 
@@ -731,342 +628,30 @@ void setup()
 void loop() 
 {
   int i = 0;
-  long serialdata;
-  
-  char val = getSerialChar();
-  if (val != 0)
-  {
-    switch(val)
-    {
-      
-      case 'A':
-      {
-        serialdata = getSerialNum();
-        switch (serialdata)
-        {
-          case 0:
-          {
-            // Animation par défaut
-            animRequest = 0;
-            Serial.println("A:0,OK");
-            break;
-          }
-          case 1:
-          {
-            animRequest = 1;
-            Serial.println("A:1,OK");
-            break;
-          }
-          case 2:
-          {
-            animRequest = 2;
-            Serial.println("A:2,OK");
-            break;
-          }
-          default:
-          {
-            Serial.println("A:ERROR");
-            break;
-          }
-        }
-        break; 
-      }
-      case 'B':
-      {
-        serialdata = getSerialNum();
-        switch (serialdata)
-        {
-          case 1:
-          {
-            // Valeur brut
-            Serial.print("B:");
-            Serial.println(bat1Val);
-            break;
-          }
-          case 2:
-          {
-            // Valeur brut
-            Serial.print("B:");
-            Serial.println(bat2Val);
-            break;
-          }
-          case 3:
-          {
-            // Valeur en volt
-            Serial.print("B:");
-            Serial.println(bat1Value, 2);
-            break;
-          }
-          case 4:
-          {
-            // Valeur en volt
-            Serial.print("B:");
-            Serial.println(bat2Value, 2);
-            break;
-          }
-          default:
-          {
-            Serial.println("B:ERROR");
-            break;
-          }
-        }
-        break; 
-      }
-      case 'C':
-      {
-        serialdata = getSerialNum();
-        switch (serialdata)
-        {
-          case 0:
-          {
-            // Noir
-            rVal = 0;
-            gVal = 0;
-            bVal = 0;
-            Serial.println("C:0,OK");
-            break;
-          }
-          case 1:
-          {
-            // Jaune
-            rVal = 100;
-            gVal = 100;
-            bVal = 0;
-            Serial.println("C:1,OK");
-            break;
-          }
-          case 2:
-          {
-            // Rouge
-            rVal = 100;
-            gVal = 0;
-            bVal = 0;
-            Serial.println("C:2,OK");
-            break;
-          }
-          case 3:
-          {
-            // Vert
-            rVal = 0;
-            gVal = 100;
-            bVal = 0;
-            Serial.println("C:3,OK");
-            break;
-          }
-          case 4:
-          {
-            // Bleu
-            rVal = 0;
-            gVal = 0;
-            bVal = 100;
-            Serial.println("C:4,OK");
-            break;
-          }
-          case 5:
-          {
-            // Cyan
-            rVal = 0;
-            gVal = 100;
-            bVal = 100;
-            Serial.println("C:5,OK");
-            break;
-          }
-          case 6:
-          {
-            // Rose
-            rVal = 100;
-            gVal = 0;
-            bVal = 100;
-            Serial.println("C:6,OK");
-            break;
-          }
-          case 10:
-          {
-            // Custom
-            rVal = getSerialNum();
-            gVal = getSerialNum();
-            bVal = getSerialNum();
-            Serial.println("C:10,OK");
-            break;
-          }
-          default:
-          {
-            Serial.println("C:ERROR");
-            break;
-          }
-        }
-        break; 
-      }
-      case 'E':
-      {
-        serialdata = getSerialNum();
-        switch (serialdata)
-        {
-          case 1:
-          {
-            // Le PC est prêt
-            wakeUp = false;
-            inmoovIsOn = true;
-            servoIsEnable = true;
-            rVal = 0;
-            gVal = 0;
-            bVal = 0;
-            animRequest = 0;
-            // Active la sortie audio
-            digitalWrite(MAX9744_MUTE_PIN, LOW);
-            Serial.println("E:1,OK");
-            break;
-          }
-          case 2:
-          {
-            // Met le nano en veille
-            inmoovIsOn = false;
-            servoIsEnable = false;
-            for (i = 0; i < NUMPIXELS; i++)
-            {
-              pixels.setPixelColor(i, pixels.Color(0,0,0));
-            }
-            pixels.show();
-            jawServo.detach();
-            Serial.println("E:2,OK");
-            break;
-          }
-          case 3:
-          {
-            // Demande d'ouverture de la bouche
-            servoIsEnable = false;
-            jawServo.attach(JAW_SERVO_PIN);
-            jawServo.write(SERVO_MAX);
-            Serial.println("E:3,OK");
-            break;
-          }
-          case 4:
-          {
-            // Demande de fermeture de la bouche
-            servoIsEnable = true;
-            jawServo.attach(JAW_SERVO_PIN);
-            jawServo.write(SERVO_MIN);
-            Serial.println("E:4,OK");
-            break;
-          }
-          case 5:
-          {
-            // Le PC va s'arrété
-            shutdownPC = true;
-            Serial.println("E:5,OK");
-            break;
-          }
-          case 6:
-          {
-            // Bloque la gestion du servo en fonction de l'audio
-            servoIsEnable = false;
-            Serial.println("E:6,OK");
-            break;
-          }
-          case 7:
-          {
-            // Débloque la gestion du servo en fonction de l'audio
-            servoIsEnable = true;
-            Serial.println("E:7,OK");
-            break;
-          }
-          default:
-          {
-            Serial.println("E:ERROR");
-            break;
-          }
-        }
-        break;
-      }
-      case 'S':
-      {
-        serialdata = getSerialNum();
-        switch (serialdata)
-        {
-          case 1:
-          {
-            // Réglage du volume
-            volAudio = getSerialNum();
-            if (setVolume(volAudio))
-            {
-              Serial.println("S:1,OK");
-            }
-            else
-            {
-              Serial.println("S:ERROR");
-            }
-            break;
-          }
-          case 2:
-          {
-            // return la valeur du volume
-            Serial.print("S:");
-            Serial.println(volAudio);
-            break;
-          }
-          case 3:
-          {
-            // réveil du module audio
-            digitalWrite(MAX9744_SHTDOWN_PIN, HIGH);
-            Serial.println("S:3,OK");
-            break;
-          }
-          case 4:
-          {
-            // shutdown du module audio
-            digitalWrite(MAX9744_SHTDOWN_PIN, LOW);
-            Serial.println("S:4,OK");
-            break;
-          }
-          case 5:
-          {
-            // mute ON
-            digitalWrite(MAX9744_MUTE_PIN, HIGH);
-            Serial.println("S:3,OK");
-            break;
-          }
-          case 6:
-          {
-            // mute OFF
-            digitalWrite(MAX9744_MUTE_PIN, LOW);
-            Serial.println("S:4,OK");
-            break;
-          }
-          default:
-          {
-            Serial.println("S:ERROR");
-            break;
-          }
-        }
-        break; 
-      }
-      case 'V':
-      {
-        Serial.print("V:");
-        Serial.println(version);
-        break; 
-      }
-      default:
-      {
-        // mauvaise commande, flush buffer
-        Serial.flush();
-      }
-    }
-  }
 
-  if (inmoovIsOn)
+  // increment how many times we've run
+  // TODO: handle overflow here after 32k runs, i suspect this might blow up?
+  mrlComm.loopCount++;
+  // get a command and process it from the serial port (if available.)
+  mrlComm.readCommand();
+  // update devices
+  //mrlComm.updateDevices();
+  // send back load time and memory
+  mrlComm.publishBoardStatus();
+
+  if (mrlComm.inmoovIsOn)
   {
     // InMoov est actif
     ///////////////////
-    
+
     // Gestion du servo de la bouche
-    if (servoIsEnable)
+    if (mrlComm.servoIsEnable)
     {
       // Lecture des valeurs analogiques audios
       audioVal = analogRead(A0);
       seuilVal = analogRead(A1);
       
-      if (audioVal > seuilVal)
+      /*if (audioVal > seuilVal)
       {
         closeRequest = false;
 
@@ -1077,20 +662,20 @@ void loop()
             ucCpt1++;
             if (ucCpt1 >= 20)
             {
-              srVal = rVal;
-              sgVal = gVal;
-              sbVal = bVal;
-              if (rVal != 0)
+              srVal = mrlComm.rVal;
+              sgVal = mrlComm.gVal;
+              sbVal = mrlComm.bVal;
+              if (mrlComm.rVal != 0)
               {
-                rVal = 255;
+                mrlComm.rVal = 200;
               }
-              if (gVal != 0)
+              if (mrlComm.gVal != 0)
               {
-                gVal = 255;
+                mrlComm.gVal = 200;
               }
-              if (bVal != 0)
+              if (mrlComm.bVal != 0)
               {
-                bVal = 255;
+                mrlComm.bVal = 200;
               }
               closeIsRun = false;
               ucCpt1 = 0;
@@ -1113,7 +698,7 @@ void loop()
         {
           closeRequest = true;
         }
-      }
+      }*/
       
       if (closeRequest)
       {
@@ -1126,19 +711,63 @@ void loop()
           bJawIsOpen = false;
           closeRequest = false;
           closeIsRun = true;
-          rVal = srVal;
-          gVal = sgVal;
-          bVal = sbVal;
+          mrlComm.rVal = srVal;
+          mrlComm.gVal = sgVal;
+          mrlComm.bVal = sbVal;
         }
       }
     }
-    
+    else
+    {
+      if (mrlComm.openJawRequest)
+      {
+        if (!bJawIsOpen)
+        {
+          jawServo.attach(JAW_SERVO_PIN);
+          jawServo.write(SERVO_MAX);
+          bJawIsOpen = true;
+          mrlComm.setDetachRequest(true);
+        }
+      }
+      else
+      {
+        if (bJawIsOpen)
+        {
+          jawServo.attach(JAW_SERVO_PIN);
+          jawServo.write(SERVO_MIN);
+          bJawIsOpen = false;
+          mrlComm.setServoEnable(true);
+          mrlComm.setDetachRequest(true);
+        }
+      }
+    }
+
     // Mise à jour du ring
     if ((superMillis() - processTime) >= 10)
     {
+      // Gestion du détachement du servo
+      //////////////////////////////////
+      if (mrlComm.servoDetachIsRequest)
+      {
+        cptDetach++;
+        if (cptDetach >= 200)
+        {
+          cptDetach = 0; 
+          jawServo.detach();
+          mrlComm.setDetachRequest(false);
+        }
+      }
+
+      // Mise à jour volume audio
+      ///////////////////////////
+      if (mrlComm.volumeUpdate)
+      {
+        mrlComm.volumeUpdate = false;
+        setVolume(mrlComm.volAudio);
+      }
+
       // Les alertes batteries sont prioritaires
       //////////////////////////////////////////
-      
       if ((batteryMotIsFailed) && (batteryEleIsFailed))
       {
         // Les 2 batteries sont vident
@@ -1225,7 +854,7 @@ void loop()
         // Pas de problème batteries
         ////////////////////////////
         
-        if (animRequest == 1)
+        if (mrlComm.animRequest == 1)
         {
           // Animations 1 demandé
           ///////////////////////
@@ -1241,10 +870,10 @@ void loop()
             pixelCpt = 0;
           }
         }
-        else if (animRequest == 2)
+        else if (mrlComm.animRequest == 2)
         {
-          // Animations 2 demandé
-          ///////////////////////
+          // Animations 2 demandées
+          /////////////////////////
           for (i = 0; i < pixels.numPixels(); i++) 
           {
             pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + pixelCpt) & 255));
@@ -1268,7 +897,7 @@ void loop()
             
             if (neoState)
             {
-              pixels.setPixelColor(pixelCpt, pixels.Color(rVal,gVal,bVal));
+              pixels.setPixelColor(pixelCpt, pixels.Color(mrlComm.rVal,mrlComm.gVal,mrlComm.bVal));
             }
             else
             {
@@ -1295,7 +924,7 @@ void loop()
   {
     // InMoov est en veille et n'est pas entrain de se réveiller...
     ///////////////////////////////////////////////////////////////
-    if (!wakeUp)
+    if (!mrlComm.wakeUp)
     {
       // Lit l'état du capteur de présence ou bouton ON
       if (digitalRead(PRESENCE_SENSOR_PIN) == LOW)
@@ -1305,8 +934,6 @@ void loop()
         // 2éme lecture pour éviter les parasites
         if (digitalRead(PRESENCE_SENSOR_PIN) == LOW)
         {
-          // InMoov se réveille...
-          wakeUp = true;
           // Démarrage...
           startupProcess();
         }

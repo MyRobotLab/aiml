@@ -6,7 +6,7 @@ if Activator==1 and IsInmoovArduino==1:
 	else:
 		ActivatorControler=right
 
-#activator arduino configuration
+  #activator arduino configuration
 	ActivatorArduino = Runtime.createAndStart("ActivatorArduino","Arduino")
 	ActivatorArduino.setBoard(BoardTypeActivator)
 	ActivatorArduino.connect(ActivatorControler,"Serial1")
@@ -14,5 +14,6 @@ if Activator==1 and IsInmoovArduino==1:
 	#recepetion
 	def FonctionReceptionData(data):
 	  print "J ai reçu des données les voici" , data
+    
 	ActivatorArduino.addListener("publishCustomMsg","python","FonctionReceptionData")
  
