@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.1.1 By Moz4r
+# - Inmoov-AI Version 2.1.2 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -231,7 +231,8 @@ torso.midStom.setRest(TorsoMidRes)
 
 #open cv lattepanda tweak
 opencv = Runtime.create("i01.opencv", "OpenCV")
-opencv.setFrameGrabberType("org.myrobotlab.opencv.SarxosFrameGrabber")
+if LATTEPANDA==1:
+	opencv.setFrameGrabberType("org.myrobotlab.opencv.SarxosFrameGrabber")
 opencv = Runtime.start("i01.opencv", "OpenCV")
 
 
@@ -342,6 +343,7 @@ if Neopixel!="COMX":
 # -- coding: utf-8 --
 execfile('INMOOV-AI_divers.py')
 execfile('INMOOV-AI_memory.py')
+execfile('INMOOV-AI_gestures.py')
 if IhaveEyelids>0:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
 execfile(u'INMOOV-AI_timers.py')
@@ -353,12 +355,11 @@ execfile('INMOOV-AI_messenger.py')
 execfile('INMOOV-AI_KnowledgeFetchers.py')
 execfile('INMOOV-AI_games.py')
 execfile('INMOOV-AI_reminders.py')
-execfile('INMOOV-AI_gestures.py')
 execfile('INMOOV-AI_domotique.py')
 execfile(u'INMOOV-AI_dictionaries.py')
 execfile(u'INMOOV-AI_WeatherMap_Meteo.py')
 execfile(u'INMOOV-AI_jeanneton.py')
-execfile(u'INMOOV-AI_demo_halleffect.py')
+#execfile(u'INMOOV-AI_demo_halleffect.py')
 execfile(u'INMOOV-AI_activator.py')
 
 NeoPixelF(3)
@@ -390,7 +391,6 @@ if IsInmoovArduino==1:
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
 
-proc1 = subprocess.Popen("%programfiles(x86)%\Google\Chrome\Application\chrome.exe", stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 
 Light(1,1,1)
 
@@ -425,11 +425,11 @@ openCvModule="123"
 #arduino.setSampleRate(9600)  # change thiopenCvModule="123"
 #i01.opencv.setInputSource("Sarxos")
 
-#i01.opencv.setCameraIndex(0)
-#i01.opencv.removeFilters()
-#i01.opencv.addFilter("PyramidDown")
-#i01.opencv.addFilter("Gray")
-#i01.opencv.addFilter("FaceDetect")
-#i01.opencv.setDisplayFilter("FaceDetect")
-#i01.opencv.capture()
+i01.opencv.setCameraIndex(0)
+i01.opencv.removeFilters()
+i01.opencv.addFilter("PyramidDown")
+i01.opencv.addFilter("Gray")
+i01.opencv.addFilter("FaceDetect")
+i01.opencv.setDisplayFilter("FaceDetect")
+i01.opencv.capture()
 #StartSensorDemo()

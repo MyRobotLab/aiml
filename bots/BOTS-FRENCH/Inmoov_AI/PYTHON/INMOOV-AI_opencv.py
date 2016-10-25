@@ -1,15 +1,19 @@
-global FaceDetectedCounter #FaceDetectedCounter is to prevent artefact face reconition
+# -*- coding: utf-8 -*- 
+
+from decimal import Decimal
+global FaceDetectedCounter
 FaceDetectedCounter=0
-global FaceDetected #open cv detected a face
+global FaceDetected 
 FaceDetected=1
 global startTimerFunction
-global posxSquare #position of the left box
-global WidthSquare #size of the face ( small is far )
-WidthSquare=0
+global posxSquare 
+global posySquare 
+global WidthSquare 
+WidthSquare=Decimal(0)
 global FaceHadMoved
 FaceHadMoved=0
-from decimal import Decimal
 posxSquare=Decimal(0)
+posySquare=Decimal(0)
 python.subscribe(opencv.getName(),"publishOpenCVData")
 
 
@@ -20,6 +24,7 @@ def onOpenCVData(data):
 #This is opencv functions that do jobs
 
 	global posxSquare
+	global posySquare
 	global openCvModule
 	global WidthSquare
 	global FaceHadMoved
@@ -41,23 +46,50 @@ def onOpenCVData(data):
 
 # openCvModule=="123" : just detect if detected face is mooving in the space. 1.2.3 soleil :)
 	if openCvModule=="123":
-		
+		#Tweak speed movement of the head
+		openCvModulesensibilityLeftRightMin=0.05
+		openCvModulesensibilityLeftRightMax=0.2
+		openCvModulesensibilityFrontBackMin=0.01
+		openCvModulesensibilityFrontBackMax=0.1
+		#if something is detected
 		if data.getBoundingBoxArray() != None:
 			if data.getBoundingBoxArray():
-				FaceDetectedCounter+=1
+				#get the first face detected
 				rect = data.getBoundingBoxArray().get(0)
-				print FaceDetectedCounter,posxSquare,posxSquare-Decimal(rect.x)
+				MoveLeftRigh=abs(posxSquare-Decimal(rect.x))
+				MoveTopBottom=abs(posySquare-Decimal(rect.y))
+				MoveFrontBack=abs(WidthSquare-Decimal(rect.width))
+				#We wait to be sure it is not artefact
+				FaceDetectedCounter+=1
+								
 				if FaceDetectedCounter>10:
-					if posxSquare != 0 and posxSquare-Decimal(rect.x) !=0 and (posxSquare-Decimal(rect.x) <= 0.2) and (posxSquare-Decimal(rect.x) >= -0.2):
-						print "tu as bougez ",posxSquare-Decimal(rect.x)
-								 # Store the information in rect
+					#ok we detect i the face move left/right/front/back
+					if posxSquare != 0 and Decimal(rect.x) != 0 and Decimal(rect.y) != 0 and Decimal(rect.width) != 0 and MoveFrontBack < openCvModulesensibilityFrontBackMax and MoveTopBottom < openCvModulesensibilityLeftRightMax and MoveLeftRigh < openCvModulesensibilityLeftRightMax and posySquare != 0 and MoveLeftRigh !=0 and MoveTopBottom !=0:
+						print MoveFrontBack
+						#left/right move
+						if ((MoveLeftRigh >= openCvModulesensibilityLeftRightMin ) or (MoveTopBottom >= openCvModulesensibilityLeftRightMin ) or (MoveFrontBack>=openCvModulesensibilityFrontBackMin )):
+							print "MOVE DETECTED :",MoveLeftRigh,MoveTopBottom,MoveFrontBack
+							talk("Tu as bougé!")
+							FaceDetectedCounter=0
+																						# Store the information in rect
+					else:
+						FaceDetectedCounter=0
 					posxSquare = Decimal(rect.x)                                        # Get the x position of the corner
-					posy = rect.y                                        # Get the y position of the corner
-					WidthSquare = rect.width                                       # Get the width
-					h = rect.height  				# Get the height
-				
+					posySquare = Decimal(rect.y)                                       # Get the y position of the corner
+					WidthSquare = Decimal(rect.width)                                    # Get the width
+					h = rect.height
+					
+					
 			else:
 				FaceDetectedCounter=0
+				
+		
+		
+	
+
+StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
+# start the clock
+StopListenTimer.startClock()
 				
 				
 				

@@ -20,6 +20,9 @@ JawMIN=0
 JawMAX=180
 JawInverted=0
 
+#TYPE DE PC
+LATTEPANDA=0
+
 #ARDUINO CONFIG
 IsInmoovArduino=0
 BoardTypeLeft="atmega2560" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
@@ -30,7 +33,7 @@ rightPort = "COM5"
 #ACTIVATOR
 Activator=0
 ActivatorPort="serial1"
-ActivatorControler="Left"
+ActivatorControler="left"
 BoardTypeActivator="atmega328" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
 
 #PIN RELAIS POUR DETACHEMENT SERVOS

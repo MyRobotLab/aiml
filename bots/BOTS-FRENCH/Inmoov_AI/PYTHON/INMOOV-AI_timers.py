@@ -84,7 +84,7 @@ def OnBalanceUnePhare_Aleatoire(timedata):
 	if RobotIsStarted==1:
 		RamdomSpeak=1
 	
-	VieAleatoire.setInterval(random.randint(120000,600000))
+	VieAleatoire.setInterval(random.randint(220000,700000))
 	if TimeNoSpeak=="ON":
 		if random.randint(0,1)==1:
 			chatBot.getResponse("ALEATOIRE")
