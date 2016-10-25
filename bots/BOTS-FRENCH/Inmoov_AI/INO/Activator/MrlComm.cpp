@@ -89,7 +89,8 @@ void MrlComm::softReset()
   bat2Val = 0;
   bat1Value = 0.0;
   bat2Value = 0.0;
-  volumeUpdate = true;
+  max9744IsOK = false;
+  updateAudio = false;
 }
 
 /***********************************************************************
@@ -250,7 +251,7 @@ void MrlComm::processCommand(int ioType)
             servoDetachIsRequest = true;
 
             // Active la sortie audio
-            digitalWrite(5, LOW);
+            setMuteOff();
           }
           break;
         }
@@ -432,22 +433,22 @@ void MrlComm::processCommand(int ioType)
           }
           break;
         }
-        case 15:
+        case 20:
         {
           volAudio = ioCmd[2];
-          volumeUpdate = true;
+          updateAudio = true;
           break;
         }
-        case 16:
+        case 21:
         {
+          servoMin = ioCmd[2];
+          EEPROM.write(10, servoMin);
           break;
         }
-        case 17:
+        case 22:
         {
-          break;
-        }
-        case 18:
-        {
+          servoMax = ioCmd[2];
+          EEPROM.write(11, servoMax);
           break;
         }
         default:
@@ -467,6 +468,7 @@ void MrlComm::processCommand(int ioType)
         {
           // Valeur brut
           MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
           msg.addData16(bat1Val);
           msg.sendMsg();
           break;
@@ -475,6 +477,7 @@ void MrlComm::processCommand(int ioType)
         {
           // Valeur brut
           MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
           msg.addData16(bat2Val);
           msg.sendMsg();
           break;
@@ -483,6 +486,7 @@ void MrlComm::processCommand(int ioType)
         {
           /* Valeur en volt
           MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
           msg.addData16(bat1Value);
           msg.sendMsg();*/
           break;
@@ -491,8 +495,50 @@ void MrlComm::processCommand(int ioType)
         {
           /* Valeur en volt
           MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
           msg.addData16(bat2Value);
           msg.sendMsg();*/
+          break;
+        }
+        case 10:
+        {
+          // Valeur du volume audio
+          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
+          msg.addData16(volAudio);
+          msg.sendMsg();
+          break;
+        }
+        case 11:
+        {
+          // Dit si le MAX9744 répond bien
+          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
+          if (max9744IsOK)
+          {
+            msg.addData(1);
+          }
+          else
+          {
+            msg.addData(0);
+          }
+          msg.sendMsg();
+          break;
+        }
+        case 20:
+        {
+          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
+          msg.addData(servoMin);
+          msg.sendMsg();
+          break;
+        }
+        case 21:
+        {
+          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          msg.addData(ioCmd[1]);
+          msg.addData(servoMax);
+          msg.sendMsg();
           break;
         }
         default:
@@ -501,76 +547,16 @@ void MrlComm::processCommand(int ioType)
           break;
         }
       }
-      //analogWrite(ioCmd[1], ioCmd[2]);
       break;
     }
     case PIN_MODE: 
-    {
-      /*switch (ioCmd[1])
-      {
-        case 1:
-        {
-          // Réglage du volume
-          actMax9744.volAudio = ioCmd[2];
-          if (actMax9744.setVolume(actMax9744.volAudio))
-          {
-          }
-          else
-          {
-          }
-          break;
-        }
-        case 2:
-        {
-          // return la valeur du volume
-          //Serial.println(volAudio);
-          break;
-        }
-        case 3:
-        {
-          // réveil du module audio
-          actMax9744.enableAudio();
-          break;
-        }
-        case 4:
-        {
-          // shutdown du module audio
-          actMax9744.disableAudio();
-          break;
-        }
-        case 5:
-        {
-          // mute ON
-          actMax9744.setMuteOn();
-          break;
-        }
-        case 6:
-        {
-          // mute OFF
-          actMax9744.setMuteOff();
-          break;
-        }
-        default:
-        {
-          break;
-        }
-      }*/
-      //pinMode(ioCmd[1], ioCmd[2]);
-      break;
-    }
     case SERVO_ATTACH: 
     {
-      /*int pin = ioCmd[2];
-      if (debug)
-        MrlMsg::publishDebug("SERVO_ATTACH " + String(pin));
-      MrlServo* servo = (MrlServo*) getDevice(ioCmd[1]);
-      servo->attach(pin);
-      if (debug)
-        MrlMsg::publishDebug(F("SERVO_ATTACHED"));*/
       break;
     }
     case SERVO_SWEEP_START:
     {
+      // Couleur custom du ring
       rVal = ioCmd[2];
       gVal = ioCmd[3];
       bVal = ioCmd[4];
@@ -621,7 +607,6 @@ void MrlComm::processCommand(int ioType)
     }
     case SET_SAMPLE_RATE:
     {
-      //setSampleRate();
       break;
     }
     case SOFT_RESET:
@@ -631,7 +616,6 @@ void MrlComm::processCommand(int ioType)
     }
     case SENSOR_POLLING_START:
     {
-      //sensorPollingStart();
       break;
     }
     case DEVICE_ATTACH:
@@ -987,11 +971,11 @@ void MrlComm::update()
         // TODO: moe the analog read outside of thie method and pass it in!
         if (pin->type == ANALOG) 
         {
-          pin->value = analogRead(pin->address);
+          pin->value = 0;//analogRead(pin->address);
         } 
         else 
         {
-          pin->value = digitalRead(pin->address);
+          pin->value = 0;//digitalRead(pin->address);
         }
 
         // loading both analog & digital data
@@ -1028,6 +1012,39 @@ void MrlComm::setServoEnable(boolean val)
 {
   this->servoIsEnable = val;
 }
+
+/** 
+ * Réveil du module audio
+ */
+void MrlComm::enableAudio()
+{
+  digitalWrite(MAX9744_SHTDOWN_PIN, HIGH);
+}
+
+/** 
+ * Met le MAX9744 en veille
+ */
+void MrlComm::disableAudio()
+{
+  digitalWrite(MAX9744_SHTDOWN_PIN, LOW);
+}
+
+/** 
+ * Coupe la sortie audio pendant le démarrage du PC
+ */
+void MrlComm::setMuteOn()
+{
+  digitalWrite(MAX9744_MUTE_PIN, HIGH);
+}
+
+/** 
+ * Active la sortie audio pendant le démarrage du PC
+ */
+void MrlComm::setMuteOff()
+{
+  digitalWrite(MAX9744_MUTE_PIN, LOW);
+}
+
 
 unsigned int MrlComm::getCustomMsg() 
 {

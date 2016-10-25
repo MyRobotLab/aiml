@@ -1,16 +1,18 @@
 #ifndef MrlComm_h
 #define MrlComm_h
 
+#include <EEPROM.h>
 #include "ArduinoMsgCodec.h"
 #include "MrlMsg.h"
 #include "MrlCmd.h"
 #include "LinkedList.h"
-//#include "MrlServo.h"
 #include "Device.h"
-//#include "MrlI2cBus.h"
-//#include "Pin.h"
+
 
 #define PRESENCE_SENSOR_PIN     2    // PIN D2
+#define MAX9744_SHTDOWN_PIN     4    // PIN D4
+#define MAX9744_MUTE_PIN        5    // PIN D5
+
 
 // TODO - standard convention of dev versions are odd release is even ?
 #define MRLCOMM_VERSION         40
@@ -95,7 +97,10 @@ class MrlComm
     int bat2Val;
     float bat1Value;
     float bat2Value;
-    boolean volumeUpdate;
+    boolean max9744IsOK;
+    boolean updateAudio;
+    byte servoMin;
+    byte servoMax;
 
     MrlComm();
     ~MrlComm();
@@ -112,6 +117,10 @@ class MrlComm
     void setWakeUp(boolean val);
     void setDetachRequest(boolean val);
     void setServoEnable(boolean val);
+    void enableAudio();
+    void disableAudio();
+    void setMuteOn();
+    void setMuteOff();
     
     unsigned int getCustomMsg();
     int getCustomMsgSize();

@@ -56,8 +56,9 @@
  *     - Ajout animation pendant le démarrage du PC                *
  * 21/10/2016 | D. Gyselinck  | V1.0.0 beta test                   *
  *     - Refonte total du programme avec le protocole MrlComm      *
- *     - Utilisation de classe pour les différentes fonctions      *
- *                                                                 *
+ * 25/10/2016 | D. Gyselinck  | V1.1.0 release                     *
+ *     - Paramètre min et max du servo en EEPROM                   *
+ *     - Correction de bug                                         *
  *                                                                 *
  *                                                                 *
  *                                                                 *
@@ -73,14 +74,13 @@
 #include <Wire.h> 
 #include "MrlComm.h"
 
-const String version = "1.0.0";
+// Numéro de version Activator
+#define V1                  1
+#define V2                  1
+#define V3                  0
 
-// Mettre 1 si le MAX9744 est connecté
-#define MAX9744             0
 // Définition des pins du nano
 #define PRESENCE_SENSOR_PIN 2    // PIN D2
-#define MAX9744_SHTDOWN_PIN 4    // PIN D4
-#define MAX9744_MUTE_PIN    5    // PIN D5
 #define NEO_PIN             6    // PIN D6
 #define JAW_SERVO_PIN       7    // PIN D7
 #define ON_ELEC_PIN         8    // PIN D8
@@ -90,12 +90,14 @@ const String version = "1.0.0";
 #define PC_POWER_PIN        12   // PIN D12
 #define LED_VEILLEUSE       13   // PIN D13
 
-// Nombre de pixels du ring
-#define NUMPIXELS           16
 
+// Valeur par défaut sauvegardé en EEPROM
 // Min et max du servo à régler en fonction de InMoov
 #define SERVO_MIN           30  // Bouche fermé
 #define SERVO_MAX           60  // Bouche ouverte
+
+// Nombre de pixels du ring
+#define NUMPIXELS           16
 
 // Définition des seuils à partir duquel on signal l'erreur batterie
 #define BAT1_SEUIL          1000
@@ -268,6 +270,9 @@ void ProcessTimer()
       mrlComm.bat1Val = analogRead(A2);
       mrlComm.bat2Val = analogRead(A3);
       
+      // TODO
+      // reglage des seuils en fonction des batteries utilisées
+      
       /*if (bat1Value < BAT1_SEUIL)
       {
         cptBat1Failed++;
@@ -322,30 +327,41 @@ void ProcessTimer()
           shutdownProcess();
         }
       }
+      else
+      {
+        cptWait = 0;
+      }
     }
     else
     {
       if (!mrlComm.wakeUp)
       {
-        // Flash de la veilleuse toutes les 5 secondes
-        // Indique que InMoov dort...
-        for (j = 0; j < 80; j++)
+        cptWait++;
+        if (cptWait >= 2)
         {
-          for (i = 0; i < pixels.numPixels(); i++)
+          cptWait = 0;
+          
+          // Flash de la veilleuse toutes les 5 secondes
+          // Indique que InMoov dort...
+          for (j = 0; j < 80; j++)
           {
-            pixels.setPixelColor(i, pixels.Color(0,0,j));
+            for (i = 0; i < pixels.numPixels(); i++)
+            {
+              pixels.setPixelColor(i, pixels.Color(0,0,j));
+            }
+            pixels.show();
+            delay(10);
           }
-          pixels.show();
-          delay(10);
-        }
-        for (j = 80; j >= 0; j--)
-        {
-          for (i = 0; i < pixels.numPixels(); i++)
+          
+          for (j = 80; j >= 0; j--)
           {
-            pixels.setPixelColor(i, pixels.Color(0,0,j));
+            for (i = 0; i < pixels.numPixels(); i++)
+            {
+              pixels.setPixelColor(i, pixels.Color(0,0,j));
+            }
+            pixels.show();
+            delay(10);
           }
-          pixels.show();
-          delay(10);
         }
       }
     }
@@ -448,9 +464,9 @@ void startupProcess()
   pixels.show();
 
   // réveil du module audio
-  digitalWrite(MAX9744_SHTDOWN_PIN, HIGH);
+  mrlComm.enableAudio();
   // Coupe la sortie audio pendant le démarrage du PC
-  digitalWrite(MAX9744_MUTE_PIN, HIGH);
+  mrlComm.setMuteOn();
 
   // Fin du startup
   digitalWrite(LED_VEILLEUSE, LOW);
@@ -506,8 +522,7 @@ void shutdownProcess()
   }
   pixels.show();
 
-  // Met le MAX9744 en veille
-  digitalWrite(MAX9744_SHTDOWN_PIN, LOW);
+  mrlComm.disableAudio();
 
   // Fin du shutdown
   digitalWrite(LED_VEILLEUSE, LOW);
@@ -536,6 +551,36 @@ uint32_t Wheel(byte WheelPos)
 }
 
 /** 
+ * Ecriture de la première config en EEPROM
+ */
+boolean writeFirstConfig()
+{
+  if (EEPROM.read(0) != 0xAA)
+  {
+    // La config n'a jamais été sauvegardé
+    EEPROM.write(0, 0xAA);
+    
+    // Version
+    EEPROM.write(0, V1);
+    EEPROM.write(1, V2);
+    EEPROM.write(2, V3);
+    
+    // Valeur min/max de la bouche
+    EEPROM.write(10, mrlComm.servoMin);
+    EEPROM.write(11, mrlComm.servoMax);
+  }
+}
+
+/** 
+ * Lecture de la config EEPROM
+ */
+void readConfig()
+{
+  mrlComm.servoMin = EEPROM.read(10);
+  mrlComm.servoMax = EEPROM.read(11);
+}
+
+/** 
  * Réglage du volume audio MAX9744
  */
 boolean setVolume(int8_t v) 
@@ -544,7 +589,7 @@ boolean setVolume(int8_t v)
   if (v > 63) v = 63;
   if (v < 0) v = 0;
   
-  if (MAX9744)
+  if (mrlComm.max9744IsOK)
   {
     Wire.beginTransmission(MAX9744_I2CADDR);
     Wire.write(v);
@@ -579,15 +624,15 @@ void setup()
   // Config des pins numériques en entrées
   pinMode(PRESENCE_SENSOR_PIN, INPUT_PULLUP);
 
-  // Configure la référence des ADCs
-  //analogReference(DEFAULT);   // 5V
-  //analogReference(INTERNAL);  // 1.1V
+  // Reférence externe à 4V pour ADC
   analogReference(EXTERNAL);  // AREF
   
   // Initialisation des états
   PowerElecOFF();
   PowerMotOFF();
-  
+  batteryEleIsFailed = false;
+  batteryMotIsFailed = false;
+
   // Initialise la librairie NeoPixel.
   pixels.begin();           
   // Eteint tout les pixels.
@@ -599,27 +644,28 @@ void setup()
   // active Timer2 
   MsTimer2::start(); 
    
-  // Init timing
-  processTime = superMillis();
+  // Démarrage I2C
+  Wire.begin();
+  mrlComm.max9744IsOK = false;
   
-  batteryEleIsFailed = false;
-  batteryMotIsFailed = false;
-
-  if (MAX9744)
+  // Vérifie la présence du module audio
+  // en mettant le volume par défaut
+  if (setVolume(mrlComm.volAudio)) 
   {
-    // Démarrage I2C
-    Wire.begin();
-    
-    // Vérifie la présence du module audio
-    // en mettant le volume par défaut
-    if (!setVolume(mrlComm.volAudio)) 
-    {
-      Serial.println("MAX9744 non trouvé!");
-    }
+    mrlComm.max9744IsOK = true;
   }
+  
+  // Init des valeurs en EEPROM
+  mrlComm.servoMin = SERVO_MIN;
+  mrlComm.servoMax = SERVO_MAX;
+  writeFirstConfig();
+  readConfig();
 
   mrlComm.publishVersion();
   mrlComm.publishBoardInfo();
+
+  // Init timing
+  processTime = superMillis();
 }
 
 /** 
@@ -680,14 +726,14 @@ void loop()
               closeIsRun = false;
               ucCpt1 = 0;
               jawServo.attach(JAW_SERVO_PIN);
-              jawServo.write(SERVO_MAX);
+              jawServo.write(mrlComm.servoMax);
               bJawIsOpen = true;
             }
           }
           else
           {
             jawServo.attach(JAW_SERVO_PIN);
-            jawServo.write(SERVO_MAX);
+            jawServo.write(mrlComm.servoMax);
             bJawIsOpen = true;
           }
         }
@@ -707,7 +753,7 @@ void loop()
         {
           ucCpt = 0;
           jawServo.attach(JAW_SERVO_PIN);
-          jawServo.write(SERVO_MIN);
+          jawServo.write(mrlComm.servoMin);
           bJawIsOpen = false;
           closeRequest = false;
           closeIsRun = true;
@@ -724,7 +770,7 @@ void loop()
         if (!bJawIsOpen)
         {
           jawServo.attach(JAW_SERVO_PIN);
-          jawServo.write(SERVO_MAX);
+          jawServo.write(mrlComm.servoMax);
           bJawIsOpen = true;
           mrlComm.setDetachRequest(true);
         }
@@ -734,7 +780,7 @@ void loop()
         if (bJawIsOpen)
         {
           jawServo.attach(JAW_SERVO_PIN);
-          jawServo.write(SERVO_MIN);
+          jawServo.write(mrlComm.servoMin);
           bJawIsOpen = false;
           mrlComm.setServoEnable(true);
           mrlComm.setDetachRequest(true);
@@ -758,14 +804,14 @@ void loop()
         }
       }
 
-      // Mise à jour volume audio
-      ///////////////////////////
-      if (mrlComm.volumeUpdate)
+      // Gestion du volume audio
+      //////////////////////////
+      if (mrlComm.updateAudio)
       {
-        mrlComm.volumeUpdate = false;
+        mrlComm.updateAudio = false;
         setVolume(mrlComm.volAudio);
       }
-
+      
       // Les alertes batteries sont prioritaires
       //////////////////////////////////////////
       if ((batteryMotIsFailed) && (batteryEleIsFailed))
