@@ -56,7 +56,8 @@ def onOpenCVData(data):
 			if data.getBoundingBoxArray():
 				#get the first face detected
 				rect = data.getBoundingBoxArray().get(0)
-				MoveLeftRigh=abs(posxSquare-Decimal(rect.x))
+				MoveLeftRight=abs(posxSquare-Decimal(rect.x))
+				#just to tune the demo detect if it's a left or right move
 				MoveTopBottom=abs(posySquare-Decimal(rect.y))
 				MoveFrontBack=abs(WidthSquare-Decimal(rect.width))
 				#We wait to be sure it is not artefact
@@ -64,11 +65,37 @@ def onOpenCVData(data):
 								
 				if FaceDetectedCounter>10:
 					#ok we detect i the face move left/right/front/back
-					if posxSquare != 0 and Decimal(rect.x) != 0 and Decimal(rect.y) != 0 and Decimal(rect.width) != 0 and MoveFrontBack < openCvModulesensibilityFrontBackMax and MoveTopBottom < openCvModulesensibilityLeftRightMax and MoveLeftRigh < openCvModulesensibilityLeftRightMax and posySquare != 0 and MoveLeftRigh !=0 and MoveTopBottom !=0:
+					if posxSquare != 0 and Decimal(rect.x) != 0 and Decimal(rect.y) != 0 and Decimal(rect.width) != 0 and MoveFrontBack < openCvModulesensibilityFrontBackMax and MoveTopBottom < openCvModulesensibilityLeftRightMax and MoveLeftRight < openCvModulesensibilityLeftRightMax and posySquare != 0 and MoveLeftRight !=0 and MoveTopBottom !=0:
 						print MoveFrontBack
 						#left/right move
-						if ((MoveLeftRigh >= openCvModulesensibilityLeftRightMin ) or (MoveTopBottom >= openCvModulesensibilityLeftRightMin ) or (MoveFrontBack>=openCvModulesensibilityFrontBackMin )):
-							print "MOVE DETECTED :",MoveLeftRigh,MoveTopBottom,MoveFrontBack
+						#tune demo 
+						MoveX=0
+						MoveY=0
+						MoveZ=0
+						if ((MoveLeftRight >= openCvModulesensibilityLeftRightMin ) or (MoveTopBottom >= openCvModulesensibilityLeftRightMin ) or (MoveFrontBack>=openCvModulesensibilityFrontBackMin )):
+							
+							if MoveLeftRight >= openCvModulesensibilityLeftRightMin:
+									
+								if posxSquare-Decimal(rect.x)>0:
+									MoveX="Left"
+								else:
+									MoveX="Right"
+									
+							if MoveTopBottom >= openCvModulesensibilityLeftRightMin:
+									
+								if posySquare-Decimal(rect.y)>0:
+									MoveY="Top"
+								else:
+									MoveY="Bottom"
+									
+							if MoveFrontBack>=openCvModulesensibilityFrontBackMin:
+									
+								if WidthSquare-Decimal(rect.width) >0:
+									MoveZ="Front"
+								else:
+									MoveZ="Back"
+									
+							print "MOVE DETECTED :",MoveLeftRight,MoveTopBottom,MoveFrontBack,MoveX,MoveY,MoveZ
 							talk("Tu as bougé!")
 							FaceDetectedCounter=0
 																						# Store the information in rect
@@ -168,4 +195,14 @@ def PhotoProcess(messagePhoto):
 	opencv.stopCapture()
 	#i01.startEyesTracking(leftPort,22,24)
 	#i01.startHeadTracking(leftPort)
+	
+if DEBUG==1:
+	openCvModule="123"
+	i01.opencv.setCameraIndex(0)
+	i01.opencv.removeFilters()
+	i01.opencv.addFilter("PyramidDown")
+	i01.opencv.addFilter("Gray")
+	i01.opencv.addFilter("FaceDetect")
+	i01.opencv.setDisplayFilter("FaceDetect")
+	i01.opencv.capture()
 	

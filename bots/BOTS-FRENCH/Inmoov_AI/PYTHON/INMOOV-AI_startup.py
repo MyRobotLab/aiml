@@ -2,7 +2,7 @@
 # 							*** SETUP / INSTALLATION ***
 # ##############################################################################
 # -----------------------------------
-# - Inmoov-AI Version 2.1.2 By Moz4r
+# - Inmoov-AI Version 2.1.3 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -246,7 +246,7 @@ if IsInmoovArduino==1:
 	
 	i01 = Runtime.start("i01","InMoov")
 	left = Runtime.start("i01.left", "Arduino")
-	
+	head = Runtime.start("i01.head", "Arduino")
 	head.setSpeed(DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed)
 	head.rothead.setSpeed(0.1)
 	head.neck.setSpeed(0.1)
@@ -412,24 +412,11 @@ chatBot.getResponse("WAKE_UP")
 GetUnreadMessageNumbers("0")
 sleep(4)
 webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
+
 #petit fix pour dire au robot qu'il eut commencer à écouter
 
 if lang=="FR":
    ear.setLanguage("fr-FR")
 python.subscribe(ear.getName(),"publishText")
-
 WebkitSpeachReconitionFix.startClock()
 RobotIsStarted=1
-#BicepsClosed()
-openCvModule="123"
-#arduino.setSampleRate(9600)  # change thiopenCvModule="123"
-#i01.opencv.setInputSource("Sarxos")
-
-i01.opencv.setCameraIndex(0)
-i01.opencv.removeFilters()
-i01.opencv.addFilter("PyramidDown")
-i01.opencv.addFilter("Gray")
-i01.opencv.addFilter("FaceDetect")
-i01.opencv.setDisplayFilter("FaceDetect")
-i01.opencv.capture()
-#StartSensorDemo()
