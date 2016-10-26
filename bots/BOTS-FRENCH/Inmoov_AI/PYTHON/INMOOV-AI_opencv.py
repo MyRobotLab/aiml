@@ -11,7 +11,7 @@ global posySquare
 global WidthSquare 
 WidthSquare=Decimal(0)
 global FaceHadMoved
-FaceHadMoved=0
+FaceHadMoved=[0,0,0,0,0,0] # MoveLeftRight,MoveTopBottom,MoveFrontBack,MoveX,MoveY,MoveZ
 posxSquare=Decimal(0)
 posySquare=Decimal(0)
 python.subscribe(opencv.getName(),"publishOpenCVData")
@@ -52,6 +52,7 @@ def onOpenCVData(data):
 		openCvModulesensibilityFrontBackMin=0.01
 		openCvModulesensibilityFrontBackMax=0.1
 		#if something is detected
+		
 		if data.getBoundingBoxArray() != None:
 			if data.getBoundingBoxArray():
 				#get the first face detected
@@ -63,7 +64,7 @@ def onOpenCVData(data):
 				#We wait to be sure it is not artefact
 				FaceDetectedCounter+=1
 								
-				if FaceDetectedCounter>10:
+				if FaceDetectedCounter>15:
 					#ok we detect i the face move left/right/front/back
 					if posxSquare != 0 and Decimal(rect.x) != 0 and Decimal(rect.y) != 0 and Decimal(rect.width) != 0 and MoveFrontBack < openCvModulesensibilityFrontBackMax and MoveTopBottom < openCvModulesensibilityLeftRightMax and MoveLeftRight < openCvModulesensibilityLeftRightMax and posySquare != 0 and MoveLeftRight !=0 and MoveTopBottom !=0:
 						print MoveFrontBack
@@ -91,12 +92,13 @@ def onOpenCVData(data):
 							if MoveFrontBack>=openCvModulesensibilityFrontBackMin:
 									
 								if WidthSquare-Decimal(rect.width) >0:
-									MoveZ="Front"
-								else:
 									MoveZ="Back"
+								else:
+									MoveZ="Front"
 									
 							print "MOVE DETECTED :",MoveLeftRight,MoveTopBottom,MoveFrontBack,MoveX,MoveY,MoveZ
-							talk("Tu as bougé!")
+							FaceHadMoved=[0,0,0,0,0,0]
+							#talk("Tu as bougé!")
 							FaceDetectedCounter=0
 																						# Store the information in rect
 					else:

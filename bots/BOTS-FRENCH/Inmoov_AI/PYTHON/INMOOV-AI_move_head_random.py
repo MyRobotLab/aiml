@@ -4,7 +4,7 @@ MoveHeadTimer.setInterval(1000)
 
 def MoveHead(timedata):
 
-	if IsInmoovArduino==1:
+	if IsInmoovArduino==1 and DEBUG<>1:
 		
 		head.neck.setSpeed(NeckSpeed)
 		head.rothead.setSpeed(RotHeadSpeed)
