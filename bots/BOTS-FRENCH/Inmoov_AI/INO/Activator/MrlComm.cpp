@@ -74,14 +74,9 @@ void MrlComm::softReset()
 	}
 	customMsgSize = 0;
 
-  inmoovIsOn = false;
-  wakeUp = false;
-  shutdownPC = false;
-  servoIsEnable = false;
   rVal = 0;
   gVal = 0; 
   bVal = 0;
-  animRequest = 0;
   openJawRequest = false;
   servoDetachIsRequest = false;
   volAudio = 31;
@@ -89,7 +84,6 @@ void MrlComm::softReset()
   bat2Val = 0;
   bat1Value = 0.0;
   bat2Value = 0.0;
-  max9744IsOK = false;
   updateAudio = false;
 }
 
@@ -430,6 +424,30 @@ void MrlComm::processCommand(int ioType)
           if (ioCmd[2] == 1)
           {
             servoDetachIsRequest = true;
+          }
+          break;
+        }
+        case 15:
+        {
+          if (ioCmd[2] == 1)
+          {
+            disableAudio();
+          }
+          else
+          {
+            enableAudio();
+          }
+          break;
+        }
+        case 16:
+        {
+          if (ioCmd[2] == 1)
+          {
+            setMuteOn();
+          }
+          else
+          {
+            setMuteOff();
           }
           break;
         }

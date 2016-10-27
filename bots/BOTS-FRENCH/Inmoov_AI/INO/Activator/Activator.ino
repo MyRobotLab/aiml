@@ -666,6 +666,14 @@ void setup()
 
   // Init timing
   processTime = superMillis();
+
+  // Init variables globals
+  mrlComm.inmoovIsOn = false;
+  mrlComm.wakeUp = false;
+  mrlComm.shutdownPC = false;
+  mrlComm.servoIsEnable = false;
+  mrlComm.animRequest = 0;
+  mrlComm.max9744IsOK = false;
 }
 
 /** 

@@ -13,7 +13,8 @@ Voice="Margaux" # ryan in english
 BotURL="http://myai.cloud/bot1.php"
 units="metric" # or : imperial
 
-
+# MouthControl / CONTROLE MACHOIRE LOGICIEL
+MRLmouthControl=0
 # BOUCHE PIN HP Bluetooth Arduino NANO / CONTROLE MACHOIRE HARDWARE
 JawMIN=0 
 JawMAX=180
@@ -22,8 +23,6 @@ JawInverted=0
 #TYPE DE PC
 LATTEPANDA=0
 
-DEBUG=0
-
 #ARDUINO CONFIG
 IsInmoovArduino=0
 BoardTypeLeft="atmega2560" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
@@ -31,19 +30,9 @@ BoardTypeRight="atmega2560" # atmega168 | atmega328 | atmega328p | atmega2560 | 
 leftPort = "COM4"
 rightPort = "COM5"
 
-#ACTIVATOR # Arduino dédié neopixel / mouthcontrol / batterie / son
+#ACTIVATOR
 Activator=0
-
-# MouthControl / CONTROLE MACHOIRE LOGICIEL
-MRLmouthControl=0
-
-# NeoPixel #Mrl Neopixel service
-MrlNeopixel=0
-MrlNeopixelPin=49
-
-
-
-ActivatorPort="serial1"
+ActivatorPort="Serial1"
 ActivatorControler="left"
 BoardTypeActivator="atmega328" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
 
