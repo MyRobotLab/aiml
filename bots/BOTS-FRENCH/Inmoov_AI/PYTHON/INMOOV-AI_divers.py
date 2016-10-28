@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*- 
 
-def NeoPixelF(valNeo):
-	if Neopixel!="COMX":
-		serial.write(valNeo)
-	else:
-		print(valNeo)
+
 
 def talk(data):
 		

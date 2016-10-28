@@ -2,7 +2,7 @@
 # 							         *** SETUP / INSTALLATION ***
 # ##############################################################################
 # 
-# - Inmoov-AI Version 2.1.2 By Moz4r
+# - Inmoov-AI Version 2.1.5 By Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -121,20 +121,25 @@ oridir=os.getcwd().replace("\\", "/")+"/"
 # ##############################################################################
 # check if a config file exist or create default one
 # ##############################################################################
-if os.path.isfile(oridir + '2-INMOOV-AI_config.py'):
-	shutil.move(oridir + '2-INMOOV-AI_config.py', oridir + 'INMOOV-AI_config.py')
 
-if os.path.isfile(oridir + 'INMOOV-AI_config.py'):
-	print("ok")
+
+if os.path.isfile(oridir + 'CONFIG/INMOOV-AI_config.py'):
+	print("config file ok")
 else:
-	shutil.copyfile(oridir + 'INMOOV-AI_config.py.default',oridir + 'INMOOV-AI_config.py')
+	shutil.copyfile(oridir + 'CONFIG/INMOOV-AI_config.py.default',oridir + 'CONFIG/INMOOV-AI_config.py')
+	
+if os.path.isfile(oridir + 'CONFIG/INMOOV-AI_ServoParam.py'):
+	print("servo file ok")
+else:
+	shutil.copyfile(oridir + 'CONFIG/INMOOV-AI_ServoParam.py.default',oridir + 'CONFIG/INMOOV-AI_ServoParam.py')
 
 # ##############################################################################
 # Chargement des paramètres de config
 # ##############################################################################
 
 # -- coding: utf-8 --
-execfile(u'INMOOV-AI_config.py')
+execfile(u'CONFIG/INMOOV-AI_config.py')
+execfile(u'CONFIG/INMOOV-AI_ServoParam.py')
 
 # ##############################################################################
 # Chargement des paramètres personnalisés
@@ -151,7 +156,7 @@ execfile(u'INMOOV-AI_InitHardware.py')
 gesturesPath = (oridir)+"gestures"
 
 # ##############################################################################
-# ???????????????
+# API MyAI ( partage de connaisances / messenger / Recherche d images )
 # ##############################################################################
 BotURL=BotURL+"?lang="+lang+"&FixPhpCache="+str(time.time())
 
@@ -249,13 +254,11 @@ execfile(u'INMOOV-AI_jeanneton.py')
 #execfile(u'INMOOV-AI_demo_halleffect.py')
 execfile(u'INMOOV-AI_activator.py')
 
-# ##############################################################################
-# Je suppose pour voir la progression si NeoPixel externe
-# ##############################################################################
-NeoPixelF(3)
+
 
 # ##############################################################################
-# ??
+# We start a function that do actions after voice start / stop
+# On creer un connecteur qui va nous permettre de savoir quand le robot commence a parler. Et quand il a fini
 # ##############################################################################
 python.subscribe(mouth.getName(),"publishStartSpeaking")
 python.subscribe(mouth.getName(),"publishEndSpeaking")
@@ -267,11 +270,9 @@ WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
 WebkitSpeachReconitionFix.setInterval(15000)
 WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")
 
-# ##########################################################	
-# program start : ????????????????
 
 # ##############################################################################
-# Je suppose pour voir la progression avec RGB externe
+# LED RGB EXTERNE
 # ##############################################################################
 Light(1,1,0)
 
@@ -280,12 +281,9 @@ ClearMemory()
 if myBotname!="":
 	UpdateBotName(myBotname)
 
-# ?????????????
+# on met le robot dans sa position repos ( les servos ne sont plus solicités )
 rest()
 
-# ##############################################################################
-# on peut faire cela uniquement si le système est prét ?????
-# ##############################################################################
 if IsInmoovArduino==1:
 	i01.head.attach()
 	HeadSide.attach()
@@ -293,9 +291,7 @@ if IsInmoovArduino==1:
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
 
-# ##############################################################################
-# Je suppose pour voir la progression avec RGB externe
-# ##############################################################################
+
 Light(1,1,1)
 
 #r=image.displayFullScreen("http://vignette2.wikia.nocookie.net/worldsofsdn/images/7/7a/Tyrell-corp.jpg",1)
@@ -313,7 +309,7 @@ if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.get
 # Je suppose pour voir la progression avec RGB externe
 # ##############################################################################
 Light(1,1,1)
-NeoPixelF(1)
+
 
 # ##############################################################################
 # Vérification divers
@@ -335,18 +331,6 @@ if lang=="FR":
 python.subscribe(ear.getName(),"publishText")
 
 WebkitSpeachReconitionFix.startClock()
-#BicepsClosed()
-openCvModule="123"
-#arduino.setSampleRate(9600)  # change thiopenCvModule="123"
-#i01.opencv.setInputSource("Sarxos")
-
-i01.opencv.setCameraIndex(0)
-i01.opencv.removeFilters()
-i01.opencv.addFilter("PyramidDown")
-i01.opencv.addFilter("Gray")
-i01.opencv.addFilter("FaceDetect")
-i01.opencv.setDisplayFilter("FaceDetect")
-i01.opencv.capture()
 
 # ##############################################################################
 # System is ready

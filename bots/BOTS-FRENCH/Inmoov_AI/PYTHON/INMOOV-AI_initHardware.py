@@ -102,7 +102,7 @@ torso.midStom.setRest(TorsoMidRes)
 if IsInmoovArduino==1:
 	i01 = Runtime.start("i01","InMoov")
 	left = Runtime.start("i01.left", "Arduino")
-	
+	head = Runtime.start("i01.head", "Arduino")
 	head.setSpeed(DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed)
 	head.rothead.setSpeed(0.1)
 	head.neck.setSpeed(0.1)
@@ -161,10 +161,5 @@ if Activator==1 and IsInmoovArduino==1:
 	ActivatorArduino.setBoard(BoardTypeActivator)
 	ActivatorArduino.connect(ActivatorControler,ActivatorPort)
   
-# ##############################################################################
-# External module NEOPIXEL configuration
-# ##############################################################################
-if Neopixel!="COMX":
-	serial = Runtime.createAndStart("serial","Serial")
-	serial.connect(Neopixel, 9600, 8, 1, 0)
+
   
