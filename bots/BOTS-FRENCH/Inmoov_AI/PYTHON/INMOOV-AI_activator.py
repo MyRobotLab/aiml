@@ -7,12 +7,19 @@
 # Réception
 # A FAIRE
 if Activator==1 and IsInmoovArduino==1:
-	def FonctionReceptionData(data):
+	def receiveActivatorData(data):
 	  print "J ai reçu des données les voici", data
-    
-	ActivatorArduino.addListener("publishCustomMsg","python","FonctionReceptionData")
+    # A VOIR CE QUI A DANS DATA
+    #BatteryElectValue=0
+    #BatteryMotorValue=0
+    #AudioVolume=30
 
-# Commande à envoyer quand le PC a terminé de charger tout les services  
+# Fonction d'écoute pour la réception des données Activator    
+if Activator==1 and IsInmoovArduino==1:
+	ActivatorArduino.addListener("publishCustomMsg","python","receiveActivatorData")
+
+# Commande à envoyer quand le PC a terminé de charger tout les services
+# Attention, le watchdog est automatiquement activé.
 def pcIsReady():
   if Activator==1 and IsInmoovArduino==1:
 		ActivatorArduino.digitalWrite(2,1)
@@ -22,6 +29,30 @@ def shudownRequest():
   if Activator==1 and IsInmoovArduino==1:
 		ActivatorArduino.digitalWrite(3,1)
     
+# Commande à envoyer périodiquement pour le watchdog  
+def watchdogRefresh():
+  if Activator==1 and IsInmoovArduino==1:
+		ActivatorArduino.digitalWrite(17,1)
+
+# Permet de désactiver le watchdog
+# pour debug par exemple
+def disableWatchdog():
+  if Activator==1 and IsInmoovArduino==1:
+		ActivatorArduino.digitalWrite(17,0)
+
+# Demande la mise à jour des valeurs batteries
+def updateBatterieRequest(bat):
+  if Activator==1 and IsInmoovArduino==1:
+    if bat==1:
+      ActivatorArduino.analogWrite(1,0)
+    else:
+      ActivatorArduino.analogWrite(2,0)
+
+# Demande le niveau audio en cours
+def updateAudioLevel():
+  if Activator==1 and IsInmoovArduino==1:
+    ActivatorArduino.analogWrite(10,0)
+
 # Commande machoire : JawAction(action)
 # action = "ouvre"
 # action = "ferme"
@@ -77,6 +108,12 @@ def NeoPixelColor(action):
 		# >>> neopixel.setAnimation("Theater Chase", 255, 0, 0, 1) #running Theater Chase with color red at full speed
 		#print 0
     
+# NeoPixelCustomColor(100,200,50)
+def NeoPixelCustomColor(r, g, b):
+  if Activator==1 and IsInmoovArduino==1:
+    # Animation par défaut
+    ActivatorArduino.setTrigger(r,g,b)
+    
 # NeoPixelAnimation(action)
 # Action = 0, 1 ou 2
 def NeoPixelAnimation(action):
@@ -116,3 +153,4 @@ def SoundDisable():
 def SoundEnable():
   if Activator==1 and IsInmoovArduino==1:
     ActivatorArduino.digitalWrite(15,0)
+

@@ -85,6 +85,7 @@ void MrlComm::softReset()
   bat1Value = 0.0;
   bat2Value = 0.0;
   updateAudio = false;
+  watchdogCpt = 0;
 }
 
 /***********************************************************************
@@ -243,6 +244,8 @@ void MrlComm::processCommand(int ioType)
             shutdownPC = false;
             servoIsEnable = true;
             servoDetachIsRequest = true;
+            watchDogIsEnable = true;
+            watchdogCpt = 0;
 
             // Active la sortie audio
             setMuteOff();
@@ -255,6 +258,8 @@ void MrlComm::processCommand(int ioType)
           {
             // Le PC va s'arrété
             shutdownPC = true;
+            watchDogIsEnable = false;
+            watchdogCpt = 0;
           }
           break;
         }
@@ -451,6 +456,21 @@ void MrlComm::processCommand(int ioType)
           }
           break;
         }
+        case 17:
+        {
+          if (ioCmd[2] == 1)
+          {
+            // Commande de rafraichissement du watchdog
+            watchDogIsEnable = true;
+          }
+          else
+          {
+            // Désactivation du watchdog
+            watchDogIsEnable = false;
+          }
+          watchdogCpt = 0;
+          break;
+        }
         case 20:
         {
           volAudio = ioCmd[2];
@@ -485,7 +505,7 @@ void MrlComm::processCommand(int ioType)
         case 1:
         {
           // Valeur brut
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
           msg.addData16(bat1Val);
           msg.sendMsg();
@@ -494,7 +514,7 @@ void MrlComm::processCommand(int ioType)
         case 2:
         {
           // Valeur brut
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
           msg.addData16(bat2Val);
           msg.sendMsg();
@@ -503,7 +523,7 @@ void MrlComm::processCommand(int ioType)
         case 3:
         {
           /* Valeur en volt
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
           msg.addData16(bat1Value);
           msg.sendMsg();*/
@@ -512,7 +532,7 @@ void MrlComm::processCommand(int ioType)
         case 4:
         {
           /* Valeur en volt
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
           msg.addData16(bat2Value);
           msg.sendMsg();*/
@@ -521,16 +541,16 @@ void MrlComm::processCommand(int ioType)
         case 10:
         {
           // Valeur du volume audio
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
-          msg.addData16(volAudio);
+          msg.addData(volAudio);
           msg.sendMsg();
           break;
         }
         case 11:
         {
           // Dit si le MAX9744 répond bien
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
           if (max9744IsOK)
           {
@@ -545,7 +565,7 @@ void MrlComm::processCommand(int ioType)
         }
         case 20:
         {
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
           msg.addData(servoMin);
           msg.sendMsg();
@@ -553,7 +573,7 @@ void MrlComm::processCommand(int ioType)
         }
         case 21:
         {
-          MrlMsg msg(PUBLISH_SENSOR_DATA, 0);
+          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
           msg.addData(ioCmd[1]);
           msg.addData(servoMax);
           msg.sendMsg();
@@ -569,17 +589,7 @@ void MrlComm::processCommand(int ioType)
     }
     case PIN_MODE: 
     case SERVO_ATTACH: 
-    {
-      break;
-    }
     case SERVO_SWEEP_START:
-    {
-      // Couleur custom du ring
-      rVal = ioCmd[2];
-      gVal = ioCmd[3];
-      bVal = ioCmd[4];
-      break;
-    }
     case SERVO_SWEEP_STOP:
     case SERVO_WRITE:
     case SERVO_WRITE_MICROSECONDS:
@@ -611,7 +621,17 @@ void MrlComm::processCommand(int ioType)
     case SET_PWMFREQUENCY:
     case PULSE:
     case PULSE_STOP:
+    {
+      break;
+    }
     case SET_TRIGGER:
+    {
+      // Couleur custom du ring
+      rVal = ioCmd[2];
+      gVal = ioCmd[3];
+      bVal = ioCmd[4];
+      break;
+    }
     case SET_DEBOUNCE:
     case SET_DIGITAL_TRIGGER_ONLY:
     case SET_SERIAL_RATE:
@@ -656,7 +676,8 @@ void MrlComm::processCommand(int ioType)
     case SET_DEBUG:
     {
       debug = ioCmd[1];
-      if (debug) {
+      if (debug) 
+      {
         MrlMsg::publishDebug(F("Debug logging enabled."));
       }
       break;

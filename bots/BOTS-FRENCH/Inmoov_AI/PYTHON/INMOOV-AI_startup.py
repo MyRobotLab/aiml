@@ -35,10 +35,7 @@
 #  						               *** END SETUP ***
 # ##############################################################################
 
-# pour les numéros de version ce serait mieux de mettre X.Y.Z
-# X modif majeur
-# Y modif mineur
-# Z correction de bug
+# Quelle est cette version
 version=21
 
 # ##############################################################################
@@ -121,8 +118,6 @@ oridir=os.getcwd().replace("\\", "/")+"/"
 # ##############################################################################
 # check if a config file exist or create default one
 # ##############################################################################
-
-
 if os.path.isfile(oridir + 'CONFIG/INMOOV-AI_config.py'):
 	print("config file ok")
 else:
@@ -233,6 +228,7 @@ htmlFilter.addListener("publishText", python.name, "talk")
 # We include all InmoovAI mods
 # ##############################################################################
 # -- coding: utf-8 --
+execfile(u'INMOOV-AI_activator.py')
 execfile('INMOOV-AI_divers.py')
 execfile('INMOOV-AI_memory.py')
 execfile('INMOOV-AI_gestures.py')
@@ -252,9 +248,6 @@ execfile(u'INMOOV-AI_dictionaries.py')
 execfile(u'INMOOV-AI_WeatherMap_Meteo.py')
 execfile(u'INMOOV-AI_jeanneton.py')
 #execfile(u'INMOOV-AI_demo_halleffect.py')
-execfile(u'INMOOV-AI_activator.py')
-
-
 
 # ##############################################################################
 # We start a function that do actions after voice start / stop
@@ -269,7 +262,6 @@ python.subscribe(mouth.getName(),"publishEndSpeaking")
 WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
 WebkitSpeachReconitionFix.setInterval(15000)
 WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")
-
 
 # ##############################################################################
 # LED RGB EXTERNE
@@ -291,7 +283,6 @@ if IsInmoovArduino==1:
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
 
-
 Light(1,1,1)
 
 #r=image.displayFullScreen("http://vignette2.wikia.nocookie.net/worldsofsdn/images/7/7a/Tyrell-corp.jpg",1)
@@ -309,7 +300,6 @@ if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.get
 # Je suppose pour voir la progression avec RGB externe
 # ##############################################################################
 Light(1,1,1)
-
 
 # ##############################################################################
 # Vérification divers
@@ -337,6 +327,15 @@ WebkitSpeachReconitionFix.startClock()
 # ##############################################################################
 RobotIsStarted=1
 pcIsReady()
+sleep(0.5)
+startWatchdogTimer()
+# A METTRE SI ON VEUT PAS DECLENCHER LE WATCHDOG
+#disableWatchdog() 
+sleep(0.5)
+updateBatterieRequest(1)
+sleep(1)
+updateBatterieRequest(2)
+sleep(1)
 
 # ##############################################################################
 # Mettre ici les différents tests
@@ -346,11 +345,10 @@ pcIsReady()
 
 #StartSensorDemo()
 
-sleep(2)
-NeoPixelColor("rouge")
-sleep(5)
-NeoPixelColor("bleu")
-sleep(5)
+#NeoPixelColor("rouge")
+#sleep(5)
+#NeoPixelCustomColor(10,10,10)
+#sleep(5)
 NeoPixelAnimation(1)
 sleep(5)
 NeoPixelAnimation(0)

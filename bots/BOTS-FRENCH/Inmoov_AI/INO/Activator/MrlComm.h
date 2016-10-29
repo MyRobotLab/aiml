@@ -86,6 +86,8 @@ class MrlComm
     boolean wakeUp;
     boolean shutdownPC;
     boolean servoIsEnable;
+    boolean watchDogIsEnable;
+    long watchdogCpt;
     byte rVal;
     byte gVal;
     byte bVal;

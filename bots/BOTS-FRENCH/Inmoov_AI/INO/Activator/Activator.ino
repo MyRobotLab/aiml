@@ -41,7 +41,7 @@
  * Date       | Auteur        | Description                        *
  * --------------------------------------------------------------- *
  * 22/09/2016 | D. Gyselinck  | Création du fichier                *
- *			                                           *
+ *			                                                           *
  * 09/10/2016 | D. Gyselinck  | V0.5.0 beta test                   *
  * 10/10/2016 | D. Gyselinck  | V0.6.0 beta test                   *
  *     - Ajout lecture tension batterie B:1, ou B:2,               *
@@ -58,6 +58,10 @@
  *     - Refonte total du programme avec le protocole MrlComm      *
  * 25/10/2016 | D. Gyselinck  | V1.1.0 release                     *
  *     - Paramètre min et max du servo en EEPROM                   *
+ *     - Correction de bug                                         *
+ * 28/10/2016 | D. Gyselinck  | V1.2.0 release                     *
+ *     - Ajout de la fonctionnalité watchdog                       *
+ *     - Ajout de commande MRL                                     *
  *     - Correction de bug                                         *
  *                                                                 *
  *                                                                 *
@@ -76,7 +80,7 @@
 
 // Numéro de version Activator
 #define V1                  1
-#define V2                  1
+#define V2                  2
 #define V3                  0
 
 // Définition des pins du nano
@@ -94,7 +98,8 @@
 // Valeur par défaut sauvegardé en EEPROM
 // Min et max du servo à régler en fonction de InMoov
 #define SERVO_MIN           30  // Bouche fermé
-#define SERVO_MAX           60  // Bouche ouverte
+#define SERVO_MAX           90  // Bouche ouverte
+#define SERVO_AUDIO_MAX     60  // Bouche ouverte avec audio
 
 // Nombre de pixels du ring
 #define NUMPIXELS           16
@@ -266,6 +271,29 @@ void ProcessTimer()
     // 5s
     if (mrlComm.inmoovIsOn)
     {
+      if (mrlComm.watchDogIsEnable)
+      {
+        mrlComm.watchdogCpt++;
+        if (mrlComm.watchdogCpt > 60)
+        {
+          // Aprés 5mn, on a rien reçu
+          // le système est planté...
+          mrlComm.watchdogCpt = 0;
+          
+          // Redémarrage du système...
+          mrlComm.inmoovIsOn = false;
+          mrlComm.wakeUp = false;
+          mrlComm.shutdownPC = false;
+          mrlComm.servoIsEnable = false;
+          mrlComm.animRequest = 0;
+          mrlComm.watchDogIsEnable = false;
+
+          shutdownProcess();
+          delay(5000);
+          startupProcess();
+        }
+      }
+      
       // Lecture des valeurs analogiques
       mrlComm.bat1Val = analogRead(A2);
       mrlComm.bat2Val = analogRead(A3);
@@ -673,7 +701,7 @@ void setup()
   mrlComm.shutdownPC = false;
   mrlComm.servoIsEnable = false;
   mrlComm.animRequest = 0;
-  mrlComm.max9744IsOK = false;
+  mrlComm.watchDogIsEnable = false;
 }
 
 /** 
@@ -734,14 +762,14 @@ void loop()
               closeIsRun = false;
               ucCpt1 = 0;
               jawServo.attach(JAW_SERVO_PIN);
-              jawServo.write(mrlComm.servoMax);
+              jawServo.write(SERVO_AUDIO_MAX);
               bJawIsOpen = true;
             }
           }
           else
           {
             jawServo.attach(JAW_SERVO_PIN);
-            jawServo.write(mrlComm.servoMax);
+            jawServo.write(SERVO_AUDIO_MAX);
             bJawIsOpen = true;
           }
         }

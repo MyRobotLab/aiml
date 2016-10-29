@@ -103,3 +103,19 @@ def TuTeTais_OuPas(value):
 VieAleatoire.addListener("pulse", python.name, "OnBalanceUnePhare_Aleatoire")
 # start the clock
 VieAleatoire.startClock()
+
+# Timer pour le watchdog
+# Envoie un refresh watchdog toutes les 2s
+def sendRefresh(timedata):
+  watchdogRefresh()
+  
+watchdogTimer = Runtime.start("watchdogTimer","Clock")
+watchdogTimer.setInterval(5000)
+watchdogTimer.addListener("pulse", python.name, "sendRefresh")
+
+def startWatchdogTimer():
+  watchdogTimer.startClock()
+
+
+
+
