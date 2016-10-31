@@ -311,7 +311,6 @@ Light(1,1,1)
 # ##############################################################################
 CheckVersion()
 anniversaire("0")
-chatBot.getResponse("WAKE_UP")
 GetUnreadMessageNumbers("0")
 sleep(4)
 
@@ -335,14 +334,12 @@ pcIsReady()
 sleep(0.5)
 image.exitFS()
 image.closeAll()
+# Mettre un # devant startWatchdogTimer si on ne veux pas du watchdog
 startWatchdogTimer()
-# A METTRE SI ON VEUT PAS DECLENCHER LE WATCHDOG
-#disableWatchdog() 
+#startWatchdogTimer()
 sleep(0.5)
-updateBatterieRequest(1)
-sleep(1)
-updateBatterieRequest(2)
-sleep(1)
+chatBot.getResponse("WAKE_UP")
+NeoPixelColor(defaultRingColor)
 
 # ##############################################################################
 # Mettre ici les différents tests
@@ -352,10 +349,6 @@ sleep(1)
 
 #StartSensorDemo()
 
-#NeoPixelColor("rouge")
-#sleep(5)
-#NeoPixelCustomColor(10,10,10)
-#sleep(5)
 NeoPixelAnimation(1)
 sleep(5)
 NeoPixelAnimation(0)

@@ -244,7 +244,6 @@ void MrlComm::processCommand(int ioType)
             shutdownPC = false;
             servoIsEnable = true;
             servoDetachIsRequest = true;
-            watchDogIsEnable = true;
             watchdogCpt = 0;
 
             // Active la sortie audio

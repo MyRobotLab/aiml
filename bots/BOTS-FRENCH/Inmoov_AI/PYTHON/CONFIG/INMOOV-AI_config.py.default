@@ -34,11 +34,11 @@ MrlNeopixel=0
 MrlNeopixelPin=49
 
 #ACTIVATOR # Arduino dédié neopixel / mouthcontrol / batterie / son
-
 Activator=0
 ActivatorPort="Serial1"
 ActivatorControler="left"
 BoardTypeActivator="atmega328" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
+defaultRingColor="bleu"
 
 #PIN RELAIS POUR DETACHEMENT SERVOS
 LeftRelaisArm=53

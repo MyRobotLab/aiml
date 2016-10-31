@@ -63,8 +63,9 @@
  *     - Ajout de la fonctionnalité watchdog                       *
  *     - Ajout de commande MRL                                     *
  *     - Correction de bug                                         *
- *                                                                 *
- *                                                                 *
+ * 31/10/2016 | D. Gyselinck  | V1.3.0 release                     *
+ *     - Correction bug NeoRing fonction de l'audio                *
+ *     - Correction bug servo Jaw en fonction de l'audio           *
  *                                                                 *
  *                                                                 *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -80,7 +81,7 @@
 
 // Numéro de version Activator
 #define V1                  1
-#define V2                  2
+#define V2                  3
 #define V3                  0
 
 // Définition des pins du nano
@@ -138,7 +139,6 @@ unsigned long long processTime;
 boolean batteryEleIsFailed = false;
 boolean batteryMotIsFailed = false;
 boolean neoState = false;
-boolean closeIsRun = false;
 boolean bUpdateRing = false;
 boolean bJawIsOpen = false;
 boolean closeRequest = false;
@@ -710,6 +710,9 @@ void setup()
 void loop() 
 {
   int i = 0;
+  int rTemp = 0;
+  int bTemp = 0;
+  int gTemp = 0;
 
   // increment how many times we've run
   // TODO: handle overflow here after 32k runs, i suspect this might blow up?
@@ -733,54 +736,43 @@ void loop()
       audioVal = analogRead(A0);
       seuilVal = analogRead(A1);
       
-      /*if (audioVal > seuilVal)
+      // Convertion en mv
+      audioVal = map(audioVal, 0, 1023, 0, 4000);
+      seuilVal = map(seuilVal, 0, 1023, 0, 4000);
+      
+      // Ajout d'un test pour éviter les erreurs
+      // Le niveau audio doit être supérieur à 800mv
+      if ((audioVal > 800) && (audioVal > seuilVal))
       {
-        closeRequest = false;
-
         if (!bJawIsOpen)
         {
-          if (closeIsRun)
-          {
-            ucCpt1++;
-            if (ucCpt1 >= 20)
-            {
-              srVal = mrlComm.rVal;
-              sgVal = mrlComm.gVal;
-              sbVal = mrlComm.bVal;
-              if (mrlComm.rVal != 0)
-              {
-                mrlComm.rVal = 200;
-              }
-              if (mrlComm.gVal != 0)
-              {
-                mrlComm.gVal = 200;
-              }
-              if (mrlComm.bVal != 0)
-              {
-                mrlComm.bVal = 200;
-              }
-              closeIsRun = false;
-              ucCpt1 = 0;
-              jawServo.attach(JAW_SERVO_PIN);
-              jawServo.write(SERVO_AUDIO_MAX);
-              bJawIsOpen = true;
-            }
-          }
-          else
-          {
-            jawServo.attach(JAW_SERVO_PIN);
-            jawServo.write(SERVO_AUDIO_MAX);
-            bJawIsOpen = true;
-          }
+          bJawIsOpen = true;
+          
+          // Pour le ring
+          srVal = mrlComm.rVal;
+          sgVal = mrlComm.gVal;
+          sbVal = mrlComm.bVal;
+          mrlComm.rVal = 200;
+          mrlComm.gVal = 200;
+
+          jawServo.attach(JAW_SERVO_PIN);
+          jawServo.write(SERVO_AUDIO_MAX);
         }
       }
       else
       {
         if (bJawIsOpen)
         {
+          bJawIsOpen = false;
+          
+          // Pour le ring
+          mrlComm.rVal = srVal;
+          mrlComm.gVal = sgVal;
+          mrlComm.bVal = sbVal;
+
           closeRequest = true;
         }
-      }*/
+      }
       
       if (closeRequest)
       {
@@ -790,12 +782,8 @@ void loop()
           ucCpt = 0;
           jawServo.attach(JAW_SERVO_PIN);
           jawServo.write(mrlComm.servoMin);
-          bJawIsOpen = false;
           closeRequest = false;
-          closeIsRun = true;
-          mrlComm.rVal = srVal;
-          mrlComm.gVal = sgVal;
-          mrlComm.bVal = sbVal;
+          mrlComm.setDetachRequest(true);
         }
       }
     }
@@ -972,10 +960,10 @@ void loop()
         {
           // Animations par défaut
           ////////////////////////
-          icptWait++;
-          if (icptWait > 5)
-          {
-            icptWait = 0;
+          //icptWait++;
+          //if (icptWait > 5)
+          //{
+            //icptWait = 0;
             
             if (neoState)
             {
@@ -983,7 +971,33 @@ void loop()
             }
             else
             {
-              pixels.setPixelColor(pixelCpt, pixels.Color(0,0,0));
+              if (mrlComm.rVal == 0)
+              {
+                rTemp = 0;
+              }
+              else
+              {
+                rTemp = 40;
+              }
+
+              if (mrlComm.gVal == 0)
+              {
+                gTemp = 0;
+              }
+              else
+              {
+                gTemp = 40;
+              }
+              
+              if (mrlComm.bVal == 0)
+              {
+                bTemp = 0;
+              }
+              else
+              {
+                bTemp = 40;
+              }
+              pixels.setPixelColor(pixelCpt, pixels.Color(rTemp, gTemp, bTemp));
             }
         
             pixelCpt++;
@@ -995,7 +1009,7 @@ void loop()
             
             // Mise à jour état des pixels
             pixels.show();
-          }
+          //}
         }
       }
 
