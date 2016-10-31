@@ -14,6 +14,11 @@ def detachHard():
 
 def rest():
 	if IsInmoovArduino==1:
+
+		#pwn activation all servos
+		i01.attach()
+		HeadSide.attach()
+		
 		head.neck.setSpeed(NeckSpeed)
 		head.rothead.setSpeed(RotHeadSpeed)
 		HeadSide.setSpeed(PistonSideSpeed)
@@ -25,23 +30,23 @@ def rest():
 		head.rothead.setSpeed(RotHeadSpeed)
 		head.rothead.moveTo(RotHeadRest)
 		i01.setTorsoSpeed(1.0, 1.0, 1.0)
+		#position defaut
 		head.rest()
 		leftHand.rest()
 		rightHand.rest()
 		leftArm.rest()
 		rightArm.rest()
 		torso.rest()
-		HeadSide.rest()
-		leftArm.bicep.moveTo(0)
-		rightArm.bicep.moveTo(0)
+		HeadSide.moveTo(HeadSideRest)
+		#wait before detach
 		sleep(2)
-		head.detach()
 		leftHand.detach()
 		rightHand.detach()
 		leftArm.detach()
 		rightArm.detach()
 		torso.detach()
 		HeadSide.detach()
+		#force pwn shutdown on special servo
 		detachHard()
 
 		

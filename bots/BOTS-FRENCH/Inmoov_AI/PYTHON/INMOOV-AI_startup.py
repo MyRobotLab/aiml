@@ -2,7 +2,7 @@
 # 							         *** SETUP / INSTALLATION ***
 # ##############################################################################
 # 
-# - Inmoov-AI Version 2.1.5 By Moz4r
+# - Inmoov-AI - Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
@@ -35,8 +35,13 @@
 #  						               *** END SETUP ***
 # ##############################################################################
 
-# Quelle est cette version
-version=21
+# version X.Y.Z X=critical : verification to tell users they must do an update
+# Y=evolution
+# Z=Github push or Bug correction
+version='2.1.6'
+print "DEBUG , InmoovAI version : ",version
+version=str(version[0])
+
 
 # ##############################################################################
 # Variables global
@@ -168,7 +173,7 @@ except:
 # ##############################################################################
 image=Runtime.createAndStart("ImageDisplay", "ImageDisplay")
 r=image.displayFullScreen('pictures\loading.jpg',1)
-#r=image.displayFullScreen(os.getcwd().replace("develop", "")+'pictures\loading.jpg',1)
+
 
 # ##############################################################################
 # Service aiml
@@ -318,7 +323,7 @@ webgui.startBrowser("http://localhost:8888/#/service/i01.ear")
 
 if lang=="FR":
    ear.setLanguage("fr-FR")
-python.subscribe(ear.getName(),"publishText")
+python.subscribe(ear.getName(),"recognized")
 
 WebkitSpeachReconitionFix.startClock()
 
@@ -328,6 +333,8 @@ WebkitSpeachReconitionFix.startClock()
 RobotIsStarted=1
 pcIsReady()
 sleep(0.5)
+image.exitFS()
+image.closeAll()
 startWatchdogTimer()
 # A METTRE SI ON VEUT PAS DECLENCHER LE WATCHDOG
 #disableWatchdog() 

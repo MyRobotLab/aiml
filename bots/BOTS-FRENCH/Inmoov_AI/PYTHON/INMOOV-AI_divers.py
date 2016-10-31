@@ -4,7 +4,7 @@
 
 def talk(data):
 		
-	ear.startListening() #fix onclick micro
+	#ear.startListening() #fix onclick micro
 	
 	if data:
 		if data!="":
@@ -59,19 +59,21 @@ def onEndSpeaking(text):
 	
 	if IcanStartToEar==1:
 		try:
-			ear.startListening()
+			ear.resumeListening()
 		except: 
 			pass
 	WebkitSpeachReconitionFix.startClock()
 	IcanStartToEar=1
 	RamdomSpeak=0
+
 	
 	#sleep(0.2)
 	
 def onStartSpeaking(text):
 	
 	global RamdomSpeak
-	print "dbg : ",RamdomSpeak
+	if DEBUG==1:
+		print "dbg : RamdomSpeak:",RamdomSpeak
 	global RobotIsSleepingSoft
 	global IcanEarOnlyKnowsWords
 	if RamdomSpeak==0:
@@ -103,7 +105,7 @@ def onStartSpeaking(text):
 	if MoveHeadRandom==1:
 		MoveHeadTimer.startClock()
 	try:
-		ear.stopListening()
+		ear.pauseListening()
 	except: 
 		pass
 	global TimeNoSpeak
@@ -115,7 +117,9 @@ def onStartSpeaking(text):
 #We intercept what the robot is listen to change some values
 #here we replace ' by space because AIML doesn't like '
 ##############################################################
-def onText(text):
+def onRecognized(text):
+	if DEBUG==1:
+		print "onRecognized : ",text
 	#print text.replace("'", " ")
 	
 	global Ispeak
@@ -128,6 +132,9 @@ def onText(text):
 		 #we close pictures
 	image.exitFS()
 	image.closeAll()
+
+
+	
 	
 
 def Light(ROUGE_V,VERT_V,BLEU_V):

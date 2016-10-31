@@ -1,5 +1,5 @@
 #EN : SHUTDOWN THE EAR ACTION AFTER 1mn INACTIVITY
-#FR : ON COUPE VIRTUELEMENT LE MICRO APRES 1 MINUTE
+#FR : ON COUPE VIRTUELEMENT LE MICRO APRES 1 MINUTE ( mode pause )
 StopListenTimer = Runtime.create("StopListenTimer","Clock")
 StopListenTimer.setInterval(60000)
 StopListenTimer = Runtime.start("StopListenTimer","Clock")
@@ -10,7 +10,8 @@ def StopListenTimerFunc(timedata):
 		global IcanEarOnlyKnowsWords
 		global RobotIsSleepingSoft
 		IcanEarOnlyKnowsWords=IcanEarOnlyKnowsWords+1
-		print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
+		if DEBUG==1:
+			print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
 		if IcanEarOnlyKnowsWords==1:
 			print "Sleeping mode ON"
 			RobotIsSleepingSoft=1
@@ -22,6 +23,7 @@ def StopListenTimerFunc(timedata):
 			sleep(3)
 			PaupiereAttach(0)
 			rest()
+			head.detach()
 		
 	
 
@@ -57,16 +59,12 @@ def WebkitSpeachReconitionON(timedata):
 	global LedWebkitListenFuncFix
 	global Ispeak
 	if Ispeak==0:
-		try:
-			ear.stopListening()
-			sleep(0.3)
-			ear.startListening()
-			Light(1,1,0)
-			LedWebkitListenFuncFix=0
-			LedWebkitListen.startClock()
-			
-		except: 
-			pass
+		ear.clearLock()
+		ear.resumeListening()
+		LedWebkitListenFuncFix=0
+		LedWebkitListen.startClock()
+		Light(1,1,0)
+
 			
 
 #RANDOM TIME ACTIONS
