@@ -38,7 +38,7 @@
 # version X.Y.Z X=critical : verification to tell users they must do an update
 # Y=evolution
 # Z=Github push or Bug correction
-version='2.1.6'
+version='2.1.8'
 print "DEBUG , InmoovAI version : ",version
 version=str(version[0])
 
@@ -84,6 +84,11 @@ global BatteryMotorValue
 BatteryMotorValue=0
 global AudioVolume
 AudioVolume=30
+global TimoutVar
+TimoutVar=-1
+global MoveEyesRandom
+MoveEyesRandom=1
+
 
 # Some voice emotions
 laugh = [" #LAUGH01# ", " #LAUGH02# ", " #LAUGH03# ", " ", " "]
@@ -142,9 +147,10 @@ execfile(u'CONFIG/INMOOV-AI_config.py')
 execfile(u'CONFIG/INMOOV-AI_ServoParam.py')
 
 # ##############################################################################
-# Chargement des paramètres personnalisés
+# Chargement des paramètres personnalisés ( en attendant autre chose )
 # ##############################################################################
-
+if not 'defaultRingColor' in locals():
+	defaultRingColor="bleu"
 # ##############################################################################
 # Initialisation hardware
 # ##############################################################################
@@ -262,13 +268,6 @@ python.subscribe(mouth.getName(),"publishStartSpeaking")
 python.subscribe(mouth.getName(),"publishEndSpeaking")
 
 # ##############################################################################
-# Timer function to autostart webkit microphone every 10seconds
-# ##############################################################################
-WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
-WebkitSpeachReconitionFix.setInterval(15000)
-WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")
-
-# ##############################################################################
 # LED RGB EXTERNE
 # ##############################################################################
 Light(1,1,0)
@@ -312,6 +311,8 @@ Light(1,1,1)
 CheckVersion()
 anniversaire("0")
 GetUnreadMessageNumbers("0")
+chatBot.getResponse("WAKE_UP")
+#WE PLACE SPEAKING STARTUP ACTION BEFORE INITIAL MICROPHONE LAUNCH TO AVOID AUTOLISTEN
 sleep(4)
 
 # ##############################################################################
@@ -338,7 +339,7 @@ image.closeAll()
 startWatchdogTimer()
 #startWatchdogTimer()
 sleep(0.5)
-chatBot.getResponse("WAKE_UP")
+
 NeoPixelColor(defaultRingColor)
 
 # ##############################################################################
@@ -352,4 +353,7 @@ NeoPixelColor(defaultRingColor)
 NeoPixelAnimation(1)
 sleep(5)
 NeoPixelAnimation(0)
+
+#matt makefaire a finaliser si mise en prod
+#MoveHeadRandomEveryMinute.startClock()
 

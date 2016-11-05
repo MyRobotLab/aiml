@@ -13,7 +13,7 @@ def talk(data):
 			data=data.replace(" l ", " l'")
 			mouth.speak(unicode(data,'utf-8'))
 		
-	if IsInmoovArduino==1:
+	if IsInmoovArduino==1 and MoveEyesRandom==1:
 		if random.randint(1,3)==1:
 			i01.head.eyeX.moveTo(0)
 			sleep(2)

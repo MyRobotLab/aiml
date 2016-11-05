@@ -23,7 +23,7 @@ def StopListenTimerFunc(timedata):
 			sleep(3)
 			PaupiereAttach(0)
 			rest()
-			head.detach()
+			#head.detach()
 		
 	
 
@@ -54,18 +54,22 @@ def LedWebkitListenFunc(timedata):
 LedWebkitListen.addListener("pulse", python.name, "LedWebkitListenFunc")
 # start the clock
 
+# ##############################################################################
+# Timer function to autostart webkit microphone every 10seconds
+# ##############################################################################
+WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
+WebkitSpeachReconitionFix.setInterval(15000)
 
 def WebkitSpeachReconitionON(timedata):
 	global LedWebkitListenFuncFix
 	global Ispeak
 	if Ispeak==0:
-		ear.clearLock()
 		ear.resumeListening()
 		LedWebkitListenFuncFix=0
 		LedWebkitListen.startClock()
 		Light(1,1,0)
 
-			
+WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")			
 
 #RANDOM TIME ACTIONS
 VieAleatoire = Runtime.start("VieAleatoire","Clock")
@@ -114,6 +118,36 @@ watchdogTimer.addListener("pulse", python.name, "sendRefresh")
 def startWatchdogTimer():
   watchdogTimer.startClock()
 
+#generic timeout function used in some loops to prevent infinite :)
+TimoutTimer = Runtime.start("TimoutTimer","Clock")
+TimoutTimer.setInterval(60000)
 
+def TimoutTimerFunc(timedata):
+	global TimoutVar
+	TimoutVar+=1
+	if TimoutVar==1:
+		TimoutTimer.stopClock()
+	
+TimoutTimer.addListener("pulse", python.name, "TimoutTimerFunc")
 
+#makerfaire matt move head random twice a minute
+MoveHeadRandomEveryMinute= Runtime.start("MoveHeadRandomEveryMinute","Clock")
+MoveHeadRandomEveryMinute.setInterval(11000)
 
+global MoveHeadRandomEveryMinuteVar
+MoveHeadRandomEveryMinuteVar=1
+def MoveHeadRandomEveryMinuteFunc(timedata):
+	global MoveHeadRandomEveryMinuteVar
+	global Ispeak
+	
+	if  Ispeak==0 and MoveHeadRandomEveryMinuteVar==0:
+		MoveHeadRandomEveryMinuteVar=1
+		MoveHeadTimer.stopClock()
+		
+	if Ispeak==0 and MoveHeadRandomEveryMinuteVar==1 and random.randint(1,3)==3:
+		MoveHeadRandomEveryMinuteVar=0
+		MoveHeadTimer.startClock()
+		
+	MoveHeadRandomEveryMinute.setInterval(random.randint(8000,11000))
+		
+MoveHeadRandomEveryMinute.addListener("pulse", python.name, "MoveHeadRandomEveryMinuteFunc")
