@@ -13,7 +13,7 @@ $genre="RANDOM";
 $row_cnt=0;
 $type="";
 
-$bdd = mysqli_connect('localhost', 'myai', 'password', 'myai');
+$bdd = mysqli_connect('localhost', '', 'password', '');
 mysqli_set_charset($bdd,"utf8");
 
 if (isset($_GET["type"]))

@@ -1,15 +1,18 @@
 #ifndef MrlComm_h
 #define MrlComm_h
 
+#include <EEPROM.h>
 #include "ArduinoMsgCodec.h"
 #include "MrlMsg.h"
 #include "MrlCmd.h"
 #include "LinkedList.h"
-#include "MrlServo.h"
 #include "Device.h"
-#include "MrlI2cBus.h"
-#include "MrlNeopixel.h"
-#include "Pin.h"
+
+
+#define PRESENCE_SENSOR_PIN     2    // PIN D2
+#define MAX9744_SHTDOWN_PIN     4    // PIN D4
+#define MAX9744_MUTE_PIN        5    // PIN D5
+
 
 // TODO - standard convention of dev versions are odd release is even ?
 #define MRLCOMM_VERSION         40
@@ -25,7 +28,8 @@
  * It has an update() which is called each loop to do any necessary processing
  * 
 */
-class MrlComm{
+class MrlComm
+{
   private:
     /**
      * "global var"
@@ -34,7 +38,7 @@ class MrlComm{
     LinkedList<Device*> deviceList;
 
     // list of pins currently being read from - can contain both digital and analog
-    LinkedList<Pin*> pinList;
+    //LinkedList<Pin*> pinList;
 
     // MRLComm message buffer and current count from serial port ( MAGIC | MSGSIZE | FUNCTION | PAYLOAD ...
     //unsigned char ioCmd[MAX_MSG_SIZE];  // message buffer for all inbound messages
@@ -57,14 +61,17 @@ class MrlComm{
     unsigned long lastHeartbeatUpdate;
     unsigned int customMsg[MAX_MSG_SIZE];
     int customMsgSize;
+    unsigned long long processTime;
+
+    
     void softReset();
     int getFreeRam();
     void publishError(int type);
     void publishError(int type, String message);
     void publishCommandAck(int function);
     void publishAttachedDevice(int id, int nameSize, unsigned char* name);
-    void setPWMFrequency(int address, int prescalar);
-    void setSerialRate();
+    //void setPWMFrequency(int address, int prescalar);
+    //void setSerialRate();
     void deviceAttach(unsigned char* ioCmd);
     void deviceDetach(int id);
     Device* getDevice(int id);
@@ -72,15 +79,51 @@ class MrlComm{
     void update();
 
   public:
+    // Normalement il faudrait coder des get pour obtenir
+    // les valeurs mais j'ai peur au débordement de pile...
     unsigned long loopCount; // main loop count
+    boolean inmoovIsOn;
+    boolean wakeUp;
+    boolean shutdownPC;
+    boolean servoIsEnable;
+    boolean watchDogIsEnable;
+    long watchdogCpt;
+    byte rVal;
+    byte gVal;
+    byte bVal;
+    int animRequest;
+    boolean openJawRequest;
+    boolean servoDetachIsRequest;
+    int8_t volAudio;
+    int bat1Val;
+    int bat2Val;
+    float bat1Value;
+    float bat2Value;
+    boolean max9744IsOK;
+    boolean updateAudio;
+    byte servoMin;
+    byte servoMax;
+
     MrlComm();
     ~MrlComm();
+    
     void publishBoardStatus();
     void publishVersion();
     void publishBoardInfo();
     void readCommand();
     void processCommand(int ioType);
     void updateDevices();
+
+    void setInmoovIsOn(boolean val);
+    void setShutdownPC(boolean val);
+    void setWakeUp(boolean val);
+    void setDetachRequest(boolean val);
+    void setServoEnable(boolean val);
+    void enableAudio();
+    void disableAudio();
+    void setMuteOn();
+    void setMuteOff();
+    
     unsigned int getCustomMsg();
     int getCustomMsgSize();
 };

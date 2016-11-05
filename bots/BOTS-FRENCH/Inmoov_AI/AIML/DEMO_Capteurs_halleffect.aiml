@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aiml>
+
+<!-- PETITE DEMO D INTERACTION AVEC DES SENSEURS BASES SUR EFFET HALL
+Si il y a de la resistance ( et la résistance c'est importnant :) )nous pouvons l'observer via ces capteurs
+pour le démo exemple PREND CETTE POMME / PREND CETTE BALLE etc...
+-->
+  <category>
+    <pattern># POMME #</pattern>
+    <template>
+		
+		<think><set name="what_is_the_thing_I_take"><star/></set></think>
+		  <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>StartSensorDemo()</param>
+        </mrl>
+      </oob>
+   
+    </template>
+  </category> 
+  
+        <category>
+    <pattern># POMMES #</pattern>
+    <template>
+		
+	 <srai># POMME #</srai>
+   
+    </template>
+  </category> 
+  
+
+    <category>
+    <pattern># CAPTEURS #</pattern>
+    <template>
+		
+	 <li>Je ne suis pas un animal de foire. Ce sont des capteurs qui mesurent l'intensité du courant, et donc de la force exercée</li>
+   
+    </template>
+  </category> 
+  
+      <category>
+    <pattern># CAPTEUR #</pattern>
+    <template>
+		
+	 <srai># CAPTEURS #</srai>
+   
+    </template>
+  </category> 
+  
+  
+   <topic name="demohallsensors">
+   <category>
+    <pattern>TU SAIS CE QUE C EST #</pattern>
+    <template>
+
+	   <srai>c est quoi une <get name="what_is_the_thing_I_take"/></srai>
+   
+    </template>
+  </category> 
+  </topic>
+  
+</aiml>
+

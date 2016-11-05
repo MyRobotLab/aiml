@@ -1,25 +1,29 @@
 #EN : SHUTDOWN THE EAR ACTION AFTER 1mn INACTIVITY
-#FR : ON COUPE VIRTUELEMENT LE MICRO APRES 1 MINUTE
+#FR : ON COUPE VIRTUELEMENT LE MICRO APRES 1 MINUTE ( mode pause )
 StopListenTimer = Runtime.create("StopListenTimer","Clock")
 StopListenTimer.setInterval(60000)
 StopListenTimer = Runtime.start("StopListenTimer","Clock")
 
 def StopListenTimerFunc(timedata):
-	global IcanEarOnlyKnowsWords
-	global RobotIsSleepingSoft
-	IcanEarOnlyKnowsWords=IcanEarOnlyKnowsWords+1
-	print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
-	if IcanEarOnlyKnowsWords==1:
-		print "Sleeping mode ON"
-		RobotIsSleepingSoft=1
-		try:
-			clockPaupiere.stopClock()
-		except: 
-			pass
-		PositionPaupiere(90,90,0.4)
-		sleep(3)
-		PaupiereAttach(0)
-		rest()
+	global PleaseRobotDontSleep
+	if PleaseRobotDontSleep==0:
+		global IcanEarOnlyKnowsWords
+		global RobotIsSleepingSoft
+		IcanEarOnlyKnowsWords=IcanEarOnlyKnowsWords+1
+		if DEBUG==1:
+			print "dbg : IcanEarOnlyKnowsWords=",IcanEarOnlyKnowsWords
+		if IcanEarOnlyKnowsWords==1:
+			print "Sleeping mode ON"
+			RobotIsSleepingSoft=1
+			try:
+				clockPaupiere.stopClock()
+			except: 
+				pass
+			PositionPaupiere(90,90,0.4)
+			sleep(3)
+			PaupiereAttach(0)
+			rest()
+			#head.detach()
 		
 	
 
@@ -50,26 +54,26 @@ def LedWebkitListenFunc(timedata):
 LedWebkitListen.addListener("pulse", python.name, "LedWebkitListenFunc")
 # start the clock
 
+# ##############################################################################
+# Timer function to autostart webkit microphone every 10seconds
+# ##############################################################################
+WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
+WebkitSpeachReconitionFix.setInterval(15000)
 
 def WebkitSpeachReconitionON(timedata):
 	global LedWebkitListenFuncFix
 	global Ispeak
 	if Ispeak==0:
-		try:
-			ear.stopListening()
-			sleep(0.3)
-			ear.startListening()
-			Light(1,1,0)
-			LedWebkitListenFuncFix=0
-			LedWebkitListen.startClock()
-			
-		except: 
-			pass
-			
+		ear.resumeListening()
+		LedWebkitListenFuncFix=0
+		LedWebkitListen.startClock()
+		Light(1,1,0)
+
+WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")			
 
 #RANDOM TIME ACTIONS
 VieAleatoire = Runtime.start("VieAleatoire","Clock")
-VieAleatoire.setInterval(60000)
+VieAleatoire.setInterval(120000)
 chatBot.getResponse("SAVEPREDICATES")
 global TimeNoSpeak
 TimeNoSpeak="OFF"
@@ -82,7 +86,7 @@ def OnBalanceUnePhare_Aleatoire(timedata):
 	if RobotIsStarted==1:
 		RamdomSpeak=1
 	
-	VieAleatoire.setInterval(random.randint(60000,600000))
+	VieAleatoire.setInterval(random.randint(220000,700000))
 	if TimeNoSpeak=="ON":
 		if random.randint(0,1)==1:
 			chatBot.getResponse("ALEATOIRE")
@@ -101,3 +105,49 @@ def TuTeTais_OuPas(value):
 VieAleatoire.addListener("pulse", python.name, "OnBalanceUnePhare_Aleatoire")
 # start the clock
 VieAleatoire.startClock()
+
+# Timer pour le watchdog
+# Envoie un refresh watchdog toutes les 2s
+def sendRefresh(timedata):
+  watchdogRefresh()
+  
+watchdogTimer = Runtime.start("watchdogTimer","Clock")
+watchdogTimer.setInterval(5000)
+watchdogTimer.addListener("pulse", python.name, "sendRefresh")
+
+def startWatchdogTimer():
+  watchdogTimer.startClock()
+
+#generic timeout function used in some loops to prevent infinite :)
+TimoutTimer = Runtime.start("TimoutTimer","Clock")
+TimoutTimer.setInterval(60000)
+
+def TimoutTimerFunc(timedata):
+	global TimoutVar
+	TimoutVar+=1
+	if TimoutVar==1:
+		TimoutTimer.stopClock()
+	
+TimoutTimer.addListener("pulse", python.name, "TimoutTimerFunc")
+
+#makerfaire matt move head random twice a minute
+MoveHeadRandomEveryMinute= Runtime.start("MoveHeadRandomEveryMinute","Clock")
+MoveHeadRandomEveryMinute.setInterval(11000)
+
+global MoveHeadRandomEveryMinuteVar
+MoveHeadRandomEveryMinuteVar=1
+def MoveHeadRandomEveryMinuteFunc(timedata):
+	global MoveHeadRandomEveryMinuteVar
+	global Ispeak
+	
+	if  Ispeak==0 and MoveHeadRandomEveryMinuteVar==0:
+		MoveHeadRandomEveryMinuteVar=1
+		MoveHeadTimer.stopClock()
+		
+	if Ispeak==0 and MoveHeadRandomEveryMinuteVar==1 and random.randint(1,3)==3:
+		MoveHeadRandomEveryMinuteVar=0
+		MoveHeadTimer.startClock()
+		
+	MoveHeadRandomEveryMinute.setInterval(random.randint(8000,11000))
+		
+MoveHeadRandomEveryMinute.addListener("pulse", python.name, "MoveHeadRandomEveryMinuteFunc")

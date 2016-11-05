@@ -167,6 +167,9 @@
 #define BOARD_TYPE_ID_MEGA    1
 #define BOARD_TYPE_ID_UNO     2
 
+#define BOARD BOARD_TYPE_ID_UNO
+
+/*
 #if defined(ARDUINO_AVR_MEGA2560) || defined(ARDUINO_AVR_ADK)
   #define BOARD BOARD_TYPE_ID_MEGA
 #elif defined(ARDUINO_AVR_UNO)
@@ -174,5 +177,6 @@
 #else
   #define BOARD BOARD_TYPE_ID_UNKNOWN
 #endif
+*/
 
 #endif

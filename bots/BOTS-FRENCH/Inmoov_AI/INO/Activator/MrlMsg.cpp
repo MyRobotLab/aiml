@@ -139,7 +139,8 @@ void MrlMsg::sendMsg() {
  *
  */
 
-void MrlMsg::publishDebug(String message){
+void MrlMsg::publishDebug(String message)
+{
   // NOTE-KW:  If this method gets called excessively I have seen memory corruption in the
   // arduino where it seems to be getting a null string passed in as "message"
   // very very very very very odd..  I suspect a bug in the arduino hardware/software
@@ -153,7 +154,8 @@ void MrlMsg::publishDebug(String message){
  * MAGIC_NUMBER|2|PUBLISH_MRLCOMM_ERROR|ERROR_CODE
  */
 // KW: remove this, force an error message.
-void MrlMsg::publishError(int type) {
+void MrlMsg::publishError(int type) 
+{
   MrlMsg msg(PUBLISH_MRLCOMM_ERROR);
   msg.addData(type);
   msg.sendMsg();
@@ -162,14 +164,16 @@ void MrlMsg::publishError(int type) {
  * Send an error message along with the error code
  *
  */
-void MrlMsg::publishError(int type, String message) {
+void MrlMsg::publishError(int type, String message) 
+{
   MrlMsg msg(PUBLISH_MRLCOMM_ERROR);
   msg.addData(type);
   msg.addData(message);
   msg.sendMsg();
 }
 
-void MrlMsg::autoSend(int value){
+void MrlMsg::autoSend(int value)
+{
   auto_send = value;
 }
 
