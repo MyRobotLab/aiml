@@ -38,7 +38,7 @@
 # version X.Y.Z X=critical : verification to tell users they must do an update
 # Y=evolution
 # Z=Github push or Bug correction
-version='2.1.8'
+version='2.2.0'
 print "DEBUG , InmoovAI version : ",version
 version=str(version[0])
 
@@ -82,6 +82,9 @@ global BatteryElectValue
 BatteryElectValue=0
 global BatteryMotorValue
 BatteryMotorValue=0
+
+
+
 global AudioVolume
 AudioVolume=30
 global TimoutVar
@@ -357,3 +360,20 @@ NeoPixelAnimation(0)
 #matt makefaire a finaliser si mise en prod
 #MoveHeadRandomEveryMinute.startClock()
 
+# ##############################################################################
+# A DEPLACER AU BON ENDROIT
+# ##############################################################################
+#test
+BatteryElectValue=11520
+BatteryMotorValue=3205
+#fin test
+BatteryElectValueRounded=int(round((int(BatteryElectValue)/1000)))
+BatteryMotorValueRounded=int(round((int(BatteryMotorValue)/1000)))
+chatBot.setPredicate("default","BatteryElectValue",str(BatteryElectValue))
+chatBot.setPredicate("default","BatteryMotorValue",str(BatteryMotorValue))
+chatBot.setPredicate("default","BatteryElectValueRounded",str(BatteryElectValueRounded))
+chatBot.setPredicate("default","BatteryMotorValueRounded",str(BatteryMotorValueRounded))
+print BatteryElectValueRounded," ",BatteryMotorValueRounded
+# ##############################################################################
+# FIN A DEPLACER
+# ##############################################################################
