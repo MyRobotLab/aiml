@@ -1,5 +1,5 @@
-#ifndef MrlComm_h
-#define MrlComm_h
+#ifndef ActMrlComm_h
+#define ActMrlComm_h
 
 #include <EEPROM.h>
 #include "ArduinoMsgCodec.h"
@@ -28,7 +28,7 @@
  * It has an update() which is called each loop to do any necessary processing
  * 
 */
-class MrlComm
+class ActMrlComm
 {
   private:
     /**
@@ -63,7 +63,6 @@ class MrlComm
     int customMsgSize;
     unsigned long long processTime;
 
-    
     void softReset();
     int getFreeRam();
     void publishError(int type);
@@ -79,11 +78,8 @@ class MrlComm
     void update();
 
   public:
-    // Normalement il faudrait coder des get pour obtenir
-    // les valeurs mais j'ai peur au débordement de pile...
     unsigned long loopCount; // main loop count
     boolean inmoovIsOn;
-    boolean wakeUp;
     boolean shutdownPC;
     boolean servoIsEnable;
     boolean watchDogIsEnable;
@@ -95,17 +91,16 @@ class MrlComm
     boolean openJawRequest;
     boolean servoDetachIsRequest;
     int8_t volAudio;
-    int bat1Val;
-    int bat2Val;
-    float bat1Value;
-    float bat2Value;
     boolean max9744IsOK;
     boolean updateAudio;
     byte servoMin;
     byte servoMax;
+    int sendValueRequest;
+    boolean servoPowerIsOn;
+    boolean servoControlRequest;
 
-    MrlComm();
-    ~MrlComm();
+    ActMrlComm();
+    ~ActMrlComm();
     
     void publishBoardStatus();
     void publishVersion();
@@ -114,18 +109,10 @@ class MrlComm
     void processCommand(int ioType);
     void updateDevices();
 
-    void setInmoovIsOn(boolean val);
-    void setShutdownPC(boolean val);
-    void setWakeUp(boolean val);
-    void setDetachRequest(boolean val);
-    void setServoEnable(boolean val);
     void enableAudio();
     void disableAudio();
     void setMuteOn();
     void setMuteOff();
-    
-    unsigned int getCustomMsg();
-    int getCustomMsgSize();
 };
 
 #endif

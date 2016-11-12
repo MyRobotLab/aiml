@@ -15,7 +15,7 @@
  *                                                                 *
  * Librairies utilisées :                                          *
  *                                                                 *
- * Timer2, Adafruit_NeoPixel, Servo, Wire.                         *
+ * Adafruit_NeoPixel, Servo, Wire.                                 *
  *                                                                 *
  * Compilateur : Arduino version 1.6.12                            *
  *                                                                 *
@@ -55,7 +55,7 @@
  * 13/10/2016 | D. Gyselinck  | V0.8.0 beta test                   *
  *     - Ajout animation pendant le démarrage du PC                *
  * 21/10/2016 | D. Gyselinck  | V1.0.0 beta test                   *
- *     - Refonte total du programme avec le protocole MrlComm      *
+ *     - Refonte total du programme avec le protocole actMrlComm   *
  * 25/10/2016 | D. Gyselinck  | V1.1.0 release                     *
  *     - Paramètre min et max du servo en EEPROM                   *
  *     - Correction de bug                                         *
@@ -66,23 +66,47 @@
  * 31/10/2016 | D. Gyselinck  | V1.3.0 release                     *
  *     - Correction bug NeoRing fonction de l'audio                *
  *     - Correction bug servo Jaw en fonction de l'audio           *
+ * 12/11/2016 | D. Gyselinck  | V1.4.0 release                     *
+ *     - Controle de l'alimentation des servos par Python          *
+ *     - Choix de la couleur des pixels au sommeil (a mettre dans  *
+ *       le define)                                                *
+ *     - Suppression du timer2 car l'interruption perturber la com *
  *                                                                 *
  *                                                                 *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include <avr/power.h>
+#include <avr/sleep.h>
+#include <avr/wdt.h>
+
 #include <Adafruit_NeoPixel.h>
-#ifdef __AVR__
-  #include <avr/power.h>
-#endif
-#include <MsTimer2.h>
 #include <Servo.h> 
 #include <Wire.h> 
-#include "MrlComm.h"
+
+#include "ActMrlComm.h"
 
 // Numéro de version Activator
 #define V1                  1
-#define V2                  3
+#define V2                  4
 #define V3                  0
+
+// Couleur du ring pendant le sommeil
+// 0 = noir
+// 1 = jaune
+// 2 = rouge
+// 3 = vert
+// 4 = bleu
+// 5 = cyan
+// 6 = rose
+// 7 = blanc
+#define PIXEL_COLOR         4
+
+// Puissance d'éclairement pendant le sommeil
+// supérieur à 5 et inférieur à 255
+#define COLOR_POWER         80
+
+// Tension de référence AREF en mV
+#define REF_VOLTAGE         4000
 
 // Définition des pins du nano
 #define PRESENCE_SENSOR_PIN 2    // PIN D2
@@ -95,7 +119,6 @@
 #define PC_POWER_PIN        12   // PIN D12
 #define LED_VEILLEUSE       13   // PIN D13
 
-
 // Valeur par défaut sauvegardé en EEPROM
 // Min et max du servo à régler en fonction de InMoov
 #define SERVO_MIN           30  // Bouche fermé
@@ -106,8 +129,8 @@
 #define NUMPIXELS           16
 
 // Définition des seuils à partir duquel on signal l'erreur batterie
-#define BAT1_SEUIL          1000
-#define BAT2_SEUIL          1000
+#define BAT1_SEUIL          12050
+#define BAT2_SEUIL          6050
 
 // Adresse I2C du MAX9744
 #define MAX9744_I2CADDR     0x4B
@@ -116,26 +139,24 @@
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, NEO_PIN, NEO_GRB + NEO_KHZ800);
 // Déclaration de l'objet servo
 Servo jawServo;
-// Objet static MrlComm
-MrlComm mrlComm;
+// Objet static actMrlComm
+ActMrlComm actMrlComm;
 
 // Déclaration des variables globals
 int sensorVal = 0;
 int audioVal = 0;
 int seuilVal = 0;
-int cptWait = 0;
-int cptTimer = 0;
 byte srVal = 0;
 byte sgVal = 0;
 byte sbVal = 0;
 
 int cptBat1Failed = 0;
 int cptBat2Failed = 0;
-int icptWait = 0;
-int cptDetach = 0;
+int pixelColorInSleep = 0;
 
 unsigned long long processTime;
 
+boolean wakeUp = false;
 boolean batteryEleIsFailed = false;
 boolean batteryMotIsFailed = false;
 boolean neoState = false;
@@ -144,11 +165,19 @@ boolean bJawIsOpen = false;
 boolean closeRequest = false;
 boolean openRequest = false;
 boolean openJawRequest = false;
+boolean state = false;
 
+float bat1Value = 0.0;
+float bat2Value = 0.0;
+
+// Compteurs
+int cptDetach = 0;
 int pixelCpt = 0;
-int ucCpt = 0;
-int ucCpt1 = 0;
-
+int icptSeconde = 0;
+int iCptVeille = 0;
+int iCpt5 = 0;
+int iCpt100 = 0;
+int iCpt500 = 0;
 
 ///////////////////////////////
 // Déclaration des fonctions //
@@ -158,7 +187,7 @@ int ucCpt1 = 0;
  * Commande du relais bistable de l'électronique générale
  * état ON
  */
-void PowerElecON()
+void PowerElecON(void)
 {
   digitalWrite(ON_ELEC_PIN, HIGH);
   delay(200);
@@ -169,7 +198,7 @@ void PowerElecON()
  * Commande du relais bistable de l'électronique générale
  * état OFF
  */
-void PowerElecOFF()
+void PowerElecOFF(void)
 {
   digitalWrite(OFF_ELEC_PIN, HIGH);
   delay(200);
@@ -180,7 +209,7 @@ void PowerElecOFF()
  * Commande du relais bistable de l'alimentation des moteurs
  * état ON
  */
-void PowerMotON()
+void PowerMotON(void)
 {
   digitalWrite(ON_MOT_PIN, HIGH);
   delay(200);
@@ -191,7 +220,7 @@ void PowerMotON()
  * Commande du relais bistable de l'alimentation des moteurs
  * état OFF
  */
-void PowerMotOFF()
+void PowerMotOFF(void)
 {
   digitalWrite(OFF_MOT_PIN, HIGH);
   delay(200);
@@ -201,7 +230,7 @@ void PowerMotOFF()
 /** 
  * Pulse de démarrage du PC
  */
-void PcPowerPulse()
+void PcPowerPulse(void)
 {
   digitalWrite(PC_POWER_PIN, HIGH);
   delay(1000);
@@ -209,191 +238,173 @@ void PcPowerPulse()
 }
 
 /** 
- * Effectue une mesure de tension des 2 batteries
- * et change l'état du neo ring en conséquence
- * Si veille, flash de la led.
- * Cette procédure est appelée toutes les 100ms
- * par l'interruption du Timer 2
+ * Animation durant le mode veille
+ * Indique que InMoov dort...
  */
-void ProcessTimer()
+void sleepAnimation(int val, int power)
 {
-  static boolean state = false;
-  static int cpt = 0;
-  
   int i, j;
   
-  if ((mrlComm.inmoovIsOn) || (mrlComm.wakeUp))
+  digitalWrite(LED_VEILLEUSE, HIGH);
+
+  for (j = 0; j < power; j++)
   {
-    // Permet de visualiser le mode RUN
-    cpt++;
-    if (cpt >= 5)
+    for (i = 0; i < pixels.numPixels(); i++)
     {
-      cpt = 0;
-      if (state)
+      if (val == 1)
       {
-        digitalWrite(LED_VEILLEUSE, LOW);
-        state = false;
+        pixels.setPixelColor(i, pixels.Color(j,j,0));
+      }
+      else if (val == 2)
+      {
+        pixels.setPixelColor(i, pixels.Color(j,0,0));
+      }
+      else if (val == 3)
+      {
+        pixels.setPixelColor(i, pixels.Color(0,j,0));
+      }
+      else if (val == 4)
+      {
+        pixels.setPixelColor(i, pixels.Color(0,0,j));
+      }
+      else if (val == 5)
+      {
+        pixels.setPixelColor(i, pixels.Color(0,j,j));
+      }
+      else if (val == 6)
+      {
+        pixels.setPixelColor(i, pixels.Color(j,0,j));
+      }
+      else if (val == 7)
+      {
+        pixels.setPixelColor(i, pixels.Color(j,j,j));
       }
       else
       {
-        digitalWrite(LED_VEILLEUSE, HIGH);
-        state = true;
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
       }
-    }
-  }
-
-  if (mrlComm.wakeUp)
-  {
-    // Permet de visualiser le mode RUN
-    pixels.setPixelColor(pixelCpt, pixels.Color(100,0,0));
-    if (pixelCpt == 0)
-    {
-      pixels.setPixelColor(pixels.numPixels() - 1, pixels.Color(0,0,0));
-    }
-    else
-    {
-      pixels.setPixelColor((pixelCpt - 1), pixels.Color(0,0,0));
     }
     pixels.show();
-        
-    pixelCpt++;
-    if (pixelCpt >= pixels.numPixels())
-    {
-      pixelCpt = 0;
-    }
+    delay(10);
   }
+
+  digitalWrite(LED_VEILLEUSE, LOW);
   
-  cptTimer++;
-  if (cptTimer >= 50)
+  for (j = power; j >= 0; j--)
   {
-    cptTimer = 0;
-    
-    // 5s
-    if (mrlComm.inmoovIsOn)
+    for (i = 0; i < pixels.numPixels(); i++)
     {
-      if (mrlComm.watchDogIsEnable)
+      if (val == 1)
       {
-        mrlComm.watchdogCpt++;
-        if (mrlComm.watchdogCpt > 60)
-        {
-          // Aprés 5mn, on a rien reçu
-          // le système est planté...
-          mrlComm.watchdogCpt = 0;
-          
-          // Redémarrage du système...
-          mrlComm.inmoovIsOn = false;
-          mrlComm.wakeUp = false;
-          mrlComm.shutdownPC = false;
-          mrlComm.servoIsEnable = false;
-          mrlComm.animRequest = 0;
-          mrlComm.watchDogIsEnable = false;
-
-          shutdownProcess();
-          delay(5000);
-          startupProcess();
-        }
+        pixels.setPixelColor(i, pixels.Color(j,j,0));
       }
-      
-      // Lecture des valeurs analogiques
-      mrlComm.bat1Val = analogRead(A2);
-      mrlComm.bat2Val = analogRead(A3);
-      
-      // TODO
-      // reglage des seuils en fonction des batteries utilisées
-      
-      /*if (bat1Value < BAT1_SEUIL)
+      else if (val == 2)
       {
-        cptBat1Failed++;
-        if (cptBat1Failed >= 12)
-        {
-          // Aprés 1mn on déclare la batterie vide.
-          batteryEleIsFailed = true;
-        }
+        pixels.setPixelColor(i, pixels.Color(j,0,0));
+      }
+      else if (val == 3)
+      {
+        pixels.setPixelColor(i, pixels.Color(0,j,0));
+      }
+      else if (val == 4)
+      {
+        pixels.setPixelColor(i, pixels.Color(0,0,j));
+      }
+      else if (val == 5)
+      {
+        pixels.setPixelColor(i, pixels.Color(0,j,j));
+      }
+      else if (val == 6)
+      {
+        pixels.setPixelColor(i, pixels.Color(j,0,j));
+      }
+      else if (val == 7)
+      {
+        pixels.setPixelColor(i, pixels.Color(j,j,j));
       }
       else
       {
-        cptBat1Failed = 0;
-        batteryEleIsFailed = false;
-      }
-        
-      if (bat2Value < BAT2_SEUIL)
-      {
-        cptBat2Failed++;
-        if (cptBat2Failed >= 12)
-        {
-          // Aprés 1mn on déclare la batterie vide.
-          batteryMotIsFailed = true;
-        }
-      }
-      else
-      {
-        batteryMotIsFailed = false;
-        cptBat2Failed = 0;
-      }*/
-
-      // Tension batterie en V
-      mrlComm.bat1Value = map(mrlComm.bat1Val, 0, 1023, 0, 4000) / 1000;
-      mrlComm.bat2Value = map(mrlComm.bat2Val, 0, 1023, 0, 4000) / 1000;
-
-      // Gestion de la mise en veille aprés avoir reçu l'ordre du PC
-      if (mrlComm.shutdownPC)
-      {
-        cptWait++;
-        if (cptWait >= 6)
-        {
-          // Aprés 30s, le PC est bien coupé (normalement)
-          
-          // Attention au mise à jour du PC...
-          // A voir si 30s suffit...
-          
-          cptWait = 0;
-          mrlComm.setServoEnable(false);
-          mrlComm.setInmoovIsOn(false);
-          mrlComm.setShutdownPC(false);
-          mrlComm.setWakeUp(false);
-          
-          shutdownProcess();
-        }
-      }
-      else
-      {
-        cptWait = 0;
+        pixels.setPixelColor(i, pixels.Color(0,0,0));
       }
     }
-    else
-    {
-      if (!mrlComm.wakeUp)
-      {
-        cptWait++;
-        if (cptWait >= 2)
-        {
-          cptWait = 0;
-          
-          // Flash de la veilleuse toutes les 5 secondes
-          // Indique que InMoov dort...
-          for (j = 0; j < 80; j++)
-          {
-            for (i = 0; i < pixels.numPixels(); i++)
-            {
-              pixels.setPixelColor(i, pixels.Color(0,0,j));
-            }
-            pixels.show();
-            delay(10);
-          }
-          
-          for (j = 80; j >= 0; j--)
-          {
-            for (i = 0; i < pixels.numPixels(); i++)
-            {
-              pixels.setPixelColor(i, pixels.Color(0,0,j));
-            }
-            pixels.show();
-            delay(10);
-          }
-        }
-      }
-    }
+    pixels.show();
+    delay(10);
   }
+}
+
+/** 
+ * Watchdog Interrupt Service est exécité lors d'un timeout du WDT
+ */
+ISR(WDT_vect) 
+{
+  sleepAnimation(pixelColorInSleep, COLOR_POWER);
+}
+
+/** 
+ * Initialisation du watchdog sur 8s
+ */
+void setup_watchdog(void) 
+{
+  // Clear the reset flag.
+  MCUSR &= ~(1<<WDRF);
+  // In order to change WDE or the prescaler, we need to
+  // set WDCE (This will allow updates for 4 clock cycles).
+  WDTCSR |= (1<<WDCE) | (1<<WDE);
+  // set new watchdog timeout prescaler value 8s
+  WDTCSR = 1<<WDP0 | 1<<WDP3;
+  // Enable the WD interrupt (note no reset).
+  WDTCSR |= _BV(WDIE);
+}
+
+/** 
+ * Interruption présence ou bouton
+ */
+void presenceSensorInterrupt(void)
+{
+  // Désactive toutes les interruptions
+  cli();
+  
+  delay(50);
+  
+  wakeUp = false;
+  
+  // 2éme lecture pour être sur que l'on veux
+  // réveiller InMoov...
+  if (digitalRead(PRESENCE_SENSOR_PIN) == LOW)
+  {
+    // Démarrage...
+    wakeUp = true;
+  }
+  else
+  {
+    // Réactive toutes les interruptions
+    sei();
+  }
+}
+
+/** 
+ * Mets le processeur en mode sommeil
+ */
+void sleepNow(void) 
+{
+  // Activation du mode veille
+  set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+  sleep_enable();
+ 
+  // Interruption quand D2 passe à 0
+  attachInterrupt(0, presenceSensorInterrupt, LOW); 
+  // Interruption watchdog
+  setup_watchdog(); 
+
+  // Mode veille, le microcontroleur ne tourne plus
+  sleep_mode();
+
+  // Réveille
+  sleep_disable();
+  // Désactive l'interruption de D2
+  detachInterrupt(0);
+  // Désactive le watchdog
+  wdt_disable();
 }
 
 /** 
@@ -405,7 +416,7 @@ void ProcessTimer()
  * le débordement aura lieu dans:
  * 584 942 417 années, 129 jours, 14 heures, 25 minutes, 51 secondes et 616 millisecondes
  */
-unsigned long long superMillis() 
+unsigned long long superMillis(void) 
 {
   static unsigned long nbRollover = 0;
   static unsigned long previousMillis = 0;
@@ -424,20 +435,94 @@ unsigned long long superMillis()
 }
 
 /** 
+ * Input a value 0 to 255 to get a color value.
+ * The colours are a transition r - g - b - back to r.
+ */
+uint32_t Wheel(byte WheelPos) 
+{
+  if (WheelPos < 85) 
+  {
+    return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+  } 
+  else if (WheelPos < 170) 
+  {
+    WheelPos -= 85;
+    return pixels.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  } 
+  else 
+  {
+    WheelPos -= 170;
+    return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+}
+
+/** 
+ * Ecriture de la première config en EEPROM
+ */
+boolean writeFirstConfig(void)
+{
+  if (EEPROM.read(0) != 0xAA)
+  {
+    // La config n'a jamais été sauvegardé
+    EEPROM.write(0, 0xAA);
+    
+    // Version
+    EEPROM.write(1, V1);
+    EEPROM.write(2, V2);
+    EEPROM.write(3, V3);
+    
+    // Valeur min/max de la bouche
+    EEPROM.write(10, actMrlComm.servoMin);
+    EEPROM.write(11, actMrlComm.servoMax);
+    EEPROM.write(12, pixelColorInSleep);
+  }
+}
+
+/** 
+ * Lecture de la config EEPROM
+ */
+void readConfig(void)
+{
+  actMrlComm.servoMin = EEPROM.read(10);
+  actMrlComm.servoMax = EEPROM.read(11);
+  pixelColorInSleep = EEPROM.read(12);
+}
+
+/** 
+ * Réglage du volume audio MAX9744
+ */
+boolean setVolume(int8_t v) 
+{
+  // cant be higher than 63 or lower than 0
+  if (v > 63) v = 63;
+  if (v < 0) v = 0;
+  
+  Wire.beginTransmission(MAX9744_I2CADDR);
+  Wire.write(v);
+
+  if (Wire.endTransmission() == 0)
+    return true;
+  else
+    return false;
+}
+
+/** 
  * Gestion du démarrage de InMoov
  * Active les 2 batteries, allume le PC.
  * A ce stade, on attend une confirmation d'une commande PC allumé.
  */
-void startupProcess()
+void startupProcess(void)
 {
   int i = 0;
   
   digitalWrite(LED_VEILLEUSE, HIGH);
-  
-  // Pas besoin du timer pendant le startup
-  MsTimer2::stop(); 
-
   // Utilisation du ring pour visualiser l'état de l'avancement
+  for (i = 0; i < pixels.numPixels(); i++)
+  {
+    pixels.setPixelColor(i, pixels.Color(0,0,0));
+  }
+  pixels.show();
+
   // Etape 1
   for (i = 0; i < 4; i++)
   {
@@ -445,8 +530,18 @@ void startupProcess()
   }
   pixels.show();
 
-  // Alimentation des moteurs
-  PowerMotON();
+  // Reférence externe à 4V pour ADC
+  analogReference(EXTERNAL);  // AREF
+  // Démarrage I2C
+  Wire.begin();
+  actMrlComm.max9744IsOK = false;
+  
+  // Vérifie la présence du module audio
+  // en mettant le volume par défaut
+  if (setVolume(actMrlComm.volAudio)) 
+  {
+    actMrlComm.max9744IsOK = true;
+  }
   delay(2000);
 
   // Etape 2
@@ -481,10 +576,10 @@ void startupProcess()
   // Ferme la bouche
   jawServo.attach(JAW_SERVO_PIN);
   jawServo.write(SERVO_MIN);
-  mrlComm.setDetachRequest(true);
-
+  actMrlComm.servoDetachIsRequest = true;
   delay(2000);
-  // Etape 5
+  
+  // Etape 4
   for (i = 0; i < pixels.numPixels(); i++)
   {
     pixels.setPixelColor(i, pixels.Color(0,0,0));
@@ -492,15 +587,15 @@ void startupProcess()
   pixels.show();
 
   // réveil du module audio
-  mrlComm.enableAudio();
+  actMrlComm.enableAudio();
   // Coupe la sortie audio pendant le démarrage du PC
-  mrlComm.setMuteOn();
+  actMrlComm.setMuteOn();
 
   // Fin du startup
   digitalWrite(LED_VEILLEUSE, LOW);
-  MsTimer2::start(); 
-
-  mrlComm.setWakeUp(true);
+  // Init timing
+  processTime = superMillis();
+  wakeUp = true;
   pixelCpt = 0;
 }
 
@@ -509,7 +604,7 @@ void startupProcess()
  * Le PC s'éteint tout seul.
  * Coupure des batteries.
  */
-void shutdownProcess()
+void shutdownProcess(void)
 {
   int i = 0;
   
@@ -550,93 +645,160 @@ void shutdownProcess()
   }
   pixels.show();
 
-  mrlComm.disableAudio();
+  actMrlComm.disableAudio();
 
   // Fin du shutdown
   digitalWrite(LED_VEILLEUSE, LOW);
+  wakeUp = false;
 }
 
 /** 
- * Input a value 0 to 255 to get a color value.
- * The colours are a transition r - g - b - back to r.
+ * Gestion du servo et du ring en fonction de l'audio
  */
-uint32_t Wheel(byte WheelPos) 
+void ProcessJaw(void)
 {
-  if (WheelPos < 85) 
-  {
-    return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
-  } 
-  else if (WheelPos < 170) 
-  {
-    WheelPos -= 85;
-    return pixels.Color(255 - WheelPos * 3, 0, WheelPos * 3);
-  } 
-  else 
-  {
-    WheelPos -= 170;
-    return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
-  }
-}
-
-/** 
- * Ecriture de la première config en EEPROM
- */
-boolean writeFirstConfig()
-{
-  if (EEPROM.read(0) != 0xAA)
-  {
-    // La config n'a jamais été sauvegardé
-    EEPROM.write(0, 0xAA);
-    
-    // Version
-    EEPROM.write(0, V1);
-    EEPROM.write(1, V2);
-    EEPROM.write(2, V3);
-    
-    // Valeur min/max de la bouche
-    EEPROM.write(10, mrlComm.servoMin);
-    EEPROM.write(11, mrlComm.servoMax);
-  }
-}
-
-/** 
- * Lecture de la config EEPROM
- */
-void readConfig()
-{
-  mrlComm.servoMin = EEPROM.read(10);
-  mrlComm.servoMax = EEPROM.read(11);
-}
-
-/** 
- * Réglage du volume audio MAX9744
- */
-boolean setVolume(int8_t v) 
-{
-  // cant be higher than 63 or lower than 0
-  if (v > 63) v = 63;
-  if (v < 0) v = 0;
+  static int iCpt = 0;
   
-  if (mrlComm.max9744IsOK)
+  // Gestion du servo de la bouche
+  if (actMrlComm.servoIsEnable)
   {
-    Wire.beginTransmission(MAX9744_I2CADDR);
-    Wire.write(v);
+    // Lecture des valeurs analogiques audios
+    audioVal = analogRead(A0);
+    seuilVal = analogRead(A1);
+    
+    // Convertion en mV
+    audioVal = map(audioVal, 0, 1023, 0, REF_VOLTAGE);
+    seuilVal = map(seuilVal, 0, 1023, 0, REF_VOLTAGE);
+    
+    // Ajout d'un test pour éviter les erreurs
+    // Le niveau audio doit être supérieur à 800mv
+    if ((audioVal > 800) && (audioVal > seuilVal))
+    {
+      if (!bJawIsOpen)
+      {
+        bJawIsOpen = true;
+        
+        // Pour le ring
+        srVal = actMrlComm.rVal;
+        sgVal = actMrlComm.gVal;
+        sbVal = actMrlComm.bVal;
+        actMrlComm.rVal = 200;
+        actMrlComm.gVal = 200;
 
-    if (Wire.endTransmission() == 0)
-      return true;
+        jawServo.attach(JAW_SERVO_PIN);
+        jawServo.write(SERVO_AUDIO_MAX);
+      }
+    }
     else
-      return false;
+    {
+      if (bJawIsOpen)
+      {
+        bJawIsOpen = false;
+        
+        // Pour le ring
+        actMrlComm.rVal = srVal;
+        actMrlComm.gVal = sgVal;
+        actMrlComm.bVal = sbVal;
+
+        closeRequest = true;
+      }
+    }
+    
+    if (closeRequest)
+    {
+      iCpt++;
+      if (iCpt >= 20)
+      {
+        iCpt = 0;
+        jawServo.attach(JAW_SERVO_PIN);
+        jawServo.write(actMrlComm.servoMin);
+        closeRequest = false;
+        actMrlComm.servoDetachIsRequest = true;
+      }
+    }
   }
   else
   {
-    return false;
+    if (actMrlComm.openJawRequest)
+    {
+      if (!bJawIsOpen)
+      {
+        jawServo.attach(JAW_SERVO_PIN);
+        jawServo.write(actMrlComm.servoMax);
+        bJawIsOpen = true;
+        actMrlComm.servoDetachIsRequest = true;
+      }
+    }
+    else
+    {
+      if (bJawIsOpen)
+      {
+        jawServo.attach(JAW_SERVO_PIN);
+        jawServo.write(actMrlComm.servoMin);
+        bJawIsOpen = false;
+        //actMrlComm.servoIsEnable = true;
+        actMrlComm.servoDetachIsRequest = true;
+      }
+    }
+  }
+}
+
+/** 
+ * Lecture de la tension batterie et test des niveaux
+ */
+void ProcessBattery(void)
+{
+  unsigned int bat1Val;
+  unsigned int bat2Val;
+
+  // Lecture des valeurs analogiques
+  bat1Val = analogRead(A2);
+  bat2Val = analogRead(A3);
+
+  // Tension batterie en mV
+  bat1Value = map(bat1Val, 0, 1023, 0, REF_VOLTAGE);
+  bat2Value = map(bat2Val, 0, 1023, 0, REF_VOLTAGE);
+  // Prise en compte du diviseur de tension
+  // Pour la batterie1 12V: V = 0.3125U
+  // Pour la batterie2 6V: V = 0.617U
+  bat1Value = 12100;//(actMrlComm.bat1Value / 0.3125);
+  bat2Value = 6100;//(actMrlComm.bat2Value / 0.383);
+  
+  if (bat1Value <= BAT1_SEUIL)
+  {
+    cptBat1Failed++;
+    if (cptBat1Failed >= 12)
+    {
+      // Aprés 1mn on déclare la batterie vide.
+      batteryEleIsFailed = true;
+    }
+  }
+  else
+  {
+    cptBat1Failed = 0;
+    batteryEleIsFailed = false;
+  }
+    
+  if (bat2Value <= BAT2_SEUIL)
+  {
+    cptBat2Failed++;
+    if (cptBat2Failed >= 12)
+    {
+      // Aprés 1mn on déclare la batterie vide.
+      batteryMotIsFailed = true;
+    }
+  }
+  else
+  {
+    batteryMotIsFailed = false;
+    cptBat2Failed = 0;
   }
 }
 
 /** 
  * Initialisation du programme
  */
-void setup() 
+void setup(void) 
 {
   // Config des pins numériques en sortie
   pinMode(ON_ELEC_PIN, OUTPUT);  
@@ -648,10 +810,8 @@ void setup()
   pinMode(JAW_SERVO_PIN, OUTPUT);
   pinMode(MAX9744_SHTDOWN_PIN, OUTPUT);
   pinMode(MAX9744_MUTE_PIN, OUTPUT);
-  
   // Config des pins numériques en entrées
   pinMode(PRESENCE_SENSOR_PIN, INPUT_PULLUP);
-
   // Reférence externe à 4V pour ADC
   analogReference(EXTERNAL);  // AREF
   
@@ -666,312 +826,267 @@ void setup()
   // Eteint tout les pixels.
   pixels.show();
 
-  // Initialisation interruption Timer 2
-  // période 100ms 
-  MsTimer2::set(100, ProcessTimer); 
-  // active Timer2 
-  MsTimer2::start(); 
-   
   // Démarrage I2C
   Wire.begin();
-  mrlComm.max9744IsOK = false;
+  actMrlComm.max9744IsOK = false;
   
   // Vérifie la présence du module audio
   // en mettant le volume par défaut
-  if (setVolume(mrlComm.volAudio)) 
+  if (setVolume(actMrlComm.volAudio)) 
   {
-    mrlComm.max9744IsOK = true;
+    actMrlComm.max9744IsOK = true;
   }
   
   // Init des valeurs en EEPROM
-  mrlComm.servoMin = SERVO_MIN;
-  mrlComm.servoMax = SERVO_MAX;
+  actMrlComm.servoMin = SERVO_MIN;
+  actMrlComm.servoMax = SERVO_MAX;
+  pixelColorInSleep = PIXEL_COLOR;
   writeFirstConfig();
   readConfig();
 
-  mrlComm.publishVersion();
-  mrlComm.publishBoardInfo();
-
-  // Init timing
-  processTime = superMillis();
+  actMrlComm.publishVersion();
+  actMrlComm.publishBoardInfo();
+  delay(100);
 
   // Init variables globals
-  mrlComm.inmoovIsOn = false;
-  mrlComm.wakeUp = false;
-  mrlComm.shutdownPC = false;
-  mrlComm.servoIsEnable = false;
-  mrlComm.animRequest = 0;
-  mrlComm.watchDogIsEnable = false;
+  actMrlComm.inmoovIsOn = false;
+  actMrlComm.shutdownPC = false;
+  actMrlComm.servoIsEnable = false;
+  actMrlComm.animRequest = 0;
+  actMrlComm.watchDogIsEnable = false;
+
+  wakeUp = false;
 }
 
 /** 
  * Boucle principal
  */
-void loop() 
+void loop(void) 
 {
   int i = 0;
   int rTemp = 0;
   int bTemp = 0;
   int gTemp = 0;
 
-  // increment how many times we've run
-  // TODO: handle overflow here after 32k runs, i suspect this might blow up?
-  mrlComm.loopCount++;
-  // get a command and process it from the serial port (if available.)
-  mrlComm.readCommand();
-  // update devices
-  //mrlComm.updateDevices();
-  // send back load time and memory
-  mrlComm.publishBoardStatus();
-
-  if (mrlComm.inmoovIsOn)
+  if (!wakeUp)
   {
-    // InMoov est actif
-    ///////////////////
+    // Si pas réveillé, alors on dort...
+    ////////////////////////////////////
+    sleepNow();
 
-    // Gestion du servo de la bouche
-    if (mrlComm.servoIsEnable)
+    if (wakeUp)
     {
-      // Lecture des valeurs analogiques audios
-      audioVal = analogRead(A0);
-      seuilVal = analogRead(A1);
+      startupProcess();
+    }
+  }
+  else
+  {
+    // increment how many times we've run
+    // TODO: handle overflow here after 32k runs, i suspect this might blow up?
+    actMrlComm.loopCount++;
+    // get a command and process it from the serial port (if available.)
+    actMrlComm.readCommand();
+    // update devices
+    //actMrlComm.updateDevices();
+    // send back load time and memory
+    actMrlComm.publishBoardStatus();
+    
+    // Répond à la demande d'informations
+    /////////////////////////////////////
+    if (actMrlComm.sendValueRequest != 0)
+    {
+      actMrlComm.sendValueRequest = 0;
       
-      // Convertion en mv
-      audioVal = map(audioVal, 0, 1023, 0, 4000);
-      seuilVal = map(seuilVal, 0, 1023, 0, 4000);
-      
-      // Ajout d'un test pour éviter les erreurs
-      // Le niveau audio doit être supérieur à 800mv
-      if ((audioVal > 800) && (audioVal > seuilVal))
-      {
-        if (!bJawIsOpen)
-        {
-          bJawIsOpen = true;
-          
-          // Pour le ring
-          srVal = mrlComm.rVal;
-          sgVal = mrlComm.gVal;
-          sbVal = mrlComm.bVal;
-          mrlComm.rVal = 200;
-          mrlComm.gVal = 200;
+      MrlMsg msg(PUBLISH_CUSTOM_MSG);
+      msg.countData();
+      msg.addData16((unsigned int)bat1Value);
+      msg.addData16((unsigned int)bat2Value);
+      msg.addData(actMrlComm.volAudio);
+      msg.sendMsg();
+    }
 
-          jawServo.attach(JAW_SERVO_PIN);
-          jawServo.write(SERVO_AUDIO_MAX);
-        }
+    // Controle de l'alimentation des servos par Python
+    ///////////////////////////////////////////////////
+    if (actMrlComm.servoControlRequest)
+    {
+      actMrlComm.servoControlRequest = false;
+      
+      if (actMrlComm.servoPowerIsOn)
+      {
+        PowerMotON();
       }
       else
       {
-        if (bJawIsOpen)
-        {
-          bJawIsOpen = false;
-          
-          // Pour le ring
-          mrlComm.rVal = srVal;
-          mrlComm.gVal = sgVal;
-          mrlComm.bVal = sbVal;
-
-          closeRequest = true;
-        }
-      }
-      
-      if (closeRequest)
-      {
-        ucCpt++;
-        if (ucCpt >= 20)
-        {
-          ucCpt = 0;
-          jawServo.attach(JAW_SERVO_PIN);
-          jawServo.write(mrlComm.servoMin);
-          closeRequest = false;
-          mrlComm.setDetachRequest(true);
-        }
+        PowerMotOFF();
       }
     }
-    else
+
+    if (actMrlComm.inmoovIsOn)
     {
-      if (mrlComm.openJawRequest)
+      // Gestion du volume audio
+      //////////////////////////
+      if (actMrlComm.updateAudio)
       {
-        if (!bJawIsOpen)
-        {
-          jawServo.attach(JAW_SERVO_PIN);
-          jawServo.write(mrlComm.servoMax);
-          bJawIsOpen = true;
-          mrlComm.setDetachRequest(true);
-        }
+        actMrlComm.updateAudio = false;
+        setVolume(actMrlComm.volAudio);
       }
-      else
-      {
-        if (bJawIsOpen)
-        {
-          jawServo.attach(JAW_SERVO_PIN);
-          jawServo.write(mrlComm.servoMin);
-          bJawIsOpen = false;
-          mrlComm.setServoEnable(true);
-          mrlComm.setDetachRequest(true);
-        }
-      }
+
+      // Gestion de la bouche si InMoov est actif
+      ///////////////////////////////////////////
+      ProcessJaw();
     }
 
-    // Mise à jour du ring
+    // Gestion tous les 10ms
+    ////////////////////////
     if ((superMillis() - processTime) >= 10)
     {
       // Gestion du détachement du servo
       //////////////////////////////////
-      if (mrlComm.servoDetachIsRequest)
+      if (actMrlComm.servoDetachIsRequest)
       {
+        // Détachement du servo aprés 2s
         cptDetach++;
         if (cptDetach >= 200)
         {
           cptDetach = 0; 
           jawServo.detach();
-          mrlComm.setDetachRequest(false);
+          actMrlComm.servoDetachIsRequest = false;
         }
       }
 
-      // Gestion du volume audio
-      //////////////////////////
-      if (mrlComm.updateAudio)
+      if (actMrlComm.inmoovIsOn)
       {
-        mrlComm.updateAudio = false;
-        setVolume(mrlComm.volAudio);
-      }
-      
-      // Les alertes batteries sont prioritaires
-      //////////////////////////////////////////
-      if ((batteryMotIsFailed) && (batteryEleIsFailed))
-      {
-        // Les 2 batteries sont vident
-        //////////////////////////////
-        icptWait++;
-        if (icptWait > 100)
-        {
-          icptWait = 0;
-          if (neoState)
-          {
-            for (i = 0; i < pixels.numPixels(); i++)
-            {
-              pixels.setPixelColor(i, pixels.Color(255,255,255));
-            }
-          }
-          else
-          {
-            for (i = 0; i < pixels.numPixels(); i++)
-            {
-              pixels.setPixelColor(i, pixels.Color(0,0,0));
-            }
-          }
-  
-          pixels.show();
-          neoState = !neoState;
-        }
-      }
-      else if (batteryEleIsFailed)
-      {
-        // La batterie de l'electronique est vide
-        /////////////////////////////////////////
-        icptWait++;
-        if (icptWait > 100)
-        {
-          icptWait = 0;
-          if (neoState)
-          {
-            for (i = 0; i < pixels.numPixels(); i++)
-            {
-              pixels.setPixelColor(i, pixels.Color(255,0,0));
-            }
-          }
-          else
-          {
-            for (i = 0; i < pixels.numPixels(); i++)
-            {
-              pixels.setPixelColor(i, pixels.Color(0,0,0));
-            }
-          }
-  
-          pixels.show();
-          neoState = !neoState;
-        }
-      }
-      else if (batteryMotIsFailed)
-      {
-        // La batterie de la motorisation est vide
+        // Les alertes batteries sont prioritaires
         //////////////////////////////////////////
-        icptWait++;
-        if (icptWait > 100)
+        if ((batteryMotIsFailed) && (batteryEleIsFailed))
         {
-          icptWait = 0;
-          if (neoState)
+          // Les 2 batteries sont vident
+          //////////////////////////////
+          icptSeconde++;
+          if (icptSeconde > 100)
           {
-            for (i = 0; i < pixels.numPixels(); i++)
+            icptSeconde = 0;
+            if (neoState)
             {
-              pixels.setPixelColor(i, pixels.Color(255,150,0));
+              for (i = 0; i < pixels.numPixels(); i++)
+              {
+                pixels.setPixelColor(i, pixels.Color(255,255,255));
+              }
             }
-          }
-          else
-          {
-            for (i = 0; i < pixels.numPixels(); i++)
+            else
             {
-              pixels.setPixelColor(i, pixels.Color(0,0,0));
+              for (i = 0; i < pixels.numPixels(); i++)
+              {
+                pixels.setPixelColor(i, pixels.Color(0,0,0));
+              }
             }
-          }
-  
-          pixels.show();
-          neoState = !neoState;
-        }
-      }
-      else
-      {
-        // Pas de problème batteries
-        ////////////////////////////
-        
-        if (mrlComm.animRequest == 1)
-        {
-          // Animations 1 demandé
-          ///////////////////////
-          for (i = 0; i < pixels.numPixels(); i++) 
-          {
-            pixels.setPixelColor(i, Wheel((i+pixelCpt) & 255));
-          }
-          pixels.show();
-
-          pixelCpt++;
-          if (pixelCpt > 255)
-          {
-            pixelCpt = 0;
+    
+            pixels.show();
+            neoState = !neoState;
           }
         }
-        else if (mrlComm.animRequest == 2)
+        else if (batteryEleIsFailed)
         {
-          // Animations 2 demandées
-          /////////////////////////
-          for (i = 0; i < pixels.numPixels(); i++) 
+          // La batterie de l'electronique est vide
+          /////////////////////////////////////////
+          icptSeconde++;
+          if (icptSeconde > 100)
           {
-            pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + pixelCpt) & 255));
+            icptSeconde = 0;
+            if (neoState)
+            {
+              for (i = 0; i < pixels.numPixels(); i++)
+              {
+                pixels.setPixelColor(i, pixels.Color(255,0,0));
+              }
+            }
+            else
+            {
+              for (i = 0; i < pixels.numPixels(); i++)
+              {
+                pixels.setPixelColor(i, pixels.Color(0,0,0));
+              }
+            }
+    
+            pixels.show();
+            neoState = !neoState;
           }
-          pixels.show();
-
-          pixelCpt++;
-          if (pixelCpt > 255)
+        }
+        else if (batteryMotIsFailed)
+        {
+          // La batterie de la motorisation est vide
+          //////////////////////////////////////////
+          icptSeconde++;
+          if (icptSeconde > 100)
           {
-            pixelCpt = 0;
+            icptSeconde = 0;
+            if (neoState)
+            {
+              for (i = 0; i < pixels.numPixels(); i++)
+              {
+                pixels.setPixelColor(i, pixels.Color(255,150,0));
+              }
+            }
+            else
+            {
+              for (i = 0; i < pixels.numPixels(); i++)
+              {
+                pixels.setPixelColor(i, pixels.Color(0,0,0));
+              }
+            }
+    
+            pixels.show();
+            neoState = !neoState;
           }
         }
         else
         {
-          // Animations par défaut
-          ////////////////////////
-          //icptWait++;
-          //if (icptWait > 5)
-          //{
-            //icptWait = 0;
-            
+          // Pas de problème batteries
+          ////////////////////////////
+          
+          if (actMrlComm.animRequest == 1)
+          {
+            // Animations 1 demandé
+            ///////////////////////
+            for (i = 0; i < pixels.numPixels(); i++) 
+            {
+              pixels.setPixelColor(i, Wheel((i+pixelCpt) & 255));
+            }
+            pixels.show();
+
+            pixelCpt++;
+            if (pixelCpt > 255)
+            {
+              pixelCpt = 0;
+            }
+          }
+          else if (actMrlComm.animRequest == 2)
+          {
+            // Animations 2 demandées
+            /////////////////////////
+            for (i = 0; i < pixels.numPixels(); i++) 
+            {
+              pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + pixelCpt) & 255));
+            }
+            pixels.show();
+
+            pixelCpt++;
+            if (pixelCpt > 255)
+            {
+              pixelCpt = 0;
+            }
+          }
+          else
+          {
+            // Animations par défaut
+            ////////////////////////
             if (neoState)
             {
-              pixels.setPixelColor(pixelCpt, pixels.Color(mrlComm.rVal,mrlComm.gVal,mrlComm.bVal));
+              pixels.setPixelColor(pixelCpt, pixels.Color(actMrlComm.rVal,actMrlComm.gVal,actMrlComm.bVal));
             }
             else
             {
-              if (mrlComm.rVal == 0)
+              if (actMrlComm.rVal == 0)
               {
                 rTemp = 0;
               }
@@ -980,7 +1095,7 @@ void loop()
                 rTemp = 40;
               }
 
-              if (mrlComm.gVal == 0)
+              if (actMrlComm.gVal == 0)
               {
                 gTemp = 0;
               }
@@ -989,7 +1104,7 @@ void loop()
                 gTemp = 40;
               }
               
-              if (mrlComm.bVal == 0)
+              if (actMrlComm.bVal == 0)
               {
                 bTemp = 0;
               }
@@ -1009,32 +1124,127 @@ void loop()
             
             // Mise à jour état des pixels
             pixels.show();
-          //}
+          }
+        }
+      }  // fin de if (actMrlComm.inmoovIsOn)
+
+      // Gestion tous les 100ms
+      /////////////////////////
+      iCpt100++;
+      if (iCpt100 >= 10)
+      {
+        iCpt100 = 0;
+
+        if (!actMrlComm.inmoovIsOn)
+        {
+          // Animation en attendant que l'on reçois la commande PC OK
+          pixels.setPixelColor(pixelCpt, pixels.Color(100,0,0));
+          if (pixelCpt == 0)
+          {
+            pixels.setPixelColor(pixels.numPixels() - 1, pixels.Color(0,0,0));
+          }
+          else
+          {
+            pixels.setPixelColor((pixelCpt - 1), pixels.Color(0,0,0));
+          }
+          pixels.show();
+              
+          pixelCpt++;
+          if (pixelCpt >= pixels.numPixels())
+          {
+            pixelCpt = 0;
+          }
         }
       }
 
-      processTime = superMillis(); 
-    }
-  }
-  else
-  {
-    // InMoov est en veille et n'est pas entrain de se réveiller...
-    ///////////////////////////////////////////////////////////////
-    if (!mrlComm.wakeUp)
-    {
-      // Lit l'état du capteur de présence ou bouton ON
-      if (digitalRead(PRESENCE_SENSOR_PIN) == LOW)
+      // Gestion tous les 500ms
+      /////////////////////////
+      iCpt500++;
+      if (iCpt500 >= 50)
       {
-        delay(50);
-        
-        // 2éme lecture pour éviter les parasites
-        if (digitalRead(PRESENCE_SENSOR_PIN) == LOW)
+        iCpt500 = 0;
+
+        if (actMrlComm.inmoovIsOn)
         {
-          // Démarrage...
-          startupProcess();
+          if (state)
+          {
+            digitalWrite(LED_VEILLEUSE, LOW);
+            state = false;
+          }
+          else
+          {
+            digitalWrite(LED_VEILLEUSE, HIGH);
+            state = true;
+          }
         }
       }
-    }
+      
+      // Gestion tous les 5s
+      //////////////////////
+      iCpt5++;
+      if (iCpt5 >= 500)
+      {
+        iCpt5 = 0;
+
+        if (actMrlComm.inmoovIsOn)
+        {
+          // Lecture tensions batteries
+          /////////////////////////////
+          ProcessBattery();
+          
+          // Gestion du watchdog
+          //////////////////////
+          if (actMrlComm.watchDogIsEnable)
+          {
+            actMrlComm.watchdogCpt++;
+            if (actMrlComm.watchdogCpt > 60)
+            {
+              // Aprés 5mn, on a rien reçu
+              // le système est planté...
+              actMrlComm.watchdogCpt = 0;
+              
+              // Redémarrage du système...
+              actMrlComm.inmoovIsOn = false;
+              actMrlComm.shutdownPC = false;
+              actMrlComm.servoIsEnable = false;
+              actMrlComm.animRequest = 0;
+              actMrlComm.watchDogIsEnable = false;
+
+              shutdownProcess();
+              delay(5000);
+              startupProcess();
+            }
+          }
+
+          // Gestion de la mise en veille aprés avoir reçu l'ordre du PC
+          //////////////////////////////////////////////////////////////
+          if (actMrlComm.shutdownPC)
+          {
+            iCptVeille++;
+            if (iCptVeille >= 6)
+            {
+              // Aprés 30s, le PC est bien coupé (normalement)
+              
+              // Attention au mise à jour du PC...
+              // A voir si 30s suffit...
+              
+              iCptVeille = 0;
+              actMrlComm.inmoovIsOn = false;
+              actMrlComm.servoIsEnable = false;
+              actMrlComm.shutdownPC = false;
+              
+              shutdownProcess();
+            }
+          }
+          else
+          {
+            iCptVeille = 0;
+          }
+        }  // fin de if (actMrlComm.inmoovIsOn)
+      }
+
+      processTime = superMillis(); 
+    }  // fin de if ((superMillis() - processTime) >= 10)
   }
 }
 

@@ -1,10 +1,10 @@
-#include "MrlComm.h"
+#include "ActMrlComm.h"
 
 
 /** 
  * Constructeur
  */
-MrlComm::MrlComm() 
+ActMrlComm::ActMrlComm() 
 {
 	softReset();
 	byteCount = 0;
@@ -21,7 +21,7 @@ MrlComm::MrlComm()
 /** 
  * Destructeur
  */
-MrlComm::~MrlComm() 
+ActMrlComm::~ActMrlComm() 
 {
 	for (unsigned int i = 0; i < (sizeof(mrlCmd) / sizeof(MrlCmd*)); i++) 
   {
@@ -35,7 +35,7 @@ MrlComm::~MrlComm()
 /***********************************************************************
  * UTILITY METHODS BEGIN
  */
-void MrlComm::softReset() 
+void ActMrlComm::softReset() 
 {
 	while (deviceList.size() > 0) 
   {
@@ -80,12 +80,11 @@ void MrlComm::softReset()
   openJawRequest = false;
   servoDetachIsRequest = false;
   volAudio = 31;
-  bat1Val = 0;
-  bat2Val = 0;
-  bat1Value = 0.0;
-  bat2Value = 0.0;
   updateAudio = false;
   watchdogCpt = 0;
+  sendValueRequest = 0;
+  servoPowerIsOn = false;
+  servoControlRequest = false;
 }
 
 /***********************************************************************
@@ -97,7 +96,7 @@ void MrlComm::softReset()
  *
  * MAGIC_NUMBER|7|[loadTime long0,1,2,3]|[freeMemory int0,1]
  */
-void MrlComm::publishBoardStatus() 
+void ActMrlComm::publishBoardStatus() 
 {
 	// protect against a divide by zero in the division.
 	if (publishBoardStatusModulus == 0) 
@@ -124,7 +123,7 @@ void MrlComm::publishBoardStatus()
 	lastMicros = now;
 }
 
-int MrlComm::getFreeRam() 
+int ActMrlComm::getFreeRam() 
 {
 	// KW: In the future the arduino might have more than an 32/64k of ram. an int might not be enough here to return.
 	extern int __heap_start, *__brkval;
@@ -144,7 +143,7 @@ int MrlComm::getFreeRam()
  * Publish the MRLComm message
  * MAGIC_NUMBER|2|MRLCOMM_VERSION
  */
-void MrlComm::publishVersion() 
+void ActMrlComm::publishVersion() 
 {
 	MrlMsg msg(PUBLISH_VERSION);
 	msg.addData(MRLCOMM_VERSION);
@@ -156,7 +155,7 @@ void MrlComm::publishVersion()
  * MAGIC_NUMBER|2|PUBLISH_BOARD_INFO|BOARD
  * return the board type (mega/uno) that can use in javaland for the pin layout
  */
-void MrlComm::publishBoardInfo() 
+void ActMrlComm::publishBoardInfo() 
 {
 	MrlMsg msg(PUBLISH_BOARD_INFO);
 	msg.addData(BOARD);
@@ -167,7 +166,7 @@ void MrlComm::publishBoardInfo()
  * Publish the acknowledgement of the command received and processed.
  * MAGIC_NUMBER|2|PUBLISH_MESSAGE_ACK|FUNCTION
  */
-void MrlComm::publishCommandAck(int function) 
+void ActMrlComm::publishCommandAck(int function) 
 {
 	MrlMsg msg(PUBLISH_MESSAGE_ACK);
 	// the function that we're ack-ing
@@ -181,7 +180,7 @@ void MrlComm::publishCommandAck(int function)
  * PUBLISH_ATTACHED_DEVICE | NEW_DEVICE_INDEX | NAME_STR_SIZE | NAME
  *
  */
-void MrlComm::publishAttachedDevice(int id, int nameSize, unsigned char* name) 
+void ActMrlComm::publishAttachedDevice(int id, int nameSize, unsigned char* name) 
 {
 	MrlMsg msg(PUBLISH_ATTACHED_DEVICE, id);
 	msg.addData(name, nameSize, true);
@@ -191,7 +190,7 @@ void MrlComm::publishAttachedDevice(int id, int nameSize, unsigned char* name)
 /***********************************************************************
  * SERIAL METHODS BEGIN
  */
-void MrlComm::readCommand() 
+void ActMrlComm::readCommand() 
 {
 	for (unsigned int i = 0; i < (sizeof(mrlCmd) / sizeof(MrlCmd*)); i++) 
   {
@@ -211,7 +210,7 @@ void MrlComm::readCommand()
  * processCommand() - once the main loop has read an mrlcomm message from the 
  * serial port, this method will be called.
  */
-void MrlComm::processCommand(int ioType) 
+void ActMrlComm::processCommand(int ioType) 
 {
 	unsigned char* ioCmd = mrlCmd[ioType - 1]->getIoCmd();
   
@@ -225,7 +224,6 @@ void MrlComm::processCommand(int ioType)
 		return;
 	}
   
-	// FIXME - all case X: should have scope operator { } !
 	// MrlMsg::publishDebug("not from Serial:" + String(ioCmd[0]));
 	switch (ioCmd[0]) 
   {
@@ -239,7 +237,6 @@ void MrlComm::processCommand(int ioType)
           if (ioCmd[2] == 1)
           {
             // Le PC est prêt
-            wakeUp = false;
             inmoovIsOn = true;
             shutdownPC = false;
             servoIsEnable = true;
@@ -470,22 +467,19 @@ void MrlComm::processCommand(int ioType)
           watchdogCpt = 0;
           break;
         }
-        case 20:
+        case 18:
         {
-          volAudio = ioCmd[2];
-          updateAudio = true;
-          break;
-        }
-        case 21:
-        {
-          servoMin = ioCmd[2];
-          EEPROM.write(10, servoMin);
-          break;
-        }
-        case 22:
-        {
-          servoMax = ioCmd[2];
-          EEPROM.write(11, servoMax);
+          if (ioCmd[2] == 1)
+          {
+            // Demande l'activation de l'alimentation des servos
+            servoPowerIsOn = true;
+          }
+          else
+          {
+            // Demande l'arrêt de l'alimentation des servos
+            servoPowerIsOn = false;
+          }
+          servoControlRequest = true;
           break;
         }
         default:
@@ -501,81 +495,22 @@ void MrlComm::processCommand(int ioType)
     {
       switch (ioCmd[1])
       {
+        case 0:
+        {
+          volAudio = ioCmd[2];
+          updateAudio = true;
+          break;
+        }
         case 1:
         {
-          // Valeur brut
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          msg.addData16(bat1Val);
-          msg.sendMsg();
+          servoMin = ioCmd[2];
+          EEPROM.write(10, servoMin);
           break;
         }
         case 2:
         {
-          // Valeur brut
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          msg.addData16(bat2Val);
-          msg.sendMsg();
-          break;
-        }
-        case 3:
-        {
-          /* Valeur en volt
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          msg.addData16(bat1Value);
-          msg.sendMsg();*/
-          break;
-        }
-        case 4:
-        {
-          /* Valeur en volt
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          msg.addData16(bat2Value);
-          msg.sendMsg();*/
-          break;
-        }
-        case 10:
-        {
-          // Valeur du volume audio
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          msg.addData(volAudio);
-          msg.sendMsg();
-          break;
-        }
-        case 11:
-        {
-          // Dit si le MAX9744 répond bien
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          if (max9744IsOK)
-          {
-            msg.addData(1);
-          }
-          else
-          {
-            msg.addData(0);
-          }
-          msg.sendMsg();
-          break;
-        }
-        case 20:
-        {
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          msg.addData(servoMin);
-          msg.sendMsg();
-          break;
-        }
-        case 21:
-        {
-          MrlMsg msg(PUBLISH_CUSTOM_MSG, 0);
-          msg.addData(ioCmd[1]);
-          msg.addData(servoMax);
-          msg.sendMsg();
+          servoMax = ioCmd[2];
+          EEPROM.write(11, servoMax);
           break;
         }
         default:
@@ -626,9 +561,9 @@ void MrlComm::processCommand(int ioType)
     case SET_TRIGGER:
     {
       // Couleur custom du ring
-      rVal = ioCmd[2];
-      gVal = ioCmd[3];
-      bVal = ioCmd[4];
+      rVal = ioCmd[1];
+      gVal = ioCmd[2];
+      bVal = ioCmd[3];
       break;
     }
     case SET_DEBOUNCE:
@@ -716,10 +651,13 @@ void MrlComm::processCommand(int ioType)
     }
     case CUSTOM_MSG: 
     {
-      for (byte i = 0; i < ioCmd[1] && customMsgSize < 64; i++) 
+      if (ioCmd[1] <= 10)
       {
-        customMsg[customMsgSize] = ioCmd[i+2];
-        customMsgSize++;
+        sendValueRequest = ioCmd[1];
+      }
+      else
+      {
+        MrlMsg::publishError(ERROR_UNKOWN_CMD);
       }
       break;
     }
@@ -730,7 +668,7 @@ void MrlComm::processCommand(int ioType)
     }
 	} // end switch
   
-	  // ack that we got a command (should we ack it first? or after we process the command?)
+	// ack that we got a command (should we ack it first? or after we process the command?)
 	heartbeat = true;
 	lastHeartbeatUpdate = millis();
 	publishCommandAck(ioCmd[0]);
@@ -765,7 +703,7 @@ void MrlComm::processCommand(int ioType)
  * implemented as a ptr it will be 4 bytes - if it is a generics id
  * it could be implemented with 1 byte
  */
-void MrlComm::deviceAttach(unsigned char* ioCmd) 
+void ActMrlComm::deviceAttach(unsigned char* ioCmd) 
 {
 	// TOOD:KW check free memory to see if we can attach a new device. o/w return an error!
 	// we're creating a new device. auto increment it
@@ -883,7 +821,7 @@ void MrlComm::deviceAttach(unsigned char* ioCmd)
  * deviceDetach - get the device
  * if it exists delete it and remove it from the deviceList
  */
-void MrlComm::deviceDetach(int id) 
+void ActMrlComm::deviceDetach(int id) 
 {
 	ListNode<Device*>* node = deviceList.getRoot();
 	int index = 0;
@@ -905,7 +843,7 @@ void MrlComm::deviceDetach(int id)
  * getDevice - this method will look up a device by it's id in the device list.
  * it returns null if the device isn't found.
  */
-Device* MrlComm::getDevice(int id) 
+Device* ActMrlComm::getDevice(int id) 
 {
 	ListNode<Device*>* node = deviceList.getRoot();
   
@@ -934,7 +872,7 @@ Device* MrlComm::getDevice(int id)
  * expand if it could not accomidate the current number of devices, when a device was
  * removed - the slot could be re-used by the next device request
  */
-void MrlComm::addDevice(Device* device) 
+void ActMrlComm::addDevice(Device* device) 
 {
 	deviceList.add(device);
 }
@@ -948,7 +886,7 @@ void MrlComm::addDevice(Device* device)
  * pulses, or possibly regulate a motor based on pid values read from
  * pins
  */
-void MrlComm::updateDevices() 
+void ActMrlComm::updateDevices() 
 {
 	// update self - the first device which
 	// is type Arduino
@@ -963,98 +901,10 @@ void MrlComm::updateDevices()
 	}
 }
 
-/***********************************************************************
- * UPDATE BEGIN
- * updates self - reads from the pinList both analog and digital
- * sends pin data back
- 
-void MrlComm::update() 
-{
-	unsigned long now = millis();
-  
-	if ((now - lastHeartbeatUpdate > 1000) && heartbeatEnabled) 
-  {
-		if (!heartbeat) 
-    {
-			softReset();
-			return;
-		}
-		heartbeat = false;
-		lastHeartbeatUpdate = now;
-	}
-  
-	if (pinList.size() > 0) 
-  {
-		// device id for our Arduino is always 0
-		MrlMsg msg(PUBLISH_SENSOR_DATA, 0); // the callback id
-
-		// size of payload - 1 byte for address + 2 bytes per pin read
-		// this is an optimization in that we send back "all" the read pin data in a
-		// standard 2 byte package - digital reads don't need both bytes, but the
-		// sending it all back in 1 msg and the simplicity is well worth it
-		
-		msg.countData();
-		msg.autoSend(57);
-    ListNode<Pin*>* node = pinList.getRoot();
-    
-    // iterate through our device list and call update on them.
-    while (node != NULL) 
-    {
-			Pin* pin = node->data;
-      
-			if (pin->rate == 0 || (now-pin->lastUpdate > pin->lastUpdate + (1000 / pin->rate))) 
-      {
-			  pin->lastUpdate = now;
-        
-        // TODO: moe the analog read outside of thie method and pass it in!
-        if (pin->type == ANALOG) 
-        {
-          pin->value = 0;//analogRead(pin->address);
-        } 
-        else 
-        {
-          pin->value = 0;//digitalRead(pin->address);
-        }
-
-        // loading both analog & digital data
-        msg.addData(pin->address); // 1 byte
-        msg.addData16(pin->value); // 2 bytes
-        node = node->next;
-      }
-    }
-    msg.sendMsg();
-	}
-}*/
-
-void MrlComm::setInmoovIsOn(boolean val)
-{
-  this->inmoovIsOn = val;
-}
-
-void MrlComm::setWakeUp(boolean val)
-{
-  this->wakeUp = val;
-}
-
-void MrlComm::setShutdownPC(boolean val)
-{
-  this->shutdownPC = val;
-}
-
-void MrlComm::setDetachRequest(boolean val)
-{
-  this->servoDetachIsRequest = val;
-}
-
-void MrlComm::setServoEnable(boolean val)
-{
-  this->servoIsEnable = val;
-}
-
 /** 
  * Réveil du module audio
  */
-void MrlComm::enableAudio()
+void ActMrlComm::enableAudio()
 {
   digitalWrite(MAX9744_SHTDOWN_PIN, HIGH);
 }
@@ -1062,7 +912,7 @@ void MrlComm::enableAudio()
 /** 
  * Met le MAX9744 en veille
  */
-void MrlComm::disableAudio()
+void ActMrlComm::disableAudio()
 {
   digitalWrite(MAX9744_SHTDOWN_PIN, LOW);
 }
@@ -1070,41 +920,16 @@ void MrlComm::disableAudio()
 /** 
  * Coupe la sortie audio pendant le démarrage du PC
  */
-void MrlComm::setMuteOn()
+void ActMrlComm::setMuteOn()
 {
-  digitalWrite(MAX9744_MUTE_PIN, HIGH);
+  digitalWrite(MAX9744_MUTE_PIN, LOW);
 }
 
 /** 
  * Active la sortie audio pendant le démarrage du PC
  */
-void MrlComm::setMuteOff()
+void ActMrlComm::setMuteOff()
 {
-  digitalWrite(MAX9744_MUTE_PIN, LOW);
-}
-
-
-unsigned int MrlComm::getCustomMsg() 
-{
-  if (customMsgSize == 0) 
-  {
-    return 0;
-  }
-  
-  int retval = customMsg[0];
-  
-  for (int i = 0; i < customMsgSize-1; i++) 
-  {
-    customMsg[i] = customMsg[i+1];
-  }
-  customMsg[customMsgSize] = 0;
-  customMsgSize--;
-  
-  return retval;
-}
-
-int MrlComm::getCustomMsgSize() 
-{
-  return customMsgSize;
+  digitalWrite(MAX9744_MUTE_PIN, HIGH);
 }
 
