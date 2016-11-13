@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aiml>
-
+<!-- loto -->
   <category>
     <pattern># loto #</pattern>
     <template>
@@ -14,9 +14,9 @@
     </template>
   </category>
   
- 
+<!--  --> 
 
-  
+<!-- The game of the words -->  
     <category>
     <pattern>JOUER AUX MOTS</pattern>
     <template>
@@ -49,15 +49,8 @@
 	</category>
 	
     
-    <category>
-    <pattern># STOP #</pattern>
-    <template>
-	<think><set name="topic">default</set></think>
-    <li>
-    A bientôt pour apprendre de nouveaux mots
-    </li>  
-    </template>
-	</category>
+
+
 	
 	<category>
     <pattern>TOP JEUX</pattern>
@@ -89,5 +82,179 @@
     </category>  
   </topic>
   
+<!--  -->  
+
+<!-- grandmother's footstep -->    
+   <category>
+    <pattern>JOUER # SOLEIL</pattern>
+    <template>
+	<oob>
+          <mrl>
+            <service>python</service>
+            <method>exec</method>
+            <param>soleil()</param>
+          </mrl>
+        </oob>
+		<li>
+		#MMM01# Tu veux vraiment jouer avec un robot? tu sais je n'ai qu'un oeil fonctionnel mais il est très efficace.
+		</li>
+			<li>
+		Plus efficace que tes machins biologiques. Enfin bref je m'égare.
+		</li> 
+		<li>
+		Place toi à environ 4 mètres. Environ, j'ai dis, on est pas au pièces non plus.
+		</li>		
+    </template>
+  </category>
+  
+  
+  <category>
+    <pattern>SYSTEM I DONT SEE YOU</pattern>
+    <template>
+	<random>
+		<li>
+		#MMM01# Je ne te vois pas, ne complique pas les choses 
+		</li>  
+		<li>
+		On joue à 1, 2, 3, soleil! ou bien à cache cache? 
+		</li>  
+		<li>
+		Si tu te mettais en face de moi, ça marcherait mieux
+		</li>  
+		<li>
+		#MMM01# Non non je ne vois pas d'humain, je ne vais pas jouer toute seule!
+		</li> 
+	</random>
+	
+    </template>
+  </category>
+  
+  
+  	 <category>
+    <pattern>SYSTEM I DONT SEE YOU2</pattern>
+    <template>
+	<srai>SYSTEM I DONT SEE YOU</srai>
+    </template>
+	</category>
+  
+    <category>
+    <pattern>SYSTEM YOU ARE TOO NEAR OF ME</pattern>
+    <template>
+	<random>
+		<li>
+		Recule!
+		</li>  
+		<li>
+		Recule Encore #THROAT01#
+		</li>  
+		<li>
+		Recule, tricheur!
+		</li>
+		<li>
+		Allez recule, mais pas trop 4 mètres c'est bien
+		</li>
+		<li>
+		J'ai dis recule! Tu comprend le français ?
+		</li> 
+	</random>
+	    </template>
+  </category>
+	
+	 <category>
+    <pattern>SYSTEM YOU ARE TOO NEAR OF ME2</pattern>
+    <template>
+	<srai>
+	SYSTEM YOU ARE TOO NEAR OF ME
+	</srai>
+    </template>
+  </category>
+  
+  
+      <category>
+    <pattern>SYSTEM TIMEOUT 123</pattern>
+    <template>
+	<random>
+		<li>
+		Je crois que tu n'as pas bien compris les règles de ce jeu, simple. #THROAT01#
+		</li>  
+		<li>
+		Le but c'est que tu sois dans mon champs de vision quand même #THROAT01#
+		</li>  
+		<li>
+		je ne te vois plus 
+		</li>
+
+	</random>
+		<li>
+		On recommence dans quelques secondes. Tu peux me dire stop aussi , si tu es fatigué #THROAT01#
+		</li> 
+    </template>
+  </category>
+
+  
+        <category>
+    <pattern>SYSTEM YOU LOSE BECAUSE *</pattern>
+    <template>
+	
+		<li>Tu as perdu car tu as bougé <star index="1" /></li>  
+		<li>
+		on recommence
+		</li> 
+		
+    </template>
+  </category>
+  
+  
+     
+        <category>
+    <pattern>SYSTEM SOLEIL</pattern>
+    <template>
+	
+		<li>
+		SOLEIL!
+		</li>  
+		
+    </template>
+  </category>
+<!-- -->    
+  
+   <category>
+    <pattern>YOU WIN</pattern>
+    <template>
+	<random>
+		<li>
+		Super! Tu as gagné
+		</li>  
+		<li>
+		Fécicitation! Tu as gagné
+		</li>  
+		<li>
+		Bravo! Tu es le plus fort
+		</li>
+
+	</random>
+	
+    </template>
+  </category>
+
+
+  
+  
+    <category>
+    <pattern>STOP JEUX</pattern>
+    <template>
+	  <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>stopJeux()</param>
+        </mrl>
+      </oob>
+	<think><set name="topic">default</set></think>
+    <li>
+    A bientôt, j'aime jouer !
+    </li>  
+    </template>
+	</category>
 </aiml>
 

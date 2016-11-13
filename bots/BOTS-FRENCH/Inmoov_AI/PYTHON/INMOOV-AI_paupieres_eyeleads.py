@@ -5,6 +5,7 @@ PaupiereServoDroite = Runtime.create("PaupiereServoDroite","Servo")
 	
 def PositionPaupiere(posGauche,posDroite,vitesse):
 	if IsInmoovArduino==1:
+		
 		PaupiereServoGauche.setSpeed(vitesse)
 		PaupiereServoDroite.setSpeed(vitesse)
 		PaupiereAttach(1)
@@ -23,7 +24,8 @@ def PaupiereAttach(status):
 			if IhaveEyelids==2:
 				PaupiereServoDroite.attach()
 			
-			
+PaupiereServoGauche.setMinMax(PaupiereGaucheMIN,PaupiereGaucheMAX) 
+PaupiereServoDroite.setMinMax(PaupiereDroiteMIN,PaupiereDroiteMAX)
 PaupiereServoGauche.map(0,180,PaupiereGaucheMIN,PaupiereGaucheMAX)
 PaupiereServoDroite.map(0,180,PaupiereDroiteMAX,PaupiereDroiteMIN)
 
@@ -38,10 +40,10 @@ if IsInmoovArduino==1:
 
 	if PaupiereArduino=="left":
 	  if IhaveEyelids==1 or IhaveEyelids==2:
-		PaupiereServoGauche.attach(left, PaupiereGaucheServoPin, 0, 10000)
+		PaupiereServoGauche.attach(left, PaupiereGaucheServoPin, PaupiereGaucheMIN, 10000)
 	else:
 	  if IhaveEyelids==1 or IhaveEyelids==2:
-		PaupiereServoGauche.attach(right, PaupiereGaucheServoPin, 0, 10000)
+		PaupiereServoGauche.attach(right, PaupiereGaucheServoPin, PaupiereGaucheMIN, 10000)
 
 	if PaupiereArduino=="left":
 	  if IhaveEyelids==2:
@@ -55,8 +57,9 @@ if IsInmoovArduino==1:
 	# define a ticktock method
 	def clignement(timedata):
 		global RobotIsStarted
+		global IcanMoveEyelids
 		RobotIsStarted+=1
-		if RobotIsStarted>2:
+		if RobotIsStarted>2 and IcanMoveEyelids==1:
 			PaupiereAttach(1)
 			PaupiereServoGauche.setSpeed(1)
 			PaupiereServoDroite.setSpeed(1)

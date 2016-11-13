@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*- 
-#EN : SHUTDOWN THE EAR ACTION AFTER 1mn INACTIVITY
-#FR : ON COUPE VIRTUELEMENT LE MICRO APRES 1 MINUTE ( mode pause )
-StopListenTimer = Runtime.create("StopListenTimer","Clock")
-StopListenTimer.setInterval(60000)
-StopListenTimer = Runtime.start("StopListenTimer","Clock")
+
+###############################################################################
+# timers.py : version 0.0.1
+###############################################################################
+
+###############################################################################
+#  EN : SHUTDOWN THE EAR ACTION AFTER 1mn INACTIVITY
+#  FR : ON COUPE VIRTUELEMENT LE MICRO APRES 1 MINUTE ( mode pause )
+###############################################################################
 
 def StopListenTimerFunc(timedata):
 	global PleaseRobotDontSleep
@@ -26,53 +30,40 @@ def StopListenTimerFunc(timedata):
 			rest()
 			#head.detach()
 		
+StopListenTimer = Runtime.create("StopListenTimer","Clock")
+StopListenTimer.setInterval(60000)
+StopListenTimer = Runtime.start("StopListenTimer","Clock")	
 StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
 
-##################################################################################
-LedWebkitListen = Runtime.create("LedWebkitListen","Clock")
-LedWebkitListen.setInterval(8000)
-LedWebkitListen = Runtime.start("LedWebkitListen","Clock")
 
-global LedWebkitListenFuncFix
-LedWebkitListenFuncFix=0
-
-def LedWebkitListenFunc(timedata):
-	global LedWebkitListenFuncFix
-	if LedWebkitListenFuncFix==1:
-		Light(1,1,1)
-		LedWebkitListenFuncFix=0
-		LedWebkitListen.stopClock()
-	else:
-		LedWebkitListenFuncFix+=1
-
-LedWebkitListen.addListener("pulse", python.name, "LedWebkitListenFunc")
-# start the clock
-
-# ##############################################################################
+###############################################################################
 # Timer function to autostart webkit microphone every 10seconds
-# ##############################################################################
+###############################################################################
 WebkitSpeachReconitionFix = Runtime.start("WebkitSpeachReconitionFix","Clock")
 WebkitSpeachReconitionFix.setInterval(15000)
+
 def WebkitSpeachReconitionON(timedata):
 	global LedWebkitListenFuncFix
 	global Ispeak
 	if Ispeak==0:
-		ear.clearLock()
 		ear.resumeListening()
-		LedWebkitListenFuncFix=0
-		LedWebkitListen.startClock()
+	
+		
 		Light(1,1,0)
+
 WebkitSpeachReconitionFix.addListener("pulse", python.name, "WebkitSpeachReconitionON")			
-			
+
 ##################################################################################
 # RANDOM TIME ACTIONS
 ##################################################################################
+
 VieAleatoire = Runtime.start("VieAleatoire","Clock")
 VieAleatoire.setInterval(120000)
 chatBot.getResponse("SAVEPREDICATES")
 global TimeNoSpeak
 TimeNoSpeak="OFF"
 TuTeTais=0
+
 def OnBalanceUnePhare_Aleatoire(timedata):
 	global TimeNoSpeak
 	global TuTeTais
@@ -91,6 +82,7 @@ def OnBalanceUnePhare_Aleatoire(timedata):
 	if TuTeTais==0:
 		TimeNoSpeak="ON"
 	
+
 def TuTeTais_OuPas(value):
 	global TuTeTais
 	TuTeTais=value
@@ -101,10 +93,12 @@ VieAleatoire.addListener("pulse", python.name, "OnBalanceUnePhare_Aleatoire")
 ##################################################################################
 # Timer pour le watchdog tous les 5 secondes
 ##################################################################################
-def sendRefresh(timedata):
-  if WatchDog==1:
-    watchdogRefresh()
 
+def sendRefresh(timedata):
+	global WatchDog
+	if WatchDog==1:
+		watchdogRefresh()
+  
 watchdogTimer = Runtime.start("watchdogTimer","Clock")
 watchdogTimer.setInterval(5000)
 watchdogTimer.addListener("pulse", python.name, "sendRefresh")
@@ -112,6 +106,7 @@ watchdogTimer.addListener("pulse", python.name, "sendRefresh")
 ##################################################################################
 # Déclaration du timer de mise à jour des données Activator  
 ##################################################################################
+
 def sendRefreshData(timedata):
   updateDataRequest()
 
@@ -123,15 +118,18 @@ updateDataTimer.addListener("pulse", python.name, "sendRefreshData")
 # Fonction qui démarre tout les timers
 # doit être mis aprés démarrage du système
 ##################################################################################
+
 def startAllTimer():
-  watchdogTimer.startClock()
-  VieAleatoire.startClock()
-  StopListenTimer.startClock()
-  updateDataTimer.startClock()
+	watchdogTimer.startClock()
+	VieAleatoire.startClock()
+	StopListenTimer.startClock()
+	updateDataTimer.startClock()
+	WebkitSpeachReconitionFix.startClock()
 
 ##################################################################################
 # generic timeout function used in some loops to prevent infinite :)
 ##################################################################################
+
 def TimoutTimerFunc(timedata):
 	global TimoutVar
 	TimoutVar+=1
@@ -145,6 +143,7 @@ TimoutTimer.addListener("pulse", python.name, "TimoutTimerFunc")
 ##################################################################################
 # makerfaire matt move head random twice a minute
 ##################################################################################
+
 MoveHeadRandomEveryMinute= Runtime.start("MoveHeadRandomEveryMinute","Clock")
 MoveHeadRandomEveryMinute.setInterval(11000)
 
@@ -165,7 +164,6 @@ def MoveHeadRandomEveryMinuteFunc(timedata):
 	MoveHeadRandomEveryMinute.setInterval(random.randint(8000,11000))
 		
 MoveHeadRandomEveryMinute.addListener("pulse", python.name, "MoveHeadRandomEveryMinuteFunc")
-
 
 
 

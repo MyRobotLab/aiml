@@ -38,19 +38,22 @@
 # version X.Y.Z X=critical : verification to tell users they must do an update
 # Y=evolution
 # Z=Github push or Bug correction
-version='2.1.6'
+version='2.3.0'
 print "DEBUG , InmoovAI version : ",version
 version=str(version[0])
 
 
 # ##############################################################################
-# Variables global
+# Variables global 
+# DESCRIPTION : https://github.com/moz4r/aiml/wiki/%5BFR%5D-%5BDEV%5D-Description-des-commandes
 # ##############################################################################
 global PaupiereGaucheMIN
 global PaupiereGaucheMAX
 global PaupiereDroiteMIN
 global PaupiereDroiteMAX
 global IhaveEyelids
+global IcanMoveEyelids
+IcanMoveEyelids=1
 global PaupiereDroiteServoPin
 global PaupiereGaucheServoPin
 global Voice
@@ -84,11 +87,13 @@ global BatteryMotorValue
 BatteryMotorValue=0
 global AudioVolume
 AudioVolume=30
-
 global TimoutVar
 TimoutVar=-1
 global MoveEyesRandom
 MoveEyesRandom=1
+global IcanMoveHeadRandom
+IcanMoveHeadRandom=1
+global WatchDog
 
 # Some voice emotions
 laugh = [" #LAUGH01# ", " #LAUGH02# ", " #LAUGH03# ", " ", " "]
@@ -151,6 +156,12 @@ execfile(u'CONFIG/INMOOV-AI_ServoParam.py')
 # ##############################################################################
 if not 'defaultRingColor' in locals():
 	defaultRingColor="bleu"
+if not 'LoadingPicture' in locals():
+	LoadingPicture=0
+if not 'WatchDog' in locals():
+	WatchDog=0
+	
+	
 # ##############################################################################
 # Initialisation hardware
 # ##############################################################################
@@ -178,7 +189,9 @@ except:
 # Service pictures
 # ##############################################################################
 image=Runtime.createAndStart("ImageDisplay", "ImageDisplay")
-#r=image.displayFullScreen('pictures\loading.jpg',1)
+if LoadingPicture==1:
+	r=image.displayFullScreen('pictures\loading.jpg',1)
+
 
 # ##############################################################################
 # Service aiml
@@ -283,11 +296,8 @@ if IsInmoovArduino==1:
 	i01.head.attach()
 	HeadSide.attach()
 	
-#if IsInmoovArduino==1 and tracking==1:
-# OK mais aprés que le système soit prêt...
-#	trackHumans()
 
-Light(1,1,1)
+
 
 #r=image.displayFullScreen("http://vignette2.wikia.nocookie.net/worldsofsdn/images/7/7a/Tyrell-corp.jpg",1)
 
@@ -305,8 +315,21 @@ if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.get
 # ##############################################################################
 Light(1,1,1)
 
+
 # ##############################################################################
-# Vérification divers
+# Servos power ON
+# ##############################################################################
+powerServoON()
+sleep(0.5)
+
+# ##############################################################################
+# System is ready
+# ##############################################################################
+RobotIsStarted=1
+pcIsReady()
+
+# ##############################################################################
+# VOCAL CHECKUP / VERIFICATIONS VOCALES
 # ##############################################################################
 CheckVersion()
 anniversaire("0")
@@ -323,19 +346,6 @@ if lang=="FR":
    ear.setLanguage("fr-FR")
 python.subscribe(ear.getName(),"recognized")
 
-WebkitSpeachReconitionFix.startClock()
-
-# ##############################################################################
-# Servos power ON
-# ##############################################################################
-powerServoON()
-sleep(0.5)
-
-# ##############################################################################
-# System is ready
-# ##############################################################################
-RobotIsStarted=1
-pcIsReady()
 sleep(0.5)
 startAllTimer()
 image.exitFS()
@@ -345,15 +355,15 @@ chatBot.getResponse("WAKE_UP")
 NeoPixelColor(defaultRingColor)
 sleep(0.5)
 
+
+
 # ##############################################################################
 # Mettre ici les différents tests
 # Anthony, peux tu déplacer les tests qui n'ont rien à voir avec le startup
 # après ceci...
 # ##############################################################################
-
 if IsInmoovArduino==1 and tracking==1:
 	trackHumans()
-
 #StartSensorDemo()
 
 NeoPixelAnimation(1)
@@ -363,7 +373,4 @@ sleep(1)
 
 #matt makefaire a finaliser si mise en prod
 #MoveHeadRandomEveryMinute.startClock()
-
-
-
 

@@ -72,6 +72,9 @@ def onEndSpeaking(text):
 def onStartSpeaking(text):
 	
 	global RamdomSpeak
+	global MoveHeadRandom
+	global Ispeak
+	
 	if DEBUG==1:
 		print "dbg : RamdomSpeak:",RamdomSpeak
 	global RobotIsSleepingSoft
@@ -90,11 +93,11 @@ def onStartSpeaking(text):
 		IcanEarOnlyKnowsWords=-1
 	
 
-	global Ispeak
+	
 	Ispeak=1
 	WebkitSpeachReconitionFix.stopClock()
-	global MoveHeadRandom
-	if 'non' in text or 'no' in text:
+	
+	if 'non' in text: # or 'no' in text HARD CODED LANGUAGE CLEAN LATER
 		No('no')
 		MoveHeadRandom=0
 		#print("no detected")
