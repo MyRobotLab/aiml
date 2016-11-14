@@ -61,8 +61,11 @@ def trackHumans():
 
 def TakePhoto(messagePhoto):
 	openCvInit()
-	i01.startEyesTracking(leftPort,22,24)
-	i01.eyesTracking.faceDetect()	
+	try:
+		i01.startEyesTracking(leftPort,22,24)
+		i01.eyesTracking.faceDetect()
+	except:
+		print "opencv error"
 	talkBlocking(messagePhoto)
 	global openCvModule
 	openCvModule = "photo"
@@ -82,7 +85,7 @@ def PhotoProcess(messagePhoto):
 	FaceDetectedCounter=0
 	FaceDetected=1
 	NoFaceDetectedTimer.stopClock()
-	NeoPixelF(3)
+	
 	talkBlocking(messagePhoto)
 	Light(1,1,1)
 	talkBlocking("chi i i i i i i i i ize")
@@ -95,7 +98,10 @@ def PhotoProcess(messagePhoto):
 	sleep(0.1)
 	Light(1,1,1)
 	sleep(0.1)
-	i01.stopTracking()
+	try:
+		i01.stopTracking()
+	except:
+		print "opencv error"
 	opencv.removeFilters()
 	opencv.stopCapture()
 	sleep(1)
@@ -107,7 +113,7 @@ def PhotoProcess(messagePhoto):
 	photoFileName = opencv.recordSingleFrame()
 	#print "name file is" , os.getcwd()+'\\'+str(photoFileName)
 	Light(1,1,1)
-	NeoPixelF(1)
+	
 	DisplayPic(os.getcwd()+'\\'+str(photoFileName))
 	opencv.removeFilters()
 	opencv.stopCapture()
@@ -115,13 +121,13 @@ def PhotoProcess(messagePhoto):
 	#i01.startHeadTracking(leftPort)
 	
 def openCvInit():
-	i01.opencv.setCameraIndex(0)
-	i01.opencv.removeFilters()
-	i01.opencv.addFilter("PyramidDown")
-	i01.opencv.addFilter("Gray")
-	i01.opencv.addFilter("FaceDetect")
-	i01.opencv.setDisplayFilter("FaceDetect")
-	i01.opencv.capture()
+	opencv.setCameraIndex(0)
+	opencv.removeFilters()
+	opencv.addFilter("PyramidDown")
+	opencv.addFilter("Gray")
+	opencv.addFilter("FaceDetect")
+	opencv.setDisplayFilter("FaceDetect")
+	opencv.capture()
 	
 
 

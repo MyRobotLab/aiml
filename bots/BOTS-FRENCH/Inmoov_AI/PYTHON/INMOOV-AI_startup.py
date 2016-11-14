@@ -166,7 +166,13 @@ if not 'WatchDog' in locals():
 # Initialisation hardware
 # ##############################################################################
 execfile(u'INMOOV-AI_InitHardware.py')
-	
+opencv = Runtime.create("i01.opencv", "OpenCV")
+# ##############################################################################
+# opencv
+# ##############################################################################
+if LATTEPANDA==1:
+	opencv.setFrameGrabberType("org.myrobotlab.opencv.SarxosFrameGrabber")
+opencv = Runtime.start("i01.opencv", "OpenCV")	
 # ##############################################################################
 # Gesture
 # ##############################################################################
@@ -203,13 +209,7 @@ Runtime.createAndStart("chatBot", "ProgramAB")
 # ##############################################################################
 Runtime.createAndStart("wdf", "WikiDataFetcher")
 
-# ##############################################################################
-# Open cv lattepanda tweak
-# ##############################################################################
-opencv = Runtime.create("i01.opencv", "OpenCV")
-if LATTEPANDA==1:
-	opencv.setFrameGrabberType("org.myrobotlab.opencv.SarxosFrameGrabber")
-opencv = Runtime.start("i01.opencv", "OpenCV")
+
 
 # ##############################################################################
 # Service WebGui
@@ -258,8 +258,8 @@ execfile('INMOOV-AI_gestures.py')
 if IhaveEyelids>0:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
 execfile(u'INMOOV-AI_timers.py')
-if IsInmoovArduino==1:
-	execfile('INMOOV-AI_opencv.py')
+
+execfile('INMOOV-AI_opencv.py')
 execfile('INMOOV-AI_move_head_random.py')
 execfile('INMOOV-AI_azure_translator.py')
 execfile('INMOOV-AI_messenger.py')
@@ -271,6 +271,11 @@ execfile(u'INMOOV-AI_dictionaries.py')
 execfile(u'INMOOV-AI_WeatherMap_Meteo.py')
 execfile(u'INMOOV-AI_jeanneton.py')
 #execfile(u'INMOOV-AI_demo_halleffect.py')
+
+# ##############################################################################
+# Open cv lattepanda tweak
+# ##############################################################################
+
 
 # ##############################################################################
 # We start a function that do actions after voice start / stop

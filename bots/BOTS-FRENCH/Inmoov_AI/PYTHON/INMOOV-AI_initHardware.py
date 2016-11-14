@@ -99,10 +99,12 @@ torso.midStom.map(0,180,TorsoMidMin,TorsoMidMax)
 torso.midStom.setRest(TorsoMidRes)
 
 # Start the arduino
+i01 = Runtime.start("i01","InMoov")
+head = Runtime.start("i01.head", "Arduino")
 if IsInmoovArduino==1:
-	i01 = Runtime.start("i01","InMoov")
+	
 	left = Runtime.start("i01.left", "Arduino")
-	head = Runtime.start("i01.head", "Arduino")
+	
 	head.setSpeed(DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed,DefaultSpeed)
 	head.rothead.setSpeed(0.1)
 	head.neck.setSpeed(0.1)
