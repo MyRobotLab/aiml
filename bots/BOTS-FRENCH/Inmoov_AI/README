@@ -1,25 +1,34 @@
-Rachel BOT is french/english AIML based bot
-Sorry english version is just a POC but fully worky, I work on french AIML in priority
-ToDo : Inmoov gesture
 # ##############################################################################
-# 							*** SETUP / INSTALLATION ***
+# 							         *** SETUP / INSTALLATION ***
 # ##############################################################################
-# STABLE FILES : https://github.com/MyRobotLab/pyrobotlab/tree/master/home/moz4r  [ RACHEL AIML + PYTHON ]
-# UPDATED DEV FILES :  https://github.com/MyRobotLab/aiml/tree/master/bots/ [ RACHEL AIML + PYTHON ]
-# -----------------------------------
-# - Inmoov-Life Version 1.5 By Moz4r
+# original post : http://inmoov.fr/forums/topic/inmoov-ai/
+# - Inmoov-AI - Moz4r
 # - Credit :
 # - Rachel the humanoïde
 # - Wikidatafetcher By Beetlejuice
-# - Grog / Kwatters / and All MRL team
+# - Azure translator by Papaoutai
+# - Grog / Kwatters / Calamity and All MRL team
 # - HairyGael
-# - heisenberg333 for help to construct french AIML brain
-# -----------------------------------
-# !!! INSTALL : !!!
-# !!! PLEASE copy all aiml files to : develop\ProgramAB\bots\rachel\aiml !!! ( french or engligh )
-# !!! AND https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-FRENCH/Rachel/TXT to the root of MRL
-# !!! + https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-ENGLISH/Rachel/TXT
-#
+# - Heisenberg
+# - Grattounet
+# - Lecagnois
+# - Dom
+# ------------------------------------------------------------------------------
+#									multilingual MRL python script
+#							( you just need translate all the aiml :)
+# ------------------------------------------------------------------------------
+# !!! INSTALL : ( if you get this from github ) !!!
+# !!! PLEASE copy all aiml files to : ProgramAB\bots\YOUR_BOT_NAME\aiml !!!
+# !!! AND https://github.com/MyRobotLab/aiml/tree/master/bots/BOTS-FRENCH/INMOOV_AI/BDD + SOUND + PICTURES + PYTHON to the root of MRL
+# ex c:\mrl\
 # 
-# don't forget to complete the config file !
-# You can use mrl.bat to launch, it's usefull to kill java and autostart the script
+# -
+#  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#  !!!!!!!!!!!!!!!! CONFIG INSIDE THIS FOLDER  !!! / ENTREZ VOS PARAMETRES DANS CE DOSSER  !!!!!!!!!!
+#  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#
+# 						CONFIG/config.py
+# 
+# ##############################################################################
+#  						               *** END SETUP ***
+# ##############################################################################
