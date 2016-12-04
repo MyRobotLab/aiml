@@ -39,6 +39,34 @@
       </oob>
     </template>
   </category>
+  
+    <category>
+    <pattern>SUIS-MOI DU REGARD</pattern>
+    <template>
+	<li>Ok je vais te suivre du regard</li>
+      <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>trackHumans()</param>
+        </mrl>
+      </oob>
+    </template>
+  </category>
+  
+   <category>
+    <pattern>ARRêTE DE ME SUIVRE DU REGARD</pattern>
+    <template>
+	<li>Ok je ne te suis plus</li>
+      <oob>
+        <mrl>
+          <service>python</service>
+          <method>exec</method>
+          <param>StoptrackHumans()</param>
+        </mrl>
+      </oob>
+    </template>
+  </category>
 
 </aiml>
 
