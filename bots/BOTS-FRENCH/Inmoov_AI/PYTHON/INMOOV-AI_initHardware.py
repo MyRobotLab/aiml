@@ -50,7 +50,11 @@ head.jaw.setRest(0)
 
 head.eyeX.setMinMax(EyeXMIN,EyeXMAX)
 head.eyeX.map(0,180,EyeXMIN,EyeXMAX)
+head.eyeX.setMinMax(0,180)
 head.eyeX.setRest(EyeXRest)
+head.eyeX.setVelocity(0)
+head.eyeY.setVelocity(0)
+head.eyeX.setInverted(True)
 
 head.eyeY.setMinMax(EyeYMIN,EyeYMAX)
 head.eyeY.map(0,180,EyeYMIN,EyeYMAX)
@@ -69,6 +73,8 @@ if RotHeadInverted==1:
 else:
 	head.rothead.map(0,180,MinRotHead,MaxRotHead)
 head.rothead.setRest(RotHeadRest)
+head.rothead.setInverted(True)
+
 
 # Right arduino
 right=Runtime.create("i01.right", "Arduino")

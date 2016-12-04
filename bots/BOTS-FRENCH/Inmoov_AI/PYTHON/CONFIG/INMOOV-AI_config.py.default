@@ -21,6 +21,8 @@ LoadingPicture=1
 #TYPE DE PC
 LATTEPANDA=0
 
+CameraIndex=0
+
 #ARDUINO CONFIG
 IsInmoovArduino=0
 BoardTypeLeft="atmega2560" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4

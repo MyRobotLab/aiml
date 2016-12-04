@@ -94,6 +94,7 @@ MoveEyesRandom=1
 global IcanMoveHeadRandom
 IcanMoveHeadRandom=1
 global WatchDog
+global CameraIndex
 
 # Some voice emotions
 laugh = [" #LAUGH01# ", " #LAUGH02# ", " #LAUGH03# ", " ", " "]
@@ -160,6 +161,8 @@ if not 'LoadingPicture' in locals():
 	LoadingPicture=0
 if not 'WatchDog' in locals():
 	WatchDog=0
+if not 'CameraIndex' in locals():
+	CameraIndex=0
 	
 	
 # ##############################################################################
@@ -378,4 +381,5 @@ sleep(1)
 
 #matt makefaire a finaliser si mise en prod
 #MoveHeadRandomEveryMinute.startClock()
+
 
