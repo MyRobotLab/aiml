@@ -6,7 +6,7 @@
 
 ###############################################################################
 #  EN : SHUTDOWN THE EAR ACTION AFTER 1mn INACTIVITY
-#  FR : ON COUPE VIRTUELEMENT LE MICRO APRES 10 MINUTE ( mode pause )
+#  FR : ON COUPE VIRTUELEMENT LE MICRO APRES 1 MINUTE ( mode pause )
 ###############################################################################
 
 def StopListenTimerFunc(timedata):
@@ -31,7 +31,7 @@ def StopListenTimerFunc(timedata):
 			#head.detach()
 		
 StopListenTimer = Runtime.create("StopListenTimer","Clock")
-StopListenTimer.setInterval(600000)
+StopListenTimer.setInterval(60000)
 StopListenTimer = Runtime.start("StopListenTimer","Clock")	
 StopListenTimer.addListener("pulse", python.name, "StopListenTimerFunc")
 

@@ -51,42 +51,16 @@ def NoFaceDetectedTimerFunction(timedata):
 NoFaceDetectedTimer.addListener("pulse", python.name, "NoFaceDetectedTimerFunction")
 # start the clock
 
-#####################################################
-# EYETRACKING
-#####################################################
 def trackHumans():
 	#i01.headTracking.findFace()
 	#i01.opencv.SetDisplayFilter
 	openCvInit()
-	i01.startEyesTracking(leftPort,22,24)
-	i01.startHeadTracking(leftPort)
-	i01.eyesTracking.pid.setPID("eyeX",12.0,1.0,0.1)
-	i01.eyesTracking.pid.setPID("eyeY",12.0,1.0,0.1)
 	i01.headTracking.faceDetect()
 	i01.eyesTracking.faceDetect()
-	head.eyeX.setVelocity(0)
-	head.eyeY.setVelocity(0)
-	head.rothead.setVelocity(0)
-	head.neck.setVelocity(0)
-	head.eyeX.setSpeed(1)
-	head.eyeY.setSpeed(1)
-	head.rothead.setSpeed(1)
-	head.neck.setSpeed(1)
-	
-def StoptrackHumans():
-	#i01.headTracking.findFace()
-	#i01.opencv.SetDisplayFilter
-	i01.eyesTracking.stopTracking()
-	opencv.removeFilters()
-	opencv.stopCapture()
+	print "test"
 
-#####################################################
-# TAKE A PHOTO
-#####################################################	
-	
 def TakePhoto(messagePhoto):
 	openCvInit()
-	
 	try:
 		i01.startEyesTracking(leftPort,22,24)
 		i01.eyesTracking.faceDetect()
@@ -145,10 +119,6 @@ def PhotoProcess(messagePhoto):
 	opencv.stopCapture()
 	#i01.startEyesTracking(leftPort,22,24)
 	#i01.startHeadTracking(leftPort)
-
-#####################################################
-# OPENCVINIT
-#####################################################	
 	
 def openCvInit():
 	opencv.setCameraIndex(0)
