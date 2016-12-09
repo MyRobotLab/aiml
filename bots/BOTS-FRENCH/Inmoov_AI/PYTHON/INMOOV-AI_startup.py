@@ -238,8 +238,10 @@ else:
    wdf.setWebSite("enwiki")
 
 sleep(0.1)
+mouth.setLanguage("FR") #mouth.setLanguage(lang)
+print mouth.getVoices()
 mouth.setVoice(voiceType)
-mouth.setLanguage(lang)
+
 
 chatBot.startSession("ProgramAB", "default", myAimlFolder)
 chatBot.addTextListener(htmlFilter)
@@ -370,8 +372,7 @@ sleep(0.5)
 # Anthony, peux tu déplacer les tests qui n'ont rien à voir avec le startup
 # après ceci...
 # ##############################################################################
-if IsInmoovArduino==1 and tracking==1:
-	trackHumans()
+
 #StartSensorDemo()
 
 NeoPixelAnimation(1)

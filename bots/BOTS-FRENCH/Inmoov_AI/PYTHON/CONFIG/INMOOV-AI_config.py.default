@@ -7,9 +7,9 @@ DEBUG=0
 
 myAimlFolder="inmoovai" # dossier ou se trouvent vos aiml pas d'accent svp
 
-# LANGUAGE ( FR/EN )
+# MARYTTS LANGUAGE 
 lang="FR"
-Voice="Margaux" # ryan in english
+Voice="upmc-pierre-hsmm" # french enst-dennys-hsmm / enst-camille-hsmm / upmc-jessica-hsmm / upmc-pierre-hsmm
 
 
 # MouthControl / CONTROLE MACHOIRE LOGICIEL
@@ -68,8 +68,7 @@ ROUGE=29
 VERT=28
 BLEU=30
 
-#tracking for testing
-tracking=0
+
 
 
 

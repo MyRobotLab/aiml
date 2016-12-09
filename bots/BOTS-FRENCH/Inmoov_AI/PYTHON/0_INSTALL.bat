@@ -6,6 +6,9 @@ RMDIR /S /Q haarcascades
 RMDIR /S /Q hogcascades
 RMDIR /S /Q lbpcascades
 RMDIR /S /Q libraries
+md libraries
+md libraries\jar
+copy /y mary\lib\*.* libraries\jar
 RMDIR /S /Q pythonModules
 RMDIR /S /Q repo
 RMDIR /S /Q resource

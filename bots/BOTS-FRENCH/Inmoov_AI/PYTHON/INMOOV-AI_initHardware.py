@@ -151,10 +151,12 @@ if IsInmoovArduino==1:
 		HeadSide.attach(right, HeadSidePin, HeadSideRest, 500)
 	HeadSide.setSpeed(PistonSideSpeed)
 
-i01.startMouth()
+#i01.startMouth()
 i01.startEar()
 ear = i01.ear
-mouth = i01.mouth
+i01.mouth = Runtime.createAndStart("i01.mouth", "MarySpeech")
+i01.startMouth()
+mouth=i01.mouth
 
 # ##############################################################################
 # Activator arduino configuration
