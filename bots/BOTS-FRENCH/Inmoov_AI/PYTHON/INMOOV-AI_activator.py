@@ -5,15 +5,35 @@
 
 	 
 # Réception
-# A FAIRE
 if Activator==1 and IsInmoovArduino==1:
 	def receiveActivatorData(data):
-	  print "J ai reçu des données les voici", data
+	  print "Activator DATA: ", data
     # A VOIR CE QUI A DANS DATA
-    #BatteryElectValue=0
-    #BatteryMotorValue=0
-    #AudioVolume=30
+    #BatteryElectValue=data[1]
+    #BatteryMotorValue=data[3]
+    #AudioVolume=data[5]
+    #print BatteryElectValue," ",BatteryMotorValue," ",AudioVolume
+    
 
+# ##############################################################################
+# A DEPLACER AU BON ENDROIT
+# ##############################################################################
+#test
+BatteryElectValue=12500
+BatteryMotorValue=6100
+#fin test
+BatteryElectValueRounded=int(round((int(BatteryElectValue)/1000)))
+BatteryMotorValueRounded=int(round((int(BatteryMotorValue)/1000)))
+chatBot.setPredicate("default","BatteryElectValue",str(BatteryElectValue))
+chatBot.setPredicate("default","BatteryMotorValue",str(BatteryMotorValue))
+chatBot.setPredicate("default","BatteryElectValueRounded",str(BatteryElectValueRounded))
+chatBot.setPredicate("default","BatteryMotorValueRounded",str(BatteryMotorValueRounded))
+print BatteryElectValueRounded," ",BatteryMotorValueRounded
+# ##############################################################################
+# FIN A DEPLACER
+# ##############################################################################
+    
+    
 # Fonction d'écoute pour la réception des données Activator    
 if Activator==1 and IsInmoovArduino==1:
 	ActivatorArduino.addListener("publishCustomMsg","python","receiveActivatorData")
@@ -40,18 +60,20 @@ def disableWatchdog():
   if Activator==1 and IsInmoovArduino==1:
 		ActivatorArduino.digitalWrite(17,0)
 
-# Demande la mise à jour des valeurs batteries
-def updateBatterieRequest(bat):
+# Permet d'activer l'alimentation des servos
+def powerServoON():
   if Activator==1 and IsInmoovArduino==1:
-    if bat==1:
-      ActivatorArduino.analogWrite(1,0)
-    else:
-      ActivatorArduino.analogWrite(2,0)
+		ActivatorArduino.digitalWrite(18,1)
 
-# Demande le niveau audio en cours
-def updateAudioLevel():
+# Permet d'éteindre l'alimentation des servos
+def powerServoOFF():
   if Activator==1 and IsInmoovArduino==1:
-    ActivatorArduino.analogWrite(10,0)
+		ActivatorArduino.digitalWrite(18,0)
+
+# Demande la mise à jour des valeurs batteries
+def updateDataRequest():
+  if Activator==1 and IsInmoovArduino==1:
+    ActivatorArduino.customMsg(1)
 
 # Commande machoire : JawAction(action)
 # action = "ouvre"
@@ -132,7 +154,8 @@ def NeoPixelAnimation(action):
 # Volume audio de 0 à 63
 def SoundControl(action):
   if Activator==1 and IsInmoovArduino==1:
-		ActivatorArduino.digitalWrite(20,action)
+    if action <= 63:
+      ActivatorArduino.analogWrite(0,action)
     
 # Fonction SoundMute()
 def SoundMute():

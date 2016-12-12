@@ -10,7 +10,7 @@
         <mrl>
           <service>python</service>
           <method>exec</method>
-          <param>HideEyes()</param>
+          <param>JeannetonBras()</param>
         </mrl>
       </oob>
    

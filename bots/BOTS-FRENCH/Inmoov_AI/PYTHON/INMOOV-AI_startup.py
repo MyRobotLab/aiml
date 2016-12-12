@@ -38,19 +38,22 @@
 # version X.Y.Z X=critical : verification to tell users they must do an update
 # Y=evolution
 # Z=Github push or Bug correction
-version='2.1.8'
+version='2.3.0'
 print "DEBUG , InmoovAI version : ",version
 version=str(version[0])
 
 
 # ##############################################################################
-# Variables global
+# Variables global 
+# DESCRIPTION : https://github.com/moz4r/aiml/wiki/%5BFR%5D-%5BDEV%5D-Description-des-commandes
 # ##############################################################################
 global PaupiereGaucheMIN
 global PaupiereGaucheMAX
 global PaupiereDroiteMIN
 global PaupiereDroiteMAX
 global IhaveEyelids
+global IcanMoveEyelids
+IcanMoveEyelids=1
 global PaupiereDroiteServoPin
 global PaupiereGaucheServoPin
 global Voice
@@ -88,7 +91,10 @@ global TimoutVar
 TimoutVar=-1
 global MoveEyesRandom
 MoveEyesRandom=1
-
+global IcanMoveHeadRandom
+IcanMoveHeadRandom=1
+global WatchDog
+global CameraIndex
 
 # Some voice emotions
 laugh = [" #LAUGH01# ", " #LAUGH02# ", " #LAUGH03# ", " ", " "]
@@ -147,15 +153,29 @@ execfile(u'CONFIG/INMOOV-AI_config.py')
 execfile(u'CONFIG/INMOOV-AI_ServoParam.py')
 
 # ##############################################################################
-# Chargement des paramètres personnalisés ( en attendant autre chose )
+# Chargement des paramètres personnalisés
 # ##############################################################################
 if not 'defaultRingColor' in locals():
 	defaultRingColor="bleu"
+if not 'LoadingPicture' in locals():
+	LoadingPicture=0
+if not 'WatchDog' in locals():
+	WatchDog=0
+if not 'CameraIndex' in locals():
+	CameraIndex=0
+	
+	
 # ##############################################################################
 # Initialisation hardware
 # ##############################################################################
 execfile(u'INMOOV-AI_InitHardware.py')
-	
+opencv = Runtime.create("i01.opencv", "OpenCV")
+# ##############################################################################
+# opencv
+# ##############################################################################
+if LATTEPANDA==1:
+	opencv.setFrameGrabberType("org.myrobotlab.opencv.SarxosFrameGrabber")
+opencv = Runtime.start("i01.opencv", "OpenCV")	
 # ##############################################################################
 # Gesture
 # ##############################################################################
@@ -178,7 +198,8 @@ except:
 # Service pictures
 # ##############################################################################
 image=Runtime.createAndStart("ImageDisplay", "ImageDisplay")
-r=image.displayFullScreen('pictures\loading.jpg',1)
+if LoadingPicture==1:
+	r=image.displayFullScreen('pictures\loading.jpg',1)
 
 
 # ##############################################################################
@@ -191,13 +212,7 @@ Runtime.createAndStart("chatBot", "ProgramAB")
 # ##############################################################################
 Runtime.createAndStart("wdf", "WikiDataFetcher")
 
-# ##############################################################################
-# Open cv lattepanda tweak
-# ##############################################################################
-opencv = Runtime.create("i01.opencv", "OpenCV")
-if LATTEPANDA==1:
-	opencv.setFrameGrabberType("org.myrobotlab.opencv.SarxosFrameGrabber")
-opencv = Runtime.start("i01.opencv", "OpenCV")
+
 
 # ##############################################################################
 # Service WebGui
@@ -223,8 +238,10 @@ else:
    wdf.setWebSite("enwiki")
 
 sleep(0.1)
+mouth.setLanguage("FR") #mouth.setLanguage(lang)
+print mouth.getVoices()
 mouth.setVoice(voiceType)
-mouth.setLanguage(lang)
+
 
 chatBot.startSession("ProgramAB", "default", myAimlFolder)
 chatBot.addTextListener(htmlFilter)
@@ -246,8 +263,8 @@ execfile('INMOOV-AI_gestures.py')
 if IhaveEyelids>0:
 	execfile('INMOOV-AI_paupieres_eyeleads.py')
 execfile(u'INMOOV-AI_timers.py')
-if IsInmoovArduino==1:
-	execfile('INMOOV-AI_opencv.py')
+
+execfile('INMOOV-AI_opencv.py')
 execfile('INMOOV-AI_move_head_random.py')
 execfile('INMOOV-AI_azure_translator.py')
 execfile('INMOOV-AI_messenger.py')
@@ -259,6 +276,11 @@ execfile(u'INMOOV-AI_dictionaries.py')
 execfile(u'INMOOV-AI_WeatherMap_Meteo.py')
 execfile(u'INMOOV-AI_jeanneton.py')
 #execfile(u'INMOOV-AI_demo_halleffect.py')
+
+# ##############################################################################
+# Open cv lattepanda tweak
+# ##############################################################################
+
 
 # ##############################################################################
 # We start a function that do actions after voice start / stop
@@ -284,10 +306,8 @@ if IsInmoovArduino==1:
 	i01.head.attach()
 	HeadSide.attach()
 	
-if IsInmoovArduino==1 and tracking==1:
-	trackHumans()
 
-Light(1,1,1)
+
 
 #r=image.displayFullScreen("http://vignette2.wikia.nocookie.net/worldsofsdn/images/7/7a/Tyrell-corp.jpg",1)
 
@@ -305,14 +325,25 @@ if str(chatBot.getPredicate("default","botname"))!="unknown" and str(chatBot.get
 # ##############################################################################
 Light(1,1,1)
 
+
 # ##############################################################################
-# Vérification divers
+# Servos power ON
+# ##############################################################################
+powerServoON()
+sleep(0.5)
+
+# ##############################################################################
+# System is ready
+# ##############################################################################
+RobotIsStarted=1
+pcIsReady()
+
+# ##############################################################################
+# VOCAL CHECKUP / VERIFICATIONS VOCALES
 # ##############################################################################
 CheckVersion()
 anniversaire("0")
 GetUnreadMessageNumbers("0")
-chatBot.getResponse("WAKE_UP")
-#WE PLACE SPEAKING STARTUP ACTION BEFORE INITIAL MICROPHONE LAUNCH TO AVOID AUTOLISTEN
 sleep(4)
 
 # ##############################################################################
@@ -325,22 +356,16 @@ if lang=="FR":
    ear.setLanguage("fr-FR")
 python.subscribe(ear.getName(),"recognized")
 
-WebkitSpeachReconitionFix.startClock()
-
-# ##############################################################################
-# System is ready
-# ##############################################################################
-RobotIsStarted=1
-pcIsReady()
 sleep(0.5)
+startAllTimer()
 image.exitFS()
 image.closeAll()
-# Mettre un # devant startWatchdogTimer si on ne veux pas du watchdog
-startWatchdogTimer()
-#startWatchdogTimer()
+sleep(0.5)
+chatBot.getResponse("WAKE_UP")
+NeoPixelColor(defaultRingColor)
 sleep(0.5)
 
-NeoPixelColor(defaultRingColor)
+
 
 # ##############################################################################
 # Mettre ici les différents tests
@@ -353,7 +378,9 @@ NeoPixelColor(defaultRingColor)
 NeoPixelAnimation(1)
 sleep(5)
 NeoPixelAnimation(0)
+sleep(1)
 
 #matt makefaire a finaliser si mise en prod
 #MoveHeadRandomEveryMinute.startClock()
+
 

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*- 
-
+###############################################################################
+# gestures.py : version 0.0.1
+###############################################################################
 def detachHard():
 	if IsInmoovArduino==1:	
 		left.digitalWrite(53,0)
@@ -14,7 +16,7 @@ def detachHard():
 
 def rest():
 	if IsInmoovArduino==1:
-
+		
 		#pwn activation all servos
 		i01.attach()
 		HeadSide.attach()
@@ -46,8 +48,10 @@ def rest():
 		rightArm.detach()
 		torso.detach()
 		HeadSide.detach()
+		#head.detach()
 		#force pwn shutdown on special servo
 		detachHard()
+		
 
 		
 def No(data):
@@ -239,4 +243,41 @@ def HideEyes():
 	sleep(1)
 	talk("Dansons la carmagnole ! Et vive le son du canon !. Sus aux privilèges et à l'ignorance ! Je t'écoute.")
 	
+def HideEyesSun():
+	rightArm.attach()
+	rightHand.attach()
+	rightHand.wrist.moveTo(8)
+	rightArm.bicep.moveTo(164)
+	rightArm.shoulder.moveTo(116)
+	rightArm.rotate.moveTo(62)
+	rightArm.omoplate.moveTo(20)
+	sleep(0.1)
+	leftArm.attach()
+	leftHand.attach()
+	leftHand.wrist.moveTo(180)
+	leftArm.bicep.moveTo(180)
+	leftArm.shoulder.moveTo(103)
+	leftArm.rotate.moveTo(62)
 	
+def RightArmAheadBehind():
+	rightArm.shoulder.attach()
+	rightArm.shoulder.moveTo(90)
+	rightHand.attach()
+	rightHand.wrist.moveTo(0)
+	sleep(2)
+	rightArm.shoulder.moveTo(0)
+	rightArm.bicep.detach()
+	rightHand.wrist.moveTo(90)
+	sleep(0.5)
+	rightHand.detach()
+	
+def SuperThumb():
+	rightArm.bicep.attach()
+	rightArm.bicep.moveTo(180)
+	rightArm.omoplate.attach()
+	rightArm.omoplate.moveTo(80)
+	MoveHand('right',0,180,180,180,180)
+	sleep(2)
+	rightArm.bicep.detach()
+	sleep(0.5)
+	rightHand.detach()

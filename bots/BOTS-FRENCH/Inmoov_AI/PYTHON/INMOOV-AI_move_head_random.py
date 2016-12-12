@@ -1,6 +1,6 @@
 def MoveHeadRandomize():
 
-	if IsInmoovArduino==1:
+	if IsInmoovArduino==1 and IcanMoveHeadRandom==1:
 		
 		head.neck.setSpeed(NeckSpeed-0.1)
 		head.rothead.setSpeed(RotHeadSpeed-0.1)
@@ -21,7 +21,7 @@ def MoveHead(timedata):
 		
 def MoveHeadStopped():
 
-	if IsInmoovArduino==1:
+	if IsInmoovArduino==1 and IcanMoveHeadRandom==1:
 		i01.moveHead(NeckRest,RotHeadRest)
 		HeadSide.moveTo(HeadSideRest)
 		

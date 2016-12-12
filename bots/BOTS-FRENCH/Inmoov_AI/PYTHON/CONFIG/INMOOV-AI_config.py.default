@@ -7,19 +7,21 @@ DEBUG=0
 
 myAimlFolder="inmoovai" # dossier ou se trouvent vos aiml pas d'accent svp
 
-# LANGUAGE ( FR/EN )
+# MARYTTS LANGUAGE 
 lang="FR"
-Voice="Margaux" # ryan in english
+Voice="upmc-pierre-hsmm" # french enst-dennys-hsmm / enst-camille-hsmm / upmc-jessica-hsmm / upmc-pierre-hsmm
 
-
-units="metric" # or : imperial
 
 # MouthControl / CONTROLE MACHOIRE LOGICIEL
 MRLmouthControl=0
 
+# LOADING PICTURES
+LoadingPicture=1
 
 #TYPE DE PC
 LATTEPANDA=0
+
+CameraIndex=0
 
 #ARDUINO CONFIG
 IsInmoovArduino=0
@@ -39,6 +41,7 @@ ActivatorPort="Serial1"
 ActivatorControler="left"
 BoardTypeActivator="atmega328" # atmega168 | atmega328 | atmega328p | atmega2560 | atmega1280 | atmega32u4
 defaultRingColor="bleu"
+WatchDog=0
 
 #PIN RELAIS POUR DETACHEMENT SERVOS
 LeftRelaisArm=53
@@ -65,8 +68,7 @@ ROUGE=29
 VERT=28
 BLEU=30
 
-#tracking for testing
-tracking=0
+
 
 
 
@@ -74,6 +76,7 @@ tracking=0
 
 # To fetch knowledge and send messages / inmoov messenger et apprentissage
 BotURL="http://myai.cloud/bot1.php"
+units="metric" # or : imperial
 
 # translator : https://datamarket.azure.com/dataset/bing/microsofttranslator 
 global Azure_client_id
