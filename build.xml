@@ -1,0 +1,37 @@
+<project name="ProgramAb AIML set" default="dist" basedir=".">
+  <description>
+    simple build script for ProgramAb AIML set
+  </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="build" location="build"/>
+  <property name="dist" location="dist"/>
+
+  <target name="init">
+    <!-- Create the time stamp -->
+    <tstamp/>
+    <!-- Create the build directory structure used by compile -->
+    <mkdir dir="${build}/ProgramAB"/>
+  </target>
+
+  <target name="dist" depends="init" description="generate the distribution">
+    <!-- Create the distribution directory -->
+    <mkdir dir="${dist}"/>
+
+    <!-- copy files to build/where ever then zip into dist/programab.zip -->
+    <copy todir="${build}/ProgramAB/bots">
+      <fileset dir="bots"/>
+    </copy>
+
+
+    <zip destfile="${dist}/programab.zip" basedir="${build}" encoding="UTF-8"/>
+       
+  </target>
+
+  <target name="clean" description="clean up">
+        
+    <!-- Delete the ${build} and ${dist} directory trees -->
+    <delete dir="${build}"/>
+    <delete dir="${dist}"/>
+  </target>
+</project>
