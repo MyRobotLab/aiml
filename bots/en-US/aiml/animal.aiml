@@ -9,11 +9,11 @@
   <!--  -->
   <!-- modified: Anthony Gallot -->
   <!-- Last modified: Jul 4, 2017 -->
-  <!-- This inmoovEnglish brain file is distributed WITHOUT ANY WARRANTY; without even the -->
+  <!-- This  file is distributed WITHOUT ANY WARRANTY; without even the -->
   <!-- implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. -->
   <!-- This file works with ProgramAB service with the software MyRobotLab -->
   <!-- For more information see http://www.myrobotlab.org -->
-  <!-- For more information see http://www.inmoov.fr -->
+  
   <!--  -->
 <category>
 	<pattern>SINGULAR <set>animals</set></pattern>

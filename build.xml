@@ -24,7 +24,7 @@
     </copy>
 
 
-    <zip destfile="${dist}/programab.zip" basedir="${build}" encoding="UTF-8"/>
+    <zip destfile="${dist}/program-ab-data-1.1.zip" basedir="${build}" encoding="UTF-8"/>
        
   </target>
 
